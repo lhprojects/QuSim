@@ -1,0 +1,112 @@
+\documentstyle[11pt]{article}
+
+\begin{document}
+
+\title{LaTeX Typesetting By Example}
+\author{Phil Farrell\\
+Stanford University School of Earth Sciences}
+
+\renewcommand{\today}{November 2, 1994}
+\maketitle
+
+$$
+-\hbar^2/(2m) \nabla^2 \psi = i \hbar \partial_t \psi
+$$
+
+$$
+\psi_p(x) = e^{ i/\hbar (p x - p^2 /(2m)t)}
+$$
+$$
+\Psi(x) = \int dp \phi_x(p) \psi_p(x)
+$$
+
+Note
+$$
+\int dx \psi_{p^\prime}^*(x) \psi_{p}(x) = e^{ i/\hbar ((p^{\prime2} - p^2) /(2m)t)} 2\pi\delta(1/\hbar(p-p^\prime))
+=2\pi\hbar\delta(p-p^\prime)
+$$
+
+$$
+\phi_x(p) = \frac{1}{2\pi\hbar}\int dx \psi^*_p(x) \Psi(x)
+$$
+the solution for any time:
+$$
+\Psi(x, t) = \int dp \frac{1}{2\pi\hbar}\int dy \psi^*_p(y) \Psi(y) \psi_p(x,t)
+$$
+
+$$
+\Psi(x, t) = \int dy  \Psi(y) \int dp \frac{1}{2\pi\hbar}\psi^*_p(y) \psi_p(x,t)
+$$
+
+$$
+\Psi(x, t) = \int dy  \Psi(y) \int dp \frac{1}{2\pi\hbar} e^{i(p(x-y)/\hbar - p^2 t/(2m\hbar))}
+$$
+
+$$
+T=t/(m\hbar)
+$$
+$$
+\Psi(x, t) = \int dy  \Psi(y) \frac{1}{2\pi\hbar} (1-i) e^{i (x-y)^2 / (2 T \hbar^2)}  \sqrt{\pi / T}
+$$
+
+
+For space $a$
+$$
+-\hbar^2/(2m a^2) (\psi(x+a) + \psi(x-a) - 2\psi(x)) \psi = i \hbar \partial_t \psi
+$$
+
+$$
+\psi_p(x) = e^{ i/\hbar (p x - \hbar^2(1 - \cos(a p/\hbar))/(m a^2)t)}
+$$
+
+$$
+\psi_p(x) = e^{ i/\hbar (p x - (p^2/(2m))t)}
+$$
+
+$$
+0 \le p < 2\pi / a
+$$
+
+$$
+\sum_{x_i} \psi_{p^\prime}^*(x_i) \psi_{p}(x_i) = e^{ i/\hbar (\hbar^2(1 - \cos(a p^\prime/\hbar) - \hbar^2(1 - \cos(a p/\hbar))/(m a^2)t)}
+\sum_{x_i}e^{i(p-p^\prime)x_i/\hbar} = 2\pi\delta(1/\hbar(p - p\prime))
+$$
+$$
+x_i = ai
+$$
+
+$$
+\phi_x(p) = \frac{1}{2\pi\hbar}\sum_{x_i} \psi^*_p(x_i) \Psi(x_i)
+$$
+
+$$
+\Psi(x, t) = \sum_{y_i} \Psi(y_i) \int dp \frac{1}{2\pi\hbar} e^{ ip(x-y)/\hbar - i\hbar(1 - \cos(a p/\hbar))/(m a^2)t}
+$$
+
+
+
+$$
+g(k) = \int dx f(x) \exp(ikx)
+$$
+
+$$
+f(x) = \frac{1}{2\pi}\int dk g(k) \exp(-ikx)
+$$
+
+$$
+f(x) = \sum_j \delta(x - ja)
+$$
+$$
+g(k) = \int dx \sum_j \delta(x - ja) \exp(ikx) = \sum_j \exp(ijka)
+$$
+
+$$
+f(x) = \sum_j \delta(x - ja) = \frac{1}{2\pi}\int dk g(k) \exp(-ikx)
+$$
+
+$$
+g(k) = 1/(2\pi a)\sum_n \delta(k+2\pi n/a)
+$$
+
+
+\end{document}
