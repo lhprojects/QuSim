@@ -7,18 +7,31 @@
 
 enum CalExprType {
 	CALE_UNK,
+	CALE_QUEST,
+	CALE_OROR,
+	CALE_ANDAND,
+
+	CALE_GT,
+	CALE_LT,
+	CALE_GE,
+	CALE_LE,
+	CALE_EQ,
+
 	CALE_ADD,
 	CALE_SUB,
 	CALE_MUL,
 	CALE_DIV,
-	CALE_POW,
 	CALE_NEG,
+
 	CALE_EXP,
 	CALE_SIN,
 	CALE_COS,
+	CALE_SIGN,
 	CALE_ABS,
 	CALE_SQRT,
+	CALE_POW,
 	CALE_GAUS,
+
 	CALE_CONST,
 	CALE_VARIABLE,
 };
@@ -46,6 +59,34 @@ struct CalExpr {
 	{
 
 		switch (fType) {
+		case CALE_QUEST:
+			if (fSubExprs.at(0)->Val(cal) != 0.0) {
+				return fSubExprs.at(1)->Val(cal);
+			} else {
+				return fSubExprs.at(2)->Val(cal);
+			}
+			break;
+		case CALE_ANDAND:
+			return ((fSubExprs.at(0)->Val(cal) != 0.0) && (fSubExprs.at(1)->Val(cal) != 0.0));
+			break;
+		case CALE_OROR:
+			return ((fSubExprs.at(0)->Val(cal) != 0.0) || (fSubExprs.at(1)->Val(cal) != 0.0));
+			break;
+		case CALE_GT:
+			return fSubExprs.at(0)->Val(cal).real() > fSubExprs.at(1)->Val(cal).real();
+			break;
+		case CALE_GE:
+			return fSubExprs.at(0)->Val(cal).real() >= fSubExprs.at(1)->Val(cal).real();
+			break;
+		case CALE_LT:
+			return fSubExprs.at(0)->Val(cal).real() < fSubExprs.at(1)->Val(cal).real();
+			break;
+		case CALE_LE:
+			return fSubExprs.at(0)->Val(cal).real() <= fSubExprs.at(1)->Val(cal).real();
+			break;
+		case CALE_EQ:
+			return fSubExprs.at(0)->Val(cal).real() == fSubExprs.at(1)->Val(cal).real();
+			break;
 		case CALE_ADD:
 			return fSubExprs.at(0)->Val(cal) + fSubExprs.at(1)->Val(cal);
 			break;
@@ -69,6 +110,9 @@ struct CalExpr {
 			break;
 		case CALE_COS:
 			return cos(fSubExprs.at(0)->Val(cal));
+			break;
+		case CALE_SIGN:
+			return fSubExprs.at(0)->Val(cal).real() > 0;
 			break;
 		case CALE_ABS:
 			return abs(fSubExprs.at(0)->Val(cal));
@@ -131,7 +175,7 @@ bool startWith(char const *s, char const *s1)
 	}
 	return *s1 == '\0';
 }
-CalExpr *parseAddExpr(char const *&s);
+CalExpr *parseQuestionExpr(char const *&s);
 CalExpr *parseFunc(char const *&s)
 {
 
@@ -160,7 +204,7 @@ CalExpr *parseFunc(char const *&s)
 	if (startWith(s, "(")) {
 		++s;
 		skipEmpty(s);
-		auto e = parseAddExpr(s);
+		auto e = parseQuestionExpr(s);
 		if (*s == ')') ++s;
 		else throw std::runtime_error("expect ')'");
 		skipEmpty(s);
@@ -182,6 +226,8 @@ CalExpr *parseFunc(char const *&s)
 				type = CALE_SIN;
 			} else if (name == "cos") {
 				type = CALE_COS;
+			} else if (name == "sign") {
+				type = CALE_SIGN;
 			} else if (name == "exp") {
 				type = CALE_EXP;
 			} else if (name == "abs") {
@@ -199,7 +245,7 @@ CalExpr *parseFunc(char const *&s)
 				skipEmpty(s);
 
 				skipEmpty(s);
-				auto e1 = parseAddExpr(s);
+				auto e1 = parseQuestionExpr(s);
 				if (*s == ')') ++s;
 				else throw std::runtime_error("expect ')'");
 				skipEmpty(s);
@@ -211,19 +257,19 @@ CalExpr *parseFunc(char const *&s)
 				++s;
 				skipEmpty(s);
 
-				auto e1 = parseAddExpr(s);
+				auto e1 = parseQuestionExpr(s);
 				skipEmpty(s);
 				if (*s == ',') ++s;
 				else throw std::runtime_error("expect ','");
 				skipEmpty(s);
 
-				auto e2 = parseAddExpr(s);
+				auto e2 = parseQuestionExpr(s);
 				skipEmpty(s);
 				if (*s == ',') ++s;
 				else throw std::runtime_error("expect ','");
 				skipEmpty(s);
 
-				auto e3 = parseAddExpr(s);
+				auto e3 = parseQuestionExpr(s);
 				if (*s == ')') ++s;
 				else throw std::runtime_error("expect ')'");
 				skipEmpty(s);
@@ -305,10 +351,112 @@ CalExpr *parseAddExpr(char const *&s)
 	return e1;
 }
 
+
+CalExpr *parseCmpExpr(char const *&s)
+{
+	auto e1 = parseAddExpr(s);
+	for (;;) {
+
+		char const *ss = s;
+		if (startWith(s, "<") || startWith(s, "<=") ||
+			startWith(s, ">") || startWith(s, ">=") ||
+			startWith(s, "==")) {
+			
+			if (startWith(ss, "<=") || startWith(ss, ">=") || startWith(ss, ">=")) s += 2;
+			else s += 1;
+
+			skipEmpty(s);
+			auto e2 = parseAddExpr(s);
+			if (startWith(ss, "<=")) {
+				e1 = new CalExpr(CALE_LE, { e1, e2 });
+			} else if (startWith(ss, ">=")) {
+				e1 = new CalExpr(CALE_GE, { e1, e2 });
+			} else if (startWith(ss, "==")) {
+				e1 = new CalExpr(CALE_EQ, { e1, e2 });
+			} else if (startWith(ss, "<")) {
+				e1 = new CalExpr(CALE_LT, { e1, e2 });
+			} else if (startWith(ss, ">")) {
+				e1 = new CalExpr(CALE_GT, { e1, e2 });
+			}
+		} else {
+			break;
+		}
+	}
+
+	return e1;
+
+}
+
+CalExpr *parseAndAndExpr(char const *&s)
+{
+	auto e1 = parseCmpExpr(s);
+	for (;;) {
+
+		char c = *s;
+		if (startWith(s, "&&")) {
+			s += 2;
+			skipEmpty(s);
+			auto e2 = parseCmpExpr(s);
+			e1 = new CalExpr(CALE_ANDAND, { e1, e2 });
+		} else {
+			break;
+		}
+	}
+
+	return e1;
+
+}
+
+CalExpr *parseOrOrExpr(char const *&s)
+{
+	auto e1 = parseAndAndExpr(s);
+	for (;;) {
+
+		if (startWith(s, "||")) {
+			s += 2;
+			skipEmpty(s);
+			auto e2 = parseAndAndExpr(s);
+			e1 = new CalExpr(CALE_OROR, { e1, e2 });
+		} else {
+			break;
+		}
+	}
+
+	return e1;
+
+}
+
+CalExpr *parseQuestionExpr(char const *&s)
+{
+	auto e1 = parseOrOrExpr(s);
+	for (;;) {
+
+		if (startWith(s, "?")) {
+			s += 1;
+			skipEmpty(s);
+
+			auto e2 = parseQuestionExpr(s);
+
+			if (*s != ':') throw std::runtime_error("expect ':'");
+			s += 1;
+			skipEmpty(s);
+
+			auto e3 = parseOrOrExpr(s);
+			skipEmpty(s);
+
+			e1 = new CalExpr(CALE_QUEST, { e1, e2, e3 });
+		} else {
+			break;
+		}
+	}
+
+	return e1;
+}
+
 CalExpr *parseExpr(char const *s)
 {
 	skipEmpty(s);
-	auto e =  parseAddExpr(s);
+	auto e = parseQuestionExpr(s);
 	if (*s != '\0') {
 		throw std::runtime_error("expect end of file");
 	}

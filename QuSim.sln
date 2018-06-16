@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27428.2043
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSim", "QuSim\QuSim.vcxproj", "{A9622653-D042-47BB-96D6-30AAAE17D219}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimTest", "QuSimTest\QuSimTest.vcxproj", "{9F3E805E-2EDF-4033-AFF3-7673A80C4C14}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{A9622653-D042-47BB-96D6-30AAAE17D219}.Release|x64.Build.0 = Release|x64
 		{A9622653-D042-47BB-96D6-30AAAE17D219}.Release|x86.ActiveCfg = Release|Win32
 		{A9622653-D042-47BB-96D6-30AAAE17D219}.Release|x86.Build.0 = Release|Win32
+		{9F3E805E-2EDF-4033-AFF3-7673A80C4C14}.Debug|x64.ActiveCfg = Debug|x64
+		{9F3E805E-2EDF-4033-AFF3-7673A80C4C14}.Debug|x64.Build.0 = Debug|x64
+		{9F3E805E-2EDF-4033-AFF3-7673A80C4C14}.Debug|x86.ActiveCfg = Debug|Win32
+		{9F3E805E-2EDF-4033-AFF3-7673A80C4C14}.Debug|x86.Build.0 = Debug|Win32
+		{9F3E805E-2EDF-4033-AFF3-7673A80C4C14}.Release|x64.ActiveCfg = Release|x64
+		{9F3E805E-2EDF-4033-AFF3-7673A80C4C14}.Release|x64.Build.0 = Release|x64
+		{9F3E805E-2EDF-4033-AFF3-7673A80C4C14}.Release|x86.ActiveCfg = Release|Win32
+		{9F3E805E-2EDF-4033-AFF3-7673A80C4C14}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

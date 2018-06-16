@@ -4,8 +4,50 @@
 void testCal()
 {
 	{
+		Cal cal(" 1");
+		assert(abs(cal.Val().real() - 1) < 0.001);
+	}
+	{
 		Cal cal(" -1");
 		assert(abs(cal.Val().real() - -1) < 0.001);
+	}
+
+	{
+		Cal cal(" 1 ? 2 : 3");
+		assert(abs(cal.Val().real() - 2) < 0.001);
+	}
+	{
+		Cal cal(" 0 ? 2 : 3");
+		assert(abs(cal.Val().real() - 3) < 0.001);
+	}
+	{
+		Cal cal(" 1 && 1");
+		assert(abs(cal.Val().real() - 1) < 0.001);
+	}
+	{
+		Cal cal(" 1 && 0");
+		assert(abs(cal.Val().real() - 0) < 0.001);
+	}
+	{
+		Cal cal(" 1 || 1");
+		assert(abs(cal.Val().real() - 1) < 0.001);
+	}
+	{
+		Cal cal(" 1 || 0");
+		assert(abs(cal.Val().real() - 1) < 0.001);
+	}
+	{
+		Cal cal(" 0 || 0");
+		assert(abs(cal.Val().real() - 0) < 0.001);
+	}
+
+	{
+		Cal cal(" 0 || 1 ? 2 : 3");
+		assert(abs(cal.Val().real() - 2) < 0.001);
+	}
+	{
+		Cal cal(" 0 && 1 ? 2 : 3");
+		assert(abs(cal.Val().real() - 3) < 0.001);
 	}
 	{
 		Cal cal(" 1+2*3^4");

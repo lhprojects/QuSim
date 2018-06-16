@@ -15,53 +15,34 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="header.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="QuSim.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\qsim\Cal.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\qsim\kissfft.hh">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\qsim\erfz.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="QuSim.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\qsim\Cal.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\TestCal.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\qsim\System.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\TestCal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="QuSim.rc">
-      <Filter>资源文件</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="small.ico">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="QuSim.ico">
-      <Filter>资源文件</Filter>
-    </Image>
+    <ClInclude Include="..\qsim\Cal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\erfz.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\kissfft.hh">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\System.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\AdptiveSimpsonQuadrature.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

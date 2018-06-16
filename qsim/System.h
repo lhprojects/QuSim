@@ -1,9 +1,5 @@
 #pragma once
 
-
-
-#include "erfz.h"
-#include "Cal.h"
 #include <vector>
 #include <complex>
 #include <cmath>
@@ -25,26 +21,40 @@ inline Real abs2(Complex const &c)
 	return real(c)*real(c) + imag(c)*imag(c);
 }
 
+enum class BoundaryCondition {
+	InfiniteWall,
+	Period,
+	ExtendInfinity,
+};
+
 struct System {
 
 
-	Int fStep;
 	Real fDt;
 	Real fMass;
 	Real fHbar;
-	Real fDx;
-	Real fX0;
-	size_t fN;
+
+	BoundaryCondition fBoundaryCondition;
 	std::string fVStr;
+	Real fX0;
+	Real fDx;
+	size_t fN;
+
 	std::string fPsiStr;
 	bool fFN;
+
+	std::vector<Real> fV;
+
+	// extend infinity only
+	std::vector<Complex> fProp;
+	// period only
+	std::vector<Complex> fFTPsi;
+
+	Int fStep;
 	std::vector<Complex> fPsi;
 	std::vector<Complex> fVPsi;
 	std::vector<Complex> fTVPsi;
 	std::vector<Complex> fVTVPsi;
-
-	std::vector<Complex> fProp;
-	std::vector<Real> fV;
 
 	System()
 	{
@@ -55,78 +65,14 @@ struct System {
 		return fDx * i + fX0;
 	}
 
-	void init(char const *psis, bool fn, Real dt, Real x0, Real x1, char const *vs, size_t n, Real mass, Real hbar = 1)
-	{
-		testCal();
-
-		fStep = 0;
-		fPsiStr = psis;
-		fVStr = vs;
-		fFN = fn;
-		fDt = dt;
-		fDx = (x1 - x0) / n;
-		fX0 = x0;
-		fN = n;
-		fMass = mass;
-		fHbar = hbar;
-		fPsi.resize(n);
-		fVPsi.resize(n);
-		fTVPsi.resize(n);
-		fVTVPsi.resize(n);
-
-		fProp.resize(n);
-		fV.resize(n);
-		initPsi();
-		initPotential();
-		initFreeParticleProp();
-	}
+	void init(char const *psi, bool fn, Real dt,
+		char const *vs, Real x0, Real x1, size_t n, BoundaryCondition b,
+		Real mass, Real hbar = 1);
 
 
-	void initPsi()
-	{
-		Cal cal(fPsiStr.c_str());
-		for (size_t i = 0; i < fN; ++i) {
-			Real x = getX(i);
-			cal.SetVarVal("x", Complex(x));
-			Complex com = cal.Val();
-			fPsi[i] = com;
-		}
-		if (fFN) {
-			Real n = 1 / Norm();
-			for (size_t i = 0; i < fN; ++i) {
-				fPsi[i] *= n;
-			}
-		}
-	}
-
-	void initPotential()
-	{
-		Cal cal(fVStr.c_str());
-		for (size_t i = 0; i < fN; ++i) {
-			Real x = getX(i);
-			cal.SetVarVal("x", Complex(x));
-			Complex com = cal.Val();
-			fV[i] = abs(com);
-		}
-	}
-
-	void initFreeParticleProp()
-	{
-		for (size_t i = 0; i < fN; ++i) {
-			double T = fHbar / fMass * fDt;
-			double x = i * fDx;
-			double K = 2 * Pi / fDx;
-			Complex a1 = 0.25*(1.0 + I)*(K*T - 2 * x) / sqrt(T);
-			Complex a2 = 0.25*(1.0 + I)*(K*T + 2 * x) / sqrt(T);
-			Complex corr = 0.5 *(erfz(a1) + erfz(a2));
-			fProp[i] = 0.5*(1.0 - I)*exp(0.5*x*x / T * I) / sqrt(Pi*T)*corr*fDx;
-		}
-		double sum = 0;
-		for (size_t i = 0; i < fN; ++i) {
-			sum += (i != 0 ? 2 : 1) * abs(fProp[i])*abs(fProp[i]);
-		}
-		//printf("prop %.20lf\n", sum);
-	}
+	void initPsi();
+	void initPotential();
+	void initFreeParticleProp();
 
 	// vpsi = exp(-i/hbar V Dt) psi
 	void ExpV(PsiVector &vpsi, PsiVector const &psi, double t)
@@ -137,20 +83,19 @@ struct System {
 		}
 	}
 
-	void ExpT(PsiVector &tpsi, PsiVector const &psi)
-	{
-		Zero(tpsi);
-		for (size_t i = 0; i < fN; ++i) {
-			for (size_t j = 0; j < fN; ++j) {
-				tpsi[i] += psi[j] * fProp[(size_t)abs((Int)i - (Int)j)];
-			}
-		}
-	}
+	void ExpT(PsiVector &tpsi, PsiVector const &psi);
 
 	void Zero(PsiVector &psi)
 	{
 		for (size_t i = 0; i < fN; ++i) {
 			psi[i] = 0.;
+		}
+	}
+
+	void Scale(PsiVector &psi, Complex const &c)
+	{
+		for (size_t i = 0; i < fN; ++i) {
+			psi[i] = psi[i] * c;
 		}
 	}
 
@@ -168,26 +113,7 @@ struct System {
 		}
 	}
 
-	void step()
-	{
-		// exp( (h1+h2£©t) ~ 1 + h1 t + h2 t + 0.5 (h1 + h2 + h1 h2 + h2 h1) t^2
-		// exp( h1 t) ~ 1 + h1 t + 0.5 (h1 t)^2
-		// exp( h2 t) ~ 1 + h2 t + 0.5 (h2 t)^2
-		// exp( 0.5 h1 t) exp( h2 t) exp( 0.5 h1 t) 
-		// ~ 1 + h1 t + h2 t + 0.5 (0.5 h1 t)^2 + 0.5 (h2 t)^2 + 0.5 (0.5 h1 t)^2 
-		//   + 0.5 h1 h2 t^2 + 0.5 h2 h1 t^2 + ( 0.5  h1 t)^2
-		// =  1 + h1 t + h2 t + 0.5 (h1 t)^2 + 0.5 (h2 t)^2 + 0.5 (h1 h2 + h2 h1)t^2 
-		// ~ exp( (h1 + h2)t)
-
-
-		ExpV(fVPsi, fPsi, 0.5);
-		ExpT(fTVPsi, fVPsi);
-		//Copy(fTVPsi, fVPsi);
-		ExpV(fVTVPsi, fTVPsi, 0.5);
-		Copy(fPsi, fVTVPsi);
-
-		++fStep;
-	}
+	void step();
 
 	Real Time()
 	{
@@ -220,18 +146,43 @@ struct System {
 		return norm2 / Norm2();
 	}
 
-	Real Norm2()
+	Real Norm2(PsiVector const &psi)
 	{
 		Real norm2 = 0;
 		for (size_t i = 0; i < fN; ++i) {
-			norm2 += abs2(fPsi[i])*fDx;
+			norm2 += abs2(psi[i])*fDx;
 		}
 		return norm2;
 	}
 
-	Real Norm()
+	Real Norm2()
 	{
-		return sqrt(Norm2());
+		return Norm2(fPsi);
+	}
+
+
+	Real NormLeft()
+	{
+		Real norm2 = 0;
+		for (size_t i = 0; i < fN/2; ++i) {
+			norm2 += abs2(fPsi[i])*fDx;
+		}
+		if (fN % 2) {
+			norm2 += 0.5*abs2(fPsi[fN/2])*fDx;
+		}
+		return norm2;
+	}
+
+	Real NormRight()
+	{
+		Real norm2 = 0;
+		for (size_t i = (fN+1)/2; i < fN; ++i) {
+			norm2 += abs2(fPsi[i])*fDx;
+		}
+		if (fN % 2) {
+			norm2 += 0.5*abs2(fPsi[fN / 2])*fDx;
+		}
+		return norm2;
 	}
 
 };
