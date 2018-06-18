@@ -71,7 +71,6 @@ void testCal()
 	{
 		Cal cal(" sqrt(4)");
 		assert(abs(cal.Val().real() - 2) < 0.001);
-
 	}
 	{
 		Cal cal(" 1 + 1 ");

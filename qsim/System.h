@@ -49,8 +49,17 @@ struct System {
 	std::vector<Complex> fProp;
 	// period only
 	std::vector<Complex> fFTPsi;
+	// extend 2
+	std::vector<Complex> f2Psi;
+	std::vector<Complex> fFT2Psi;
+	// infinite wall
+	std::vector<Complex> fIWPsi;
+	std::vector<Complex> fIWKPsi;
+
 
 	Int fStep;
+	std::vector<Complex> fLastLastPsi;
+	std::vector<Complex> fLastPsi;
 	std::vector<Complex> fPsi;
 	std::vector<Complex> fVPsi;
 	std::vector<Complex> fTVPsi;
@@ -65,7 +74,7 @@ struct System {
 		return fDx * i + fX0;
 	}
 
-	void init(char const *psi, bool fn, Real dt,
+	void init(char const *psi, bool force_normalization, Real dt,
 		char const *vs, Real x0, Real x1, size_t n, BoundaryCondition b,
 		Real mass, Real hbar = 1);
 
@@ -119,6 +128,7 @@ struct System {
 	{
 		return fStep * fDt;
 	}
+
 	Real Xavg()
 	{
 		Real norm2 = 0;
@@ -132,24 +142,19 @@ struct System {
 	{
 		Real norm2 = 0;
 		for (size_t i = 0; i < fN; ++i) {
-			norm2 += abs(fPsi[i])*abs(fPsi[i])*fV[i];
+			norm2 += abs2(fPsi[i])*fV[i]*fDx;
 		}
 		return norm2 / Norm2();
 	}
 
-	Real KinEn()
-	{
-		Real norm2 = 0;
-		for (size_t i = 1; i < fN - 1; ++i) {
-			norm2 += abs((fPsi[i - 1] / fPsi[i] + fPsi[i + 1] / fPsi[i] - 2.0)*fHbar / (2 * fMass));
-		}
-		return norm2 / Norm2();
-	}
+	Real KinEn();
+
+	Real EnPartialT();
 
 	Real Norm2(PsiVector const &psi)
 	{
 		Real norm2 = 0;
-		for (size_t i = 0; i < fN; ++i) {
+		for (size_t i = 0; i < psi.size(); ++i) {
 			norm2 += abs2(psi[i])*fDx;
 		}
 		return norm2;

@@ -109,4 +109,89 @@ g(k) = 1/(2\pi a)\sum_n \delta(k+2\pi n/a)
 $$
 
 
+\section{Infinite Wall}
+
+Eigen state
+$$
+\psi_k(j) = \sin(jk\pi/N)
+$$
+
+$$
+j=0..N-1
+$$
+
+$$
+k=1...N-1
+$$
+
+Eigen value
+$$
+E_k = k\pi/(N a)
+$$
+
+$$
+\sum_j \psi_j(k)\psi_j(k) = N/2
+$$
+
+$$
+\Psi(j) = \sum_{k=1}^{N-1} \Phi(k) \psi_k(j)
+$$
+
+$$
+\Phi(k) = (2/N) \sum_j \Psi(j) \psi_k(j)
+$$
+
+$$
+\Phi(k) = (2/N) \sum_j \Psi(j) \sin(jk\pi/N)
+$$
+
+$$
+\Phi(k) = (1/(Ni)) \sum_j \Psi(j) (\exp(ijk\pi/N) - \exp(-ijk\pi/N))
+$$
+
+$$
+\Phi(k) = (1/(Ni)) \sum_j \Psi(j) (\exp(ijk2\pi/2N) - \exp(i(2N-j)k2\pi/2N))
+$$
+
+$$
+\Phi(k) = \frac{1}{Ni}\left(\sum_j^{N-1} \Psi(j)\exp(ijk2\pi/2N) - \sum_{N+1}^{2N} \Psi(2N-j)\exp(jk2\pi/2N))\right)
+$$
+
+by define
+$$
+\Phi(N)=0
+$$
+
+$$
+\Phi(k) = \frac{1}{Ni}\left(\sum_j^{N-1} \Psi(j)\exp(ijk2\pi/2N) - \sum_{j=N}^{2N-1} \Psi(2N-j)\exp(ijk2\pi/2N))\right)
+$$
+
+$$
+\Phi(k) = \frac{1}{Ni}\left(\sum_{j=0}^{2N-1} \Psi^\prime(j)\exp(ijk2\pi/2N)\right)
+$$
+
+$$
+\Psi^\prime(j) = \Psi(j) (j \le N-1)
+$$
+$$
+\Psi^\prime(j) = 0 (j = N)
+$$
+$$
+\Psi^\prime(j) = -\Psi(2N-j) (j > N)
+$$
+
+$$
+\Phi(k) = \frac{1}{Ni} {\rm inv fft}(2N, \Psi^\prime(j), k)
+$$
+
+
+$$
+\Psi(j) = \sum_{k=1}^{N-1} \Phi(k) \sin(jk\pi/N)
+$$
+
+$$
+\Psi(j) = \frac{1}{2i} {\rm inv fft}(2N, \Phi^\prime(k), j)
+$$
+
+
 \end{document}

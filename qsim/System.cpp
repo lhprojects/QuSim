@@ -3,11 +3,30 @@
 #include "System.h"
 #include "erfz.h"
 #include "Cal.h"
+
 #include "kissfft.hh"
 
 using std::abs;
 
-void System::init(char const *psi, bool fn, Real dt,
+void dump(PsiVector const &v, char const *fn)
+{
+	FILE *f = fopen(fn," w");
+	for (auto &x : v) {
+		fprintf(f, "(% .20lf, % .20lf)\n", x.real(), x.imag());
+	}
+	fclose(f);
+};
+
+void dump(std::vector<Real> const &v, char const *fn)
+{
+	FILE *f = fopen(fn, " w");
+	for (auto &x : v) {
+		fprintf(f, "% .20lf\n", x);
+	}
+	fclose(f);
+};
+
+void System::init(char const *psi, bool force_normalization, Real dt,
 	char const *vs, Real x0, Real x1, size_t n, BoundaryCondition b,
 	Real mass, Real hbar)
 {
@@ -15,11 +34,11 @@ void System::init(char const *psi, bool fn, Real dt,
 
 	fStep = 0;
 
-	fFN = fn;
+	fFN = force_normalization;
 	fPsiStr = psi;
 
 	fX0 = x0;
-	fDx = (x1 - x0) / (n - 1);
+	fDx = (x1 - x0) / n;
 	fN = n;
 	fVStr = vs;
 	fBoundaryCondition = b;
@@ -35,12 +54,17 @@ void System::init(char const *psi, bool fn, Real dt,
 
 	fV.resize(n);
 	initPsi();
+	fLastLastPsi = fPsi;
+	fLastPsi = fPsi;
 	initPotential();
 
 	if (fBoundaryCondition == BoundaryCondition::ExtendInfinity) {
 		initFreeParticleProp();
 	} else if (fBoundaryCondition == BoundaryCondition::Period) {
 		fFTPsi.resize(n);
+	} else if (fBoundaryCondition == BoundaryCondition::InfiniteWall) {
+		fIWPsi.resize(2 * n);
+		fIWKPsi.resize(2 * n);
 	}
 }
 
@@ -53,12 +77,14 @@ void System::initPsi()
 		Complex com = cal.Val();
 		fPsi[i] = com;
 	}
+
 	if (fFN) {
 		Real n = 1 / sqrt(Norm2());
 		for (size_t i = 0; i < fN; ++i) {
 			fPsi[i] *= n;
 		}
 	}
+	dump(fPsi, "psi.txt");
 }
 
 void System::initPotential()
@@ -70,6 +96,7 @@ void System::initPotential()
 		Complex com = cal.Val();
 		fV[i] = abs(com);
 	}
+	//dump(fV, "V.txt");
 }
 
 void System::initFreeParticleProp()
@@ -104,10 +131,15 @@ void System::ExpT(PsiVector &tpsi, PsiVector const &psi)
 		}
 	} else if (fBoundaryCondition == BoundaryCondition::Period) {
 		//Zero(fFTPsi);
+
 		kissfft<Real> fft(fN, false);
 		kissfft<Real> inv_fft(fN, true);
+		//kiss_fft_cfg kiss_cfg =  kiss_fft_alloc(fN, false, NULL, NULL);
+		//kiss_fft_cfg kiss_cfg_inv = kiss_fft_alloc(fN, true, NULL, NULL);
 
-		fft.transform(fPsi.data(), fFTPsi.data());
+		fft.transform(psi.data(), fFTPsi.data());
+		//kiss_fft(kiss_cfg, (kiss_fft_cpx*)psi.data(), (kiss_fft_cpx*)fFTPsi.data());
+
 		Scale(fFTPsi, 1.0 / sqrt(1.0*fN));
 
 
@@ -131,8 +163,54 @@ void System::ExpT(PsiVector &tpsi, PsiVector const &psi)
 		}
 
 		inv_fft.transform(fFTPsi.data(), tpsi.data());
+		//kiss_fft(kiss_cfg_inv, (kiss_fft_cpx*)fFTPsi.data(), (kiss_fft_cpx*)tpsi.data());
+
 		Scale(tpsi, 1.0 / sqrt(1.0*fN));
 
+		//free(kiss_cfg);
+		//free(kiss_cfg_inv);
+
+
+	} else if (fBoundaryCondition == BoundaryCondition::InfiniteWall) {
+	
+		kissfft<Real> inv_fft(2*fN, true);
+		//kiss_fft_cfg kiss_cfg_inv = kiss_fft_alloc(2*fN, true, NULL, NULL);
+
+		std::copy(psi.begin(), psi.end(), fIWPsi.begin());
+		fIWPsi[0] = 0;
+		fIWPsi[fN] = 0;
+		for (size_t i = fN + 1; i < 2 * fN; ++i) {
+			fIWPsi[i] = -fIWPsi[2*fN - i];
+		}
+
+		inv_fft.transform(fIWPsi.data(), fIWKPsi.data());
+		//kiss_fft(kiss_cfg_inv, (kiss_fft_cpx*)fIWPsi.data(), (kiss_fft_cpx*)fIWKPsi.data());
+
+		Scale(fIWKPsi, 1.0/(1.0*fN*I));
+
+		for (size_t i = 0; i < fN; ++i) {
+			Real k = i * Pi / (fDx * fN);
+#if 0
+			Real s = sin(0.5 * k * fDx);
+			Real t = fHbar * (2 * s*s / (fDx*fDx)) / fMass;
+#else
+			Real t = fHbar * k*k / (2 * fMass);
+#endif
+			Complex f = exp(-I * (t * fDt));
+			fIWKPsi[i] *= f;
+		}
+		fIWKPsi[0] = 0;
+		fIWKPsi[fN] = 0;
+		for (size_t i = fN + 1; i < 2 * fN; ++i) {
+			fIWKPsi[i] = -fIWKPsi[2 * fN - i];
+		}
+
+		inv_fft.transform(fIWKPsi.data(), fIWPsi.data());
+		//kiss_fft(kiss_cfg_inv, (kiss_fft_cpx*)fIWKPsi.data(), (kiss_fft_cpx*)fIWPsi.data());
+
+		Scale(fIWPsi, 1.0 / (2.0 * I));
+		std::copy(fIWPsi.begin(), fIWPsi.begin() + fN, tpsi.begin());
+		
 	}
 }
 
@@ -147,8 +225,8 @@ void System::step()
 	// =  1 + h1 t + h2 t + 0.5 (h1 t)^2 + 0.5 (h2 t)^2 + 0.5 (h1 h2 + h2 h1)t^2 
 	// ~ exp( (h1 + h2)t)
 
-	
-
+	fLastLastPsi = fLastPsi;
+	fLastPsi = fPsi;
 	ExpV(fVPsi, fPsi, 0.5);
 	ExpT(fTVPsi, fVPsi);
 	//Copy(fTVPsi, fVPsi);
@@ -157,4 +235,77 @@ void System::step()
 	Copy(fPsi, fVTVPsi);
 
 	++fStep;
+}
+
+Real System::KinEn()
+{
+	if (fBoundaryCondition == BoundaryCondition::ExtendInfinity) {
+		return 0;
+	} else if (fBoundaryCondition == BoundaryCondition::Period) {
+		//Zero(fFTPsi);
+
+		kissfft<Real> fft(fN, false);
+		//kiss_fft_cfg kiss_cfg = kiss_fft_alloc(fN, false, NULL, NULL);
+
+		fft.transform(fPsi.data(), fFTPsi.data());
+		//kiss_fft(kiss_cfg, (kiss_fft_cpx*)fPsi.data(), (kiss_fft_cpx*)fFTPsi.data());
+
+		Real kinen = 0;
+		Real norm2 = 0;
+		for (size_t i = 0; i < fN; ++i) {
+			size_t j = i > fN / 2 ? fN - i : i;
+			Real p = fHbar * j * 2 * Pi / (fDx * fN);
+#if 0
+			Real s = sin(0.5 * k * fDx);
+			Real t = fHbar * (2 * s*s / (fDx*fDx)) / fMass;
+#else
+			Real t = p*p / (2 * fMass);
+#endif
+			kinen += abs2(fFTPsi[i]) * t;
+			norm2 += abs2(fFTPsi[i]);
+		}
+		return kinen / norm2;
+
+
+	} else if (fBoundaryCondition == BoundaryCondition::InfiniteWall) {
+
+		kissfft<Real> inv_fft(2 * fN, true);
+
+		std::copy(fPsi.begin(), fPsi.end(), fIWPsi.begin());
+		fIWPsi[0] = 0;
+		fIWPsi[fN] = 0;
+		for (size_t i = fN + 1; i < 2 * fN; ++i) {
+			fIWPsi[i] = -fIWPsi[2 * fN - i];
+		}
+
+		inv_fft.transform(fIWPsi.data(), fIWKPsi.data());
+
+
+		Real kinen = 0;
+		Real norm2 = 0;
+
+		for (size_t i = 0; i < fN; ++i) {
+			Real p = fHbar * i * Pi / (fDx * fN);
+#if 0
+			Real s = sin(0.5 * k * fDx);
+			Real t = fHbar * (2 * s*s / (fDx*fDx)) / fMass;
+#else
+			Real t = p*p / (2 * fMass);
+#endif
+			kinen += abs2(fIWKPsi[i]) * t;
+			norm2 += abs2(fIWKPsi[i]);
+		}
+		return kinen / norm2;
+
+	}
+	return 0;
+}
+
+Real System::EnPartialT()
+{
+	Complex en = 0;
+	for (size_t i = 0; i < fN; ++i) {
+		en += I*fHbar*conj(fPsi[i])*(fPsi[i] - fLastLastPsi[i])/(2*fDt)*fDx;
+	}
+	return en.real();
 }
