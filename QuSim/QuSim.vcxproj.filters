@@ -50,9 +50,6 @@
     <ClCompile Include="..\qsim\System.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\qsim\double_kiss_fft.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="QuSim.rc">
