@@ -30,7 +30,9 @@ enum class BoundaryCondition {
 struct System {
 
 
-	Real fDt;
+	Complex fDt;
+	bool fFNES;
+
 	Real fMass;
 	Real fHbar;
 
@@ -74,7 +76,8 @@ struct System {
 		return fDx * i + fX0;
 	}
 
-	void init(char const *psi, bool force_normalization, Real dt,
+	void init(char const *psi, bool force_normalization,
+		Complex dt, bool force_normalization_each_step,
 		char const *vs, Real x0, Real x1, size_t n, BoundaryCondition b,
 		Real mass, Real hbar = 1);
 
@@ -86,7 +89,7 @@ struct System {
 	// vpsi = exp(-i/hbar V Dt) psi
 	void ExpV(PsiVector &vpsi, PsiVector const &psi, double t)
 	{
-		Real f = -1.0 / fHbar * fDt * t;
+		Complex f = -1.0 / fHbar * fDt * t;
 		for (size_t i = 0; i < fN; ++i) {
 			vpsi[i] = psi[i] * exp(f*fV[i] * I);
 		}
@@ -102,6 +105,13 @@ struct System {
 	}
 
 	void Scale(PsiVector &psi, Complex const &c)
+	{
+		for (size_t i = 0; i < fN; ++i) {
+			psi[i] = psi[i] * c;
+		}
+	}
+
+	void Scale(PsiVector &psi, double c)
 	{
 		for (size_t i = 0; i < fN; ++i) {
 			psi[i] = psi[i] * c;
@@ -126,7 +136,7 @@ struct System {
 
 	Real Time()
 	{
-		return fStep * fDt;
+		return fStep * abs(fDt);
 	}
 
 	Real Xavg()

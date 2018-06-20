@@ -26,7 +26,8 @@ void dump(std::vector<Real> const &v, char const *fn)
 	fclose(f);
 };
 
-void System::init(char const *psi, bool force_normalization, Real dt,
+void System::init(char const *psi, bool force_normalization,
+	Complex dt, bool force_normalization_each_step,
 	char const *vs, Real x0, Real x1, size_t n, BoundaryCondition b,
 	Real mass, Real hbar)
 {
@@ -44,6 +45,7 @@ void System::init(char const *psi, bool force_normalization, Real dt,
 	fBoundaryCondition = b;
 
 	fDt = dt;
+	fFNES = force_normalization_each_step;
 	fMass = mass;
 	fHbar = hbar;
 
@@ -79,10 +81,7 @@ void System::initPsi()
 	}
 
 	if (fFN) {
-		Real n = 1 / sqrt(Norm2());
-		for (size_t i = 0; i < fN; ++i) {
-			fPsi[i] *= n;
-		}
+		Scale(fPsi, 1 / sqrt(Norm2()));
 	}
 	dump(fPsi, "psi.txt");
 }
@@ -94,7 +93,7 @@ void System::initPotential()
 		Real x = getX(i);
 		cal.SetVarVal("x", Complex(x));
 		Complex com = cal.Val();
-		fV[i] = abs(com);
+		fV[i] = com.real();
 	}
 	//dump(fV, "V.txt");
 }
@@ -103,7 +102,7 @@ void System::initFreeParticleProp()
 {
 	fProp.resize(fN);
 	for (size_t i = 0; i < fN; ++i) {
-		double T = fHbar / fMass * fDt;
+		Complex T = fHbar / fMass * fDt;
 		double x = i * fDx;
 		double K = 2 * Pi / fDx;
 		Complex a1 = 0.25*(1.0 + I)*(K*T - 2 * x) / sqrt(T);
@@ -233,6 +232,9 @@ void System::step()
 	ExpV(fVTVPsi, fTVPsi, 0.5);
 
 	Copy(fPsi, fVTVPsi);
+	if (fFNES) {
+		Scale(fPsi, 1.0 / sqrt(Norm2()));
+	}
 
 	++fStep;
 }
@@ -305,7 +307,7 @@ Real System::EnPartialT()
 {
 	Complex en = 0;
 	for (size_t i = 0; i < fN; ++i) {
-		en += I*fHbar*conj(fPsi[i])*(fPsi[i] - fLastLastPsi[i])/(2*fDt)*fDx;
+		en += I*fHbar*conj(fPsi[i])*(fPsi[i] - fLastLastPsi[i])/(2.0*fDt)*fDx;
 	}
 	return en.real();
 }
