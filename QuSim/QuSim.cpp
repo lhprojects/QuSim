@@ -1055,13 +1055,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						}
 					} else {
 						messager.SetWhat(WhatToDo::Run);
+						messager.GetWhatNotify();
 					}
-					messager.GetWhatNotify();
 					SendMessage(hRun, WM_SETTEXT, 0, (LPARAM)TEXT("Pause"));
 					if (gui.runningState == STATE_STOPPED) {
 						gui.showRunning = true;
 						enableAllWindows(false);
 						EnableWindow(hStop, true);
+						UpdateWindow(hWnd);
 					}
 					gui.runningState = STATE_RUNNING;
 
