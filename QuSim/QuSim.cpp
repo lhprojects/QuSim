@@ -373,13 +373,47 @@ void DrawPotential(Gdiplus::Graphics &graphics,
 	auto it = std::minmax_element(V.begin(), V.end());
 	Real vmin = *it.first;
 	Real vmax = *it.second;
-	vmax = 1.5*max(abs(vmin), abs(vmax));
+	vmax = 1.1*max(abs(vmin), abs(vmax));
 
+	// draw potential axis
+	Real axis_max = 0;
+	Real vmax_log10 = log10(vmax);
+	Real int_vmax_log10 = floor(vmax_log10);
+	Real remain = vmax_log10 - int_vmax_log10;
+	if (remain > log10(5)) {
+		axis_max = pow(10, int_vmax_log10 + 1);
+	} else {
+		axis_max = 5 * pow(10, int_vmax_log10);
+	}
+
+	Pen      black_pen(Color(255, 0, 0, 0));
+	Font myFont(L"Courier New", 14);
+	StringFormat format;
+	format.SetAlignment(StringAlignmentNear);
+	SolidBrush blackBrush(Color(255, 0, 0, 0));
+
+	for (int i = -10; i <= 10; ++i) {
+		Point b, e;
+		
+		b.X = w - 10;
+		e.X = w;
+		b.Y = e.Y = (int)((-1.0*i/20+0.5)*h);
+		graphics.DrawLine(&black_pen, b, e);
+
+		wchar_t bf[100];
+		swprintf(bf, 100, L"% 5g", (double)(i/10.0*axis_max));
+		PointF layoutRect(b.X - 100, b.Y - 10);
+
+		graphics.DrawString(bf, lstrlenW(bf), &myFont, layoutRect, &blackBrush);
+	}
+
+
+	// draw potential lines
 	for (int i = 0; i < w; i += 1) {
 		int xi = (int)(1.0 * i / w * (V.size() - 1));
 		int v = 0;
 		if (vmax != 0) {
-			v = (int)(-V[xi] / vmax * h / 2 + h / 2);
+			v = (int)(-V[xi] / axis_max * h / 2 + h / 2);
 		}
 		vc.push_back(Point(i, v));
 	}
@@ -387,6 +421,7 @@ void DrawPotential(Gdiplus::Graphics &graphics,
 	Pen      pen4(Color(255, 0, 255, 0));
 	graphics.DrawLines(&pen4, vc.data(), vc.size());
 
+	exp(Complex(0, 1));
 }
 
 void DrawPsi(Gdiplus::Graphics &graphics,
@@ -667,10 +702,11 @@ VOID OnPaint(HDC hdc, long left, long top, long w, long h)
 	Bitmap bitmap(w, h);
 	Gdiplus::Graphics graphics(&bitmap);
 
+	graphics.TranslateTransform(0, 15);
 	if (gui.showRunning) {
-		OnPaint1(graphics, left, top, w, h);
+		OnPaint1(graphics, left, top, w, h - 30);
 	} else {
-		OnPaint2(graphics, left, top, w, h);
+		OnPaint2(graphics, left, top, w, h - 30);
 	}
 
 	Graphics gr(hdc);
@@ -1031,7 +1067,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		GetClientRect(hWnd, &client_rect);
 
 		SetWindowPos(hCanvas, NULL, 0, 150,
-			client_rect.right, client_rect.bottom - 50, 0);
+			client_rect.right, client_rect.bottom - 150, 0);
 	}
 	break;
 	case WM_COMMAND:

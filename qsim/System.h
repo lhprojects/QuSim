@@ -46,18 +46,21 @@ struct System {
 	bool fFN;
 
 	std::vector<Real> fV;
+	std::vector<Complex> fExpV0Dot5Dt;
 
 	// extend infinity only
 	std::vector<Complex> fProp;
+	void *inv_fft_2N;
 	// period only
 	std::vector<Complex> fFTPsi;
+	void *fft_N;
+	void *inv_fft_N;
 	// extend 2
 	std::vector<Complex> f2Psi;
 	std::vector<Complex> fFT2Psi;
 	// infinite wall
 	std::vector<Complex> fIWPsi;
 	std::vector<Complex> fIWKPsi;
-
 
 	Int fStep;
 	std::vector<Complex> fLastLastPsi;
@@ -66,11 +69,19 @@ struct System {
 	std::vector<Complex> fVPsi;
 	std::vector<Complex> fTVPsi;
 	std::vector<Complex> fVTVPsi;
+	// informations
+	Real fKinEnergy;
+	Real fPotEnergy;
+
 
 	System()
 	{
 		fN = 0;
+		fft_N = nullptr;
+		inv_fft_N = nullptr;
+		inv_fft_2N = nullptr;
 	}
+
 	Real getX(size_t i)
 	{
 		return fDx * i + fX0;
@@ -87,14 +98,7 @@ struct System {
 	void initFreeParticleProp();
 
 	// vpsi = exp(-i/hbar V Dt) psi
-	void ExpV(PsiVector &vpsi, PsiVector const &psi, double t)
-	{
-		Complex f = -1.0 / fHbar * fDt * t;
-		for (size_t i = 0; i < fN; ++i) {
-			vpsi[i] = psi[i] * exp(f*fV[i] * I);
-		}
-	}
-
+	void ExpV(PsiVector &vpsi, PsiVector const &psi, double t);
 	void ExpT(PsiVector &tpsi, PsiVector const &psi);
 
 	void Zero(PsiVector &psi)
@@ -148,16 +152,11 @@ struct System {
 		return norm2/Norm2();
 	}
 
-	Real PotEn()
-	{
-		Real norm2 = 0;
-		for (size_t i = 0; i < fN; ++i) {
-			norm2 += abs2(fPsi[i])*fV[i]*fDx;
-		}
-		return norm2 / Norm2();
-	}
-
+	Real PotEn();
 	Real KinEn();
+	Real CalPotEn();
+	Real CalKinEn();
+
 
 	Real EnPartialT();
 
