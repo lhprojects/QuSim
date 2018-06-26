@@ -154,12 +154,12 @@ void simulate()
 			worker->syst = guiToWorker->syst;
 			{
 				std::lock_guard<std::mutex> lk(workerToGUI->mutex);
-				workerToGUI->data.psi = worker->syst.fPsi;
+				workerToGUI->data.psi = worker->syst.GetPsi();
 				workerToGUI->data.norm = worker->syst.Norm2();
 				workerToGUI->data.xavg = worker->syst.Xavg();
 				workerToGUI->data.time = worker->syst.Time();
-				workerToGUI->data.fN = worker->syst.fN;
-				workerToGUI->data.v = worker->syst.fV;
+				workerToGUI->data.fN = worker->syst.GetN();
+				workerToGUI->data.v = worker->syst.GetV();
 				workerToGUI->data.normLeft = worker->syst.NormLeft();
 				workerToGUI->data.normRight = worker->syst.NormRight();
 				workerToGUI->data.pot = worker->syst.PotEn();
@@ -173,12 +173,12 @@ void simulate()
 			worker->syst.step();
 			{
 				std::lock_guard<std::mutex> lk(workerToGUI->mutex);
-				workerToGUI->data.psi = worker->syst.fPsi;
+				workerToGUI->data.psi = worker->syst.GetPsi();
 				workerToGUI->data.norm = worker->syst.Norm2();
 				workerToGUI->data.xavg = worker->syst.Xavg();
 				workerToGUI->data.time = worker->syst.Time();
-				workerToGUI->data.fN = worker->syst.fN;
-				workerToGUI->data.v = worker->syst.fV;
+				workerToGUI->data.fN = worker->syst.GetN();
+				workerToGUI->data.v = worker->syst.GetV();
 				workerToGUI->data.normLeft = worker->syst.NormLeft();
 				workerToGUI->data.normRight = worker->syst.NormRight();
 				workerToGUI->data.pot = worker->syst.PotEn();
@@ -596,7 +596,7 @@ void InitialASystem(System &syst)
 	}
 
 	syst.init(psi.c_str(), fn, deltaT, fnes, pot.c_str(),
-		x0, x1, n, bc, mass, hbar);
+		x0, x1, n, bc, SolverMethod::HalfVTHalfV, mass, hbar);
 
 }
 
@@ -684,16 +684,17 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 
 	try {
 		syst.init(psi.c_str(), fn, 1, false, pot.c_str(),
-			x0, x1, n, BoundaryCondition::Period, 1);
+			x0, x1, n, BoundaryCondition::Period, SolverMethod::HalfVTHalfV, 1);
 	} catch (...) {
+		MessageBox(hMainWin, L"err", L"err", MB_OK);
 		show_psi = false;
 		show_pot = false;
 	}
 	if (show_psi) {
-		DrawPsi(graphics, syst.fPsi, left, top, w, h);
+		DrawPsi(graphics, syst.GetPsi(), left, top, w, h);
 	}
 	if (show_pot) {
-		DrawPotential(graphics, syst.fV, left, top, w, h);
+		DrawPotential(graphics, syst.GetV(), left, top, w, h);
 	}
 
 }

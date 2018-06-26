@@ -158,6 +158,9 @@
     <ClInclude Include="..\qsim\Cal.h" />
     <ClInclude Include="..\qsim\erfz.h" />
     <ClInclude Include="..\qsim\kissfft.hh" />
+    <ClInclude Include="..\qsim\SystemEigen.h" />
+    <ClInclude Include="..\qsim\SystemHalfVTHalfV.h" />
+    <ClInclude Include="..\qsim\SystemImpl.h" />
     <ClInclude Include="header.h" />
     <ClInclude Include="QuSim.h" />
     <ClInclude Include="Resource.h" />
@@ -166,6 +169,9 @@
   <ItemGroup>
     <ClCompile Include="..\qsim\Cal.cpp" />
     <ClCompile Include="..\qsim\System.cpp" />
+    <ClCompile Include="..\qsim\SystemEigen.cpp" />
+    <ClCompile Include="..\qsim\SystemImpl.cpp" />
+    <ClCompile Include="..\qsim\SystemHalfVTHalfV.cpp" />
     <ClCompile Include="..\qsim\TestCal.cpp" />
     <ClCompile Include="QuSim.cpp" />
   </ItemGroup>
