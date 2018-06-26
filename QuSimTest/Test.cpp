@@ -6,12 +6,12 @@ int main()
 
 	System p;
 	p.init("abs(x) < 0.0000001 ? 1 : 0",
-		false, 0.01, "0", -50, 50, 1001,
+		false, 0.01, false, "0", -50, 50, 1001,
 		BoundaryCondition::Period, 1, 1);
 
 	System l;
 	l.init("abs(x) < 0.0000001 ? 1 : 0",
-		false, 0.01, "0", -50, 50, 1001,
+		false, 0.01, false, "0", -50, 50, 1001,
 		BoundaryCondition::ExtendInfinity, 1, 1);
 
 	for (int i = 0; i < 1; ++i) {
