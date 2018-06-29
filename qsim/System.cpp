@@ -7,23 +7,6 @@
 
 using std::abs;
 
-void dump(PsiVector const &v, char const *fn)
-{
-	FILE *f = fopen(fn," w");
-	for (auto &x : v) {
-		fprintf(f, "(% .20lf, % .20lf)\n", x.real(), x.imag());
-	}
-	fclose(f);
-};
-
-void dump(std::vector<Real> const &v, char const *fn)
-{
-	FILE *f = fopen(fn, " w");
-	for (auto &x : v) {
-		fprintf(f, "% .20lf\n", x);
-	}
-	fclose(f);
-};
 
 void System::init(char const *psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "SystemImpl.h"
-//#include "eigen/Eigen/Sparse"
+#include "eigen/Eigen/Dense"
+#include "eigen/Eigen/Eigenvalues"
 
-//typedef Eigen::SparseMatrix<double > SpMat;
 
 struct SystemEigen : SystemImpl {
 
@@ -15,7 +15,16 @@ struct SystemEigen : SystemImpl {
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar = 1) override;
 
-	//SpMat fH;
+	Eigen::MatrixXd fH;
+	Eigen::SelfAdjointEigenSolver< Eigen::MatrixXd > fSolver;
+
+	Eigen::VectorXcd expDt;
+	Eigen::VectorXcd psi0;
+	Eigen::VectorXcd psi0_eigenspace;
+
+	Eigen::VectorXcd psi;
+	Eigen::VectorXcd psi_eigenspace;
+
 	void update_psi() override;
 };
 

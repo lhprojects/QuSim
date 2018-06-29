@@ -18,6 +18,7 @@ inline Real abs2(Complex const &c)
 	return real(c)*real(c) + imag(c)*imag(c);
 }
 
+
 enum class BoundaryCondition {
 	InfiniteWall,
 	Period,
