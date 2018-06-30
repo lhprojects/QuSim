@@ -44,6 +44,8 @@ HWND hPeriod;
 HWND hHbar;
 HWND hMass;
 HWND hExtend;
+HWND hEigen;
+HWND hVTV;
 
 std::vector<HWND> enableControlList;
 void enableAllWindows(bool enable)
@@ -500,12 +502,19 @@ void InitialASystem(System &syst)
 	int n = 100;
 	bool fn = false;
 	bool fnes = false;
+	bool eigen = false;
 	Complex deltaT;
 	BoundaryCondition bc;
+	SolverMethod sl;
 
 	fn = SendMessage(hNormInitPsi, BM_GETCHECK, 0, 0) == BST_CHECKED;
 	fnes = SendMessage(hNormPsiEachStep, BM_GETCHECK, 0, 0) == BST_CHECKED;
-
+	eigen = SendMessage(hEigen, BM_GETCHECK, 0, 0) == BST_CHECKED;
+	if (eigen) {
+		sl = SolverMethod::Eigen;
+	} else {
+		sl = SolverMethod::HalfVTHalfV;
+	}
 	if (SendMessage(hInfiniteWall, BM_GETCHECK, 0, 0) == BST_CHECKED) {
 		bc = BoundaryCondition::InfiniteWall;
 	} else if(SendMessage(hPeriod, BM_GETCHECK, 0, 0) == BST_CHECKED){
@@ -596,7 +605,7 @@ void InitialASystem(System &syst)
 	}
 
 	syst.init(psi.c_str(), fn, deltaT, fnes, pot.c_str(),
-		x0, x1, n, bc, SolverMethod::HalfVTHalfV, mass, hbar);
+		x0, x1, n, bc, sl, mass, hbar);
 
 }
 
@@ -780,7 +789,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SendMessage(hs2, WM_SETFONT, (LPARAM)guiFont, true);
 		x += 180;
 
-		hInitalPsi = CreateWindow(TEXT("EDIT"), TEXT("gauss(x, 0, 2)*exp(I*x)"),
+		hInitalPsi = CreateWindow(TEXT("EDIT"), TEXT("gauss(x, -20, 5)*exp(I*x)"),
 			WS_CHILD | WS_VISIBLE | WS_BORDER /*边框*/ | ES_AUTOHSCROLL /*水平滚动*/,
 			x, y, 500, 30,
 			hWnd, (HMENU)NULL, hInst, NULL
@@ -834,7 +843,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SendMessage(hs3, WM_SETFONT, (LPARAM)guiFont, true);
 		x += 180;
 
-		hPotential = CreateWindow(TEXT("EDIT"), TEXT("0.5*x*x"),
+		hPotential = CreateWindow(TEXT("EDIT"), TEXT("exp(-x*x)"),
 			WS_CHILD | WS_VISIBLE | WS_BORDER /*边框*/ | ES_AUTOHSCROLL /*水平滚动*/,
 			x, y, 500, 30,
 			hWnd, (HMENU)NULL, hInst, NULL
@@ -852,7 +861,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SendMessage(static_x0, WM_SETFONT, (LPARAM)guiFont, true);
 		x += 50;
 
-		hX0 = CreateWindow(TEXT("EDIT"), TEXT("-10"),
+		hX0 = CreateWindow(TEXT("EDIT"), TEXT("-50"),
 			WS_CHILD | WS_VISIBLE | WS_BORDER /*边框*/ | ES_AUTOHSCROLL,
 			x, y, 80, 30,
 			hWnd, (HMENU)NULL, hInst, NULL
@@ -870,7 +879,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SendMessage(static_x1, WM_SETFONT, (LPARAM)guiFont, true);
 		x += 50;
 
-		hX1 = CreateWindow(TEXT("EDIT"), TEXT("10"),
+		hX1 = CreateWindow(TEXT("EDIT"), TEXT("50"),
 			WS_CHILD | WS_VISIBLE | WS_BORDER /*边框*/ | ES_AUTOHSCROLL,
 			x, y, 80, 30,
 			hWnd, (HMENU)NULL, hInst, NULL
@@ -968,18 +977,52 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		x += 100;
 
 		HWND hs1 = CreateWindow(
-			TEXT("STATIC"), TEXT("Boundary Condition:"),
+			TEXT("STATIC"), TEXT("Solver:"),
 			WS_CHILD | WS_VISIBLE | SS_CENTERIMAGE | SS_CENTER,
-			x, y, 180, 30,
+			x, y, 80, 30,
 			hWnd, (HMENU)NULL, hInst, NULL
 		);
 		SendMessage(hs1, WM_SETFONT, (LPARAM)guiFont, true);
-		x += 180;
+		x += 80;
+
+
+		hVTV = CreateWindow(
+			TEXT("BUTTON"),
+			TEXT("VTV"),
+			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON | WS_GROUP,
+			x /*X坐标*/, y /*Y坐标*/, 80/*宽度*/, 30/*高度*/,
+			hWnd, (HMENU)0, hInst, NULL
+		);
+		SendMessage(hVTV, WM_SETFONT, (LPARAM)guiFont, true);
+		SendMessage(hVTV, BM_SETCHECK, BST_CHECKED, NULL);
+		x += 80;
+		enableControlList.push_back(hVTV);
+
+		hEigen = CreateWindow(
+			TEXT("BUTTON"),
+			TEXT("Eigen"),
+			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON,
+			x /*X坐标*/, y /*Y坐标*/, 80 /*宽度*/, 30/*高度*/,
+			hWnd, (HMENU)0, hInst, NULL
+		);
+		SendMessage(hEigen, WM_SETFONT, (LPARAM)guiFont, true);
+		x += 80;
+		enableControlList.push_back(hEigen);
+
+
+		HWND hs4 = CreateWindow(
+			TEXT("STATIC"), TEXT("Boundary Condition:"),
+			WS_CHILD | WS_VISIBLE | SS_CENTERIMAGE | SS_CENTER,
+			x, y, 160, 30,
+			hWnd, (HMENU)NULL, hInst, NULL
+		);
+		SendMessage(hs4, WM_SETFONT, (LPARAM)guiFont, true);
+		x += 160;
 
 		hInfiniteWall = CreateWindow(
 			TEXT("BUTTON"),
 			TEXT("Infinite Wall"),
-			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON | WS_GROUP,
 			x /*X坐标*/, y /*Y坐标*/, 120/*宽度*/, 30/*高度*/,
 			hWnd, (HMENU)0, hInst, NULL
 		);
