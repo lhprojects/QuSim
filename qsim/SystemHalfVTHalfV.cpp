@@ -1,7 +1,6 @@
 
 #include "SystemHalfVTHalfV.h"
 #include "kissfft.hh"
-#include "erfz.h"
 
 void SystemHalfVTHalfV::init(char const *psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
@@ -19,9 +18,7 @@ void SystemHalfVTHalfV::init(char const *psi, bool force_normalization,
 	fVTVPsi.resize(n);
 
 	initExpV();
-	if (fBoundaryCondition == BoundaryCondition::ExtendInfinity) {
-		initFreeParticleProp();
-	} else if (fBoundaryCondition == BoundaryCondition::Period) {
+	if (fBoundaryCondition == BoundaryCondition::Period) {
 		fFTPsi.resize(n);
 
 		if (fft_N) delete (kissfft<Real>*)fft_N;
@@ -35,26 +32,6 @@ void SystemHalfVTHalfV::init(char const *psi, bool force_normalization,
 		fIWPsi.resize(2 * n);
 		fIWKPsi.resize(2 * n);
 	}
-}
-
-
-void SystemHalfVTHalfV::initFreeParticleProp()
-{
-	fProp.resize(fN);
-	for (size_t i = 0; i < fN; ++i) {
-		Complex T = fHbar / fMass * fDt;
-		double x = i * fDx;
-		double K = 2 * Pi / fDx;
-		Complex a1 = 0.25*(1.0 + I)*(K*T - 2 * x) / sqrt(T);
-		Complex a2 = 0.25*(1.0 + I)*(K*T + 2 * x) / sqrt(T);
-		Complex corr = 0.5 *(erfz(a1) + erfz(a2));
-		fProp[i] = 0.5*(1.0 - I)*exp(0.5*x*x / T * I) / sqrt(Pi*T)*corr*fDx;
-	}
-	double sum = 0;
-	for (size_t i = 0; i < fN; ++i) {
-		sum += (i != 0 ? 2 : 1) * abs(fProp[i])*abs(fProp[i]);
-	}
-	//printf("prop %.20lf\n", sum);
 }
 
 void SystemHalfVTHalfV::initExpV()
@@ -73,15 +50,7 @@ void SystemHalfVTHalfV::initExpV()
 void SystemHalfVTHalfV::ExpT(PsiVector &tpsi, PsiVector const &psi)
 {
 	Zero(tpsi);
-	if (fBoundaryCondition == BoundaryCondition::ExtendInfinity) {
-		//fKinEnergy = 0;
-
-		for (size_t i = 0; i < fN; ++i) {
-			for (size_t j = 0; j < fN; ++j) {
-				tpsi[i] += psi[j] * fProp[(size_t)abs((Int)i - (Int)j)];
-			}
-		}
-	} else if (fBoundaryCondition == BoundaryCondition::Period) {
+	if (fBoundaryCondition == BoundaryCondition::Period) {
 		//Zero(fFTPsi);
 		//fKinEnergy = 0;
 
@@ -215,9 +184,7 @@ void SystemHalfVTHalfV::ExpV(PsiVector &vpsi, PsiVector const &psi, double t)
 
 Real SystemHalfVTHalfV::CalKinEn()
 {
-	if (fBoundaryCondition == BoundaryCondition::ExtendInfinity) {
-		return 0;
-	} else if (fBoundaryCondition == BoundaryCondition::Period) {
+	if (fBoundaryCondition == BoundaryCondition::Period) {
 		//Zero(fFTPsi);
 
 		kissfft<Real> &fft = *(kissfft<Real>*)this->fft_N;

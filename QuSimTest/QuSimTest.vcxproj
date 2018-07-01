@@ -145,6 +145,9 @@
   <ItemGroup>
     <ClCompile Include="..\qsim\Cal.cpp" />
     <ClCompile Include="..\qsim\System.cpp" />
+    <ClCompile Include="..\qsim\SystemEigen.cpp" />
+    <ClCompile Include="..\qsim\SystemHalfVTHalfV.cpp" />
+    <ClCompile Include="..\qsim\SystemImpl.cpp" />
     <ClCompile Include="..\qsim\TestCal.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>

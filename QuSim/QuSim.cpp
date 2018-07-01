@@ -43,7 +43,6 @@ HWND hInfiniteWall;
 HWND hPeriod;
 HWND hHbar;
 HWND hMass;
-HWND hExtend;
 HWND hEigen;
 HWND hVTV;
 
@@ -519,8 +518,6 @@ void InitialASystem(System &syst)
 		bc = BoundaryCondition::InfiniteWall;
 	} else if(SendMessage(hPeriod, BM_GETCHECK, 0, 0) == BST_CHECKED){
 		bc = BoundaryCondition::Period;
-	} else {
-		bc = BoundaryCondition::ExtendInfinity;
 	}
 
 	{
@@ -1041,17 +1038,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SendMessage(hPeriod, WM_SETFONT, (LPARAM)guiFont, true);
 		x += 100;
 		enableControlList.push_back(hPeriod);
-
-		hExtend = CreateWindow(
-			TEXT("BUTTON"),
-			TEXT("Extend Infinity"),
-			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON,
-			x /*X坐标*/, y /*Y坐标*/, 160 /*宽度*/, 30/*高度*/,
-			hWnd, (HMENU)0, hInst, NULL
-		);
-		SendMessage(hExtend, WM_SETFONT, (LPARAM)guiFont, true);
-		x += 160;
-		enableControlList.push_back(hExtend);
 
 		HWND static_hbar = CreateWindow(
 			TEXT("STATIC"), TEXT("hbar"),

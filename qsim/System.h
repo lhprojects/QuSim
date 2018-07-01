@@ -22,7 +22,6 @@ inline Real abs2(Complex const &c)
 enum class BoundaryCondition {
 	InfiniteWall,
 	Period,
-	ExtendInfinity,
 };
 
 enum class SolverMethod {

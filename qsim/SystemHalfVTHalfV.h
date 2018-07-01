@@ -37,7 +37,6 @@ struct SystemHalfVTHalfV : SystemImpl {
 	void update_psi() override;
 	Real CalKinEn() override;
 
-	void initFreeParticleProp();
 	void initExpV();
 	// vpsi = exp(-i/hbar V Dt) psi
 	void ExpV(PsiVector &vpsi, PsiVector const &psi, double t);
