@@ -1107,8 +1107,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			if ((HWND)lParam == hRun && HIWORD(wParam) == BN_CLICKED) {
 				if (gui.runningState == STATE_STOPPED || gui.runningState == STATE_PAUSED) {
-					if (gui.runningState == STATE_STOPPED) {
-						try {
+					try {
+						if (gui.runningState == STATE_STOPPED) {
 							System syst;
 							InitialASystem(syst);
 							std::lock_guard<std::mutex> lk(guiToWorker->mutex);
@@ -1116,21 +1116,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							messager.SetWhat(WhatToDo::InitAndRun);
 							messager.GetWhatNotify();
 
-						} catch (...) {
-							MessageBox(hWnd, L"err", L"err", MB_OK);
+						} else {
+							messager.SetWhat(WhatToDo::Run);
+							messager.GetWhatNotify();
 						}
-					} else {
-						messager.SetWhat(WhatToDo::Run);
-						messager.GetWhatNotify();
+						SendMessage(hRun, WM_SETTEXT, 0, (LPARAM)TEXT("Pause"));
+						if (gui.runningState == STATE_STOPPED) {
+							gui.showRunning = true;
+							enableAllWindows(false);
+							EnableWindow(hStop, true);
+							UpdateWindow(hWnd);
+						}
+						gui.runningState = STATE_RUNNING;
+
+					} catch (std::exception const &exp) {
+						wchar_t w[100];
+						mbstowcs(w, exp.what(), 100);
+						MessageBox(hWnd, w, L"Intialization Error", MB_OK);
+					} catch (...) {
+						MessageBox(hWnd, L"err", L"err", MB_OK);
 					}
-					SendMessage(hRun, WM_SETTEXT, 0, (LPARAM)TEXT("Pause"));
-					if (gui.runningState == STATE_STOPPED) {
-						gui.showRunning = true;
-						enableAllWindows(false);
-						EnableWindow(hStop, true);
-						UpdateWindow(hWnd);
-					}
-					gui.runningState = STATE_RUNNING;
 
 				} else if (gui.runningState == STATE_RUNNING) {
 					messager.SetWhat(WhatToDo::Pause);
