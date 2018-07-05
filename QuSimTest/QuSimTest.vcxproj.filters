@@ -41,9 +41,6 @@
     <ClInclude Include="..\qsim\Cal.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\qsim\erfz.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\qsim\kissfft.hh">
       <Filter>头文件</Filter>
     </ClInclude>

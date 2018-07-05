@@ -1,28 +1,35 @@
 #include "Cal.h"
 #include <assert.h>
 
+#define ASS(x) if(!(x)) { printf("%s failed\n", #x);}
+double const Pi = 3.1415926;
 void testCal()
 {
 	{
 		Cal cal(" 1");
-		assert(abs(cal.Val().real() - 1) < 0.001);
+		ASS(abs(cal.Val().real() - 1) < 0.001);
 	}
 	{
 		Cal cal(" -1");
-		assert(abs(cal.Val().real() - -1) < 0.001);
+		ASS(abs(cal.Val().real() - -1) < 0.001);
+	}
+
+	{
+		Cal cal(" (3.1415926)");
+		ASS(abs(cal.Val().real() - 3.1415926) < 0.001);
 	}
 
 	{
 		Cal cal(" 1 ? 2 : 3");
-		assert(abs(cal.Val().real() - 2) < 0.001);
+		ASS(abs(cal.Val().real() - 2) < 0.001);
 	}
 	{
 		Cal cal(" 0 ? 2 : 3");
-		assert(abs(cal.Val().real() - 3) < 0.001);
+		ASS(abs(cal.Val().real() - 3) < 0.001);
 	}
 	{
 		Cal cal(" 1 && 1");
-		assert(abs(cal.Val().real() - 1) < 0.001);
+		ASS(abs(cal.Val().real() - 1) < 0.001);
 	}
 	{
 		Cal cal(" 1 && 0");
@@ -30,51 +37,57 @@ void testCal()
 	}
 	{
 		Cal cal(" 1 || 1");
-		assert(abs(cal.Val().real() - 1) < 0.001);
+		ASS(abs(cal.Val().real() - 1) < 0.001);
 	}
 	{
 		Cal cal(" 1 || 0");
-		assert(abs(cal.Val().real() - 1) < 0.001);
+		ASS(abs(cal.Val().real() - 1) < 0.001);
 	}
 	{
 		Cal cal(" 0 || 0");
-		assert(abs(cal.Val().real() - 0) < 0.001);
+		ASS(abs(cal.Val().real() - 0) < 0.001);
 	}
 
 	{
 		Cal cal(" 0 || 1 ? 2 : 3");
-		assert(abs(cal.Val().real() - 2) < 0.001);
+		ASS(abs(cal.Val().real() - 2) < 0.001);
 	}
 	{
 		Cal cal(" 0 && 1 ? 2 : 3");
-		assert(abs(cal.Val().real() - 3) < 0.001);
+		ASS(abs(cal.Val().real() - 3) < 0.001);
 	}
 	{
 		Cal cal(" 1+2*3^4");
-		assert(abs(cal.Val().real() - 163) < 0.001);
+		ASS(abs(cal.Val().real() - 163) < 0.001);
 	}
 
 	{
-		Cal cal(" (3.1415926)");
-		assert(abs(cal.Val().real() - 3.1415926) < 0.001);
+		Cal cal(" sin(3.1415926/2)");
+		ASS(abs(cal.Val().real() - 1) < 0.001);
 	}
 
-	{
-		Cal cal(" sin(3.1415926)");
-		assert(abs(cal.Val().real() - 0) < 0.001);
-	}
 	{
 		Cal cal(" cos(3.1415926)");
-		assert(abs(cal.Val().real() - -1) < 0.001);
+		ASS(abs(cal.Val().real() - -1) < 0.001);
+	}
+
+	{
+		Cal cal(" asin(1)");
+		ASS(abs(cal.Val().real() - Pi / 2) < 0.001);
+	}
+
+	{
+		Cal cal(" acos(1)");
+		ASS(abs(cal.Val().real() - 0) < 0.001);
 	}
 
 	{
 		Cal cal(" sqrt(4)");
-		assert(abs(cal.Val().real() - 2) < 0.001);
+		ASS(abs(cal.Val().real() - 2) < 0.001);
 	}
 	{
 		Cal cal(" 1 + 1 ");
-		assert(abs(cal.Val().real() - 2) < 0.001);
+		ASS(abs(cal.Val().real() - 2) < 0.001);
 	}
 
 }

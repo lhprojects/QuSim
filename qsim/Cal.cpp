@@ -23,9 +23,13 @@ enum CalExprType {
 	CALE_DIV,
 	CALE_NEG,
 
-	CALE_EXP,
 	CALE_SIN,
 	CALE_COS,
+	CALE_EXP,
+	CALE_TANH,
+	CALE_ASIN,
+	CALE_ACOS,
+
 	CALE_SIGN,
 	CALE_ABS,
 	CALE_SQRT,
@@ -105,11 +109,20 @@ struct CalExpr {
 		case CALE_EXP:
 			return exp(fSubExprs.at(0)->Val(cal));
 			break;
+		case CALE_TANH:
+			return tanh(fSubExprs.at(0)->Val(cal));
+			break;
 		case CALE_SIN:
 			return sin(fSubExprs.at(0)->Val(cal));
 			break;
 		case CALE_COS:
 			return cos(fSubExprs.at(0)->Val(cal));
+			break;
+		case CALE_ASIN:
+			return asin(fSubExprs.at(0)->Val(cal));
+			break;
+		case CALE_ACOS:
+			return acos(fSubExprs.at(0)->Val(cal));
 			break;
 		case CALE_SIGN:
 			return fSubExprs.at(0)->Val(cal).real() > 0;
@@ -226,10 +239,16 @@ CalExpr *parseFunc(char const *&s)
 				type = CALE_SIN;
 			} else if (name == "cos") {
 				type = CALE_COS;
+			} else if (name == "asin") {
+				type = CALE_ASIN;
+			} else if (name == "acos") {
+				type = CALE_ACOS;
 			} else if (name == "sign") {
 				type = CALE_SIGN;
 			} else if (name == "exp") {
 				type = CALE_EXP;
+			} else if (name == "tanh") {
+				type = CALE_TANH;
 			} else if (name == "abs") {
 				type = CALE_ABS;
 			} else if (name == "sqrt") {
@@ -240,7 +259,10 @@ CalExpr *parseFunc(char const *&s)
 				throw std::runtime_error("unkown function");
 			}
 
-			if (type == CALE_SIN || type == CALE_COS || type == CALE_EXP || type == CALE_ABS || type == CALE_SQRT) {
+			if (type == CALE_SIN || type == CALE_COS ||
+				type == CALE_ASIN || type == CALE_ACOS ||
+				type == CALE_EXP || type == CALE_TANH ||
+				type == CALE_ABS || type == CALE_SQRT) {
 				++s;
 				skipEmpty(s);
 
