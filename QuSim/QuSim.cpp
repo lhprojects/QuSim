@@ -112,7 +112,7 @@ struct WorkerToGUI {
 
 struct GUIToWorker {
 	// data shard package 2
-	System syst;
+	System1D syst;
 	std::mutex mutex;
 };
 
@@ -131,7 +131,7 @@ struct GUI {
 
 struct Worker {
 	// woker thread
-	System syst;
+	System1D syst;
 
 };
 
@@ -490,7 +490,7 @@ void OnPaint1(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 	DrawPsi(graphics, gui.data.psi, left, top, w, h);
 }
 
-void InitialASystem(System &syst)
+void InitialASystem1D(System1D &syst)
 {
 	std::string psi;
 	std::string pot;
@@ -614,7 +614,7 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 	Pen      blackPen(Color(255, 0, 0, 0));
 	graphics.DrawLine(&blackPen, Point(0, h / 2), Point(w, h / 2));
 
-	System syst;
+	System1D syst;
 
 	bool show_psi = SendMessage(hShowPsi, BM_GETCHECK, 0, 0) == BST_CHECKED;
 	bool show_pot = SendMessage(hShowPotential, BM_GETCHECK, 0, 0) == BST_CHECKED;
@@ -1109,8 +1109,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (gui.runningState == STATE_STOPPED || gui.runningState == STATE_PAUSED) {
 					try {
 						if (gui.runningState == STATE_STOPPED) {
-							System syst;
-							InitialASystem(syst);
+							System1D syst;
+							InitialASystem1D(syst);
 							std::lock_guard<std::mutex> lk(guiToWorker->mutex);
 							guiToWorker->syst = syst;
 							messager.SetWhat(WhatToDo::InitAndRun);

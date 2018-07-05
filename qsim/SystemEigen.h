@@ -5,7 +5,7 @@
 #include "eigen/Eigen/Eigenvalues"
 
 
-struct SystemEigen : SystemImpl {
+struct SystemEigen : SystemImpl1D {
 
 	SystemEigen();
 

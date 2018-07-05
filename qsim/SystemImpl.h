@@ -51,8 +51,8 @@ inline void dump_matrix_comp(Matrix const &v, char const *fn)
 	fclose(f);
 };
 
-struct SystemImpl {
-
+struct SystemImpl
+{
 	Complex fDt;
 	bool fFNES;
 
@@ -60,18 +60,46 @@ struct SystemImpl {
 	Real fHbar;
 
 	std::string fVStr;
+
+	BoundaryCondition fBoundaryCondition;
+	SolverMethod fSolverMethod;
+
+	std::string fPsiStr;
+	bool fFN;
+	Int fStep;
+
+	// init fPsi
+	// init fV
+	// init fN
+	virtual void init(char const *psi, bool force_normalization,
+		Complex dt, bool force_normalization_each_step,
+		char const *vs, BoundaryCondition b, SolverMethod solver,
+		Real mass, Real hbar = 1);
+
+	virtual void step() = 0;
+	Real Time()
+	{
+		return fStep * abs(fDt);
+	}
+
+	virtual Real PotEn() = 0;
+	virtual Real KinEn() = 0;
+	virtual Real EnPartialT() = 0;
+	virtual Real Norm2() = 0;
+
+
+
+};
+
+struct SystemImpl1D : SystemImpl {
+
 	Real fX0;
 	Real fDx;
 	size_t fN;
 	std::vector<Real> fV;
 
-	std::string fPsiStr;
-	bool fFN;
 
-	BoundaryCondition fBoundaryCondition;
-	SolverMethod fSolverMethod;
 
-	Int fStep;
 	std::vector<Complex> fLastLastPsi;
 	std::vector<Complex> fLastPsi;
 	std::vector<Complex> fPsi;
@@ -79,7 +107,7 @@ struct SystemImpl {
 	void initPsi();
 	void initPotential();
 
-	SystemImpl()
+	SystemImpl1D()
 	{
 		fN = 0;
 	}
@@ -134,7 +162,7 @@ struct SystemImpl {
 		}
 	}
 
-	void step()
+	void step() override
 	{
 		fLastLastPsi = fLastPsi;
 		fLastPsi = fPsi;
@@ -152,11 +180,6 @@ struct SystemImpl {
 	virtual Real CalKinEn();
 	// update fPsi
 	virtual void update_psi() = 0;
-
-	Real Time()
-	{
-		return fStep * abs(fDt);
-	}
 
 	Real Xavg()
 	{

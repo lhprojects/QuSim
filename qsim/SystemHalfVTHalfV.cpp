@@ -8,7 +8,7 @@ void SystemHalfVTHalfV::init(char const *psi, bool force_normalization,
 	BoundaryCondition b, SolverMethod solver,
 	Real mass, Real hbar)
 {
-	SystemImpl::init(psi, force_normalization,
+	SystemImpl1D::init(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, n, b, solver,
 		mass, hbar);

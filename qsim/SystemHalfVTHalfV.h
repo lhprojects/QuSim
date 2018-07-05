@@ -1,7 +1,7 @@
 #pragma once
 #include "SystemImpl.h"
 
-struct SystemHalfVTHalfV : SystemImpl {
+struct SystemHalfVTHalfV : SystemImpl1D {
 
 	std::vector<Complex> fExpV0Dot5Dt;
 	std::vector<Complex> fVPsi;

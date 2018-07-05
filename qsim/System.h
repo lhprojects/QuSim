@@ -30,7 +30,25 @@ enum class SolverMethod {
 };
 
 struct SystemImpl;
+struct SystemImpl1D;
+struct SystemImpl2D;
+
 struct System {
+
+	void step();
+	Real Norm2();
+	Real Time();
+	Real PotEn();
+	Real KinEn();
+	Real EnPartialT();
+
+	System() { fImpl = nullptr; }
+protected:
+	SystemImpl *fImpl;
+};
+
+
+struct System1D : System {
 
 	void init(char const *psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
@@ -38,7 +56,28 @@ struct System {
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar = 1);
 
-	void step();
+	PsiVector const &GetPsi();
+	std::vector<Real> const &GetV();
+	Real Xavg();
+	UInt GetN();
+	Real NormLeft();
+	Real NormRight();
+
+	System1D() { fImpl = nullptr; }
+protected:
+	SystemImpl1D * fImpl;
+
+};
+
+
+struct System2D : System {
+
+	void init(char const *psi, bool force_normalization,
+		Complex dt, bool force_normalization_each_step,
+		char const *vs, Real x0, Real x1, size_t n,
+		BoundaryCondition b, SolverMethod solver,
+		Real mass, Real hbar = 1);
+
 	PsiVector const &GetPsi();
 	std::vector<Real> const &GetV();
 	Real Xavg();
@@ -47,10 +86,8 @@ struct System {
 	UInt GetN();
 	Real NormLeft();
 	Real NormRight();
-	Real PotEn();
-	Real KinEn();
-	Real EnPartialT();
-private:
-	SystemImpl *fImpl;
-};
 
+protected:
+	SystemImpl2D * fImpl;
+
+};
