@@ -3,10 +3,14 @@
 #include "System.h"
 #include "SystemImpl.h"
 #include "SystemHalfVTHalfV.h"
+#include "SystemHalfVTHalfV2D.h"
 #include "SystemEigen.h"
 
 using std::abs;
 
+System::System() {
+	fImpl = nullptr;
+}
 
 void System::step()
 {
@@ -64,10 +68,14 @@ void System1D::init(char const *psi, bool force_normalization,
 		fImpl = new SystemEigen();
 	}
 	System::fImpl = fImpl;
-	fImpl->init(psi, force_normalization,
+	fImpl->initSystem1D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, n, b, solver,
 		mass, hbar);
+}
+
+System1D::System1D() {
+	fImpl = nullptr;
 }
 
 
@@ -99,4 +107,66 @@ Real System1D::NormLeft()
 Real System1D::NormRight()
 {
 	return fImpl->NormRight();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+System2D::System2D()
+{
+	fImpl = nullptr;
+}
+
+void System2D::init(char const * psi, bool force_normalization,
+	Complex dt, bool force_normalization_each_step,
+	char const * vs, Real x0, Real x1, size_t nx,
+	Real y0, Real y1, size_t ny,
+	BoundaryCondition b, SolverMethod solver,
+	Real mass, Real hbar)
+{
+	if (solver == SolverMethod::HalfVTHalfV) {
+		fImpl = new SystemHalfVTHalfV2D();
+	} else {
+		throw std::runtime_error("unsupported solver");
+	}
+	System::fImpl = fImpl;
+	fImpl->initSystem2D(psi, force_normalization,
+		dt, force_normalization_each_step,
+		vs, x0, x1, nx,
+		y0, y1, ny,
+		b, solver,
+		mass, hbar);
+
+}
+
+Eigen::MatrixXcd const & System2D::GetPsi()
+{
+	//double x = Norm2();
+	return fImpl->fPsi;
+}
+
+Eigen::MatrixXd const & System2D::GetV()
+{
+	return fImpl->fV;
+}
+
+UInt System2D::GetNx()
+{
+	return fImpl->fNx;
+}
+
+UInt System2D::GetNy()
+{
+	return fImpl->fNy;
 }

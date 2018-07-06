@@ -2,6 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "System.h"
+#include "eigen/Eigen/Dense"
 #include <stdio.h>
 
 template<class PsiVector>
@@ -71,23 +72,26 @@ struct SystemImpl
 	// init fPsi
 	// init fV
 	// init fN
-	virtual void init(char const *psi, bool force_normalization,
+	void initSystem(char const *psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		char const *vs, BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar = 1);
 
 	virtual void step() = 0;
+	virtual Real PotEn() = 0;
+	virtual Real KinEn() = 0;
+	virtual Real EnPartialT() = 0;
+	// int abs2(psi) dx for 1D
+	//( sum_i psi_i Dx)
+	// or int abs2(psi) dx dy for 2D
+	//( sum_ij psi_ij Dx Dy)
+	virtual Real Norm2() = 0;
+
+
 	Real Time()
 	{
 		return fStep * abs(fDt);
 	}
-
-	virtual Real PotEn() = 0;
-	virtual Real KinEn() = 0;
-	virtual Real EnPartialT() = 0;
-	virtual Real Norm2() = 0;
-
-
 
 };
 
@@ -104,9 +108,6 @@ struct SystemImpl1D : SystemImpl {
 	std::vector<Complex> fLastPsi;
 	std::vector<Complex> fPsi;
 	
-	void initPsi();
-	void initPotential();
-
 	SystemImpl1D()
 	{
 		fN = 0;
@@ -120,12 +121,28 @@ struct SystemImpl1D : SystemImpl {
 	// init fPsi
 	// init fV
 	// init fN
-	virtual void init(char const *psi, bool force_normalization,
+	virtual void initSystem1D(char const *psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		char const *vs, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar = 1);
+		Real mass, Real hbar);
 
+	virtual Real CalPotEn();
+	virtual Real CalKinEn();
+	// update fPsi
+	virtual void update_psi() = 0;
+
+	void step() override;
+	Real PotEn() override;
+	Real KinEn() override;
+	Real EnPartialT() override;
+	Real Norm2() override;
+
+
+private:
+	void initPsi();
+	void initPotential();
+public:
 
 	void Zero(PsiVector &psi)
 	{
@@ -162,25 +179,6 @@ struct SystemImpl1D : SystemImpl {
 		}
 	}
 
-	void step() override
-	{
-		fLastLastPsi = fLastPsi;
-		fLastPsi = fPsi;
-
-		update_psi();
-
-		if (fFNES) {
-			Scale(fPsi, 1.0 / sqrt(Norm2()));
-		}
-		++fStep;
-
-	}
-
-	virtual Real CalPotEn();
-	virtual Real CalKinEn();
-	// update fPsi
-	virtual void update_psi() = 0;
-
 	Real Xavg()
 	{
 		Real norm2 = 0;
@@ -190,12 +188,6 @@ struct SystemImpl1D : SystemImpl {
 		return norm2 / Norm2();
 	}
 
-	Real PotEn();
-	Real KinEn();
-
-
-	Real EnPartialT();
-
 	Real Norm2(PsiVector const &psi)
 	{
 		Real norm2 = 0;
@@ -204,12 +196,6 @@ struct SystemImpl1D : SystemImpl {
 		}
 		return norm2;
 	}
-
-	Real Norm2()
-	{
-		return Norm2(fPsi);
-	}
-
 
 	Real NormLeft()
 	{
@@ -234,5 +220,70 @@ struct SystemImpl1D : SystemImpl {
 		}
 		return norm2;
 	}
+
+};
+
+struct SystemImpl2D : SystemImpl {
+
+	Real fX0;
+	Real fDx;
+	Real fY0;
+	Real fDy;
+	size_t fNx;
+	size_t fNy;
+	Eigen::MatrixXd fV;
+
+	// col major
+	// y major
+	Eigen::MatrixXcd fLastLastPsi;
+	Eigen::MatrixXcd fLastPsi;
+	Eigen::MatrixXcd fPsi;
+
+	SystemImpl2D()
+	{
+		fNx = 0;
+		fNy = 0;
+	}
+
+	Real getX(size_t i)
+	{
+		return fDx * i + fX0;
+	}
+
+	Real getY(size_t i)
+	{
+		return fDy * i + fY0;
+	}
+
+	// init fPsi
+	// init fV
+	// init fN
+	virtual void initSystem2D(char const *psi, bool force_normalization,
+		Complex dt, bool force_normalization_each_step,
+		char const *vs, Real x0, Real x1, size_t nx,
+		Real y0, Real y1, size_t ny,
+		BoundaryCondition b, SolverMethod solver,
+		Real mass, Real hbar = 1);
+	virtual Real CalPotEn() const;
+	virtual Real CalKinEn() const;
+	// update fPsi
+	virtual void update_psi() = 0;
+
+	void step() override;
+	Real PotEn() override { return CalPotEn(); }
+	Real KinEn() override { return CalKinEn(); }
+	Real EnPartialT() override;
+	Real Norm2() override;
+
+private:
+	void initPsi();
+	void initPotential();
+public:
+
+
+
+
+
+
 
 };

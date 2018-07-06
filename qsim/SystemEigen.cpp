@@ -4,13 +4,13 @@ SystemEigen::SystemEigen()
 {
 }
 
-void SystemEigen::init(char const * psi, bool force_normalization, 
+void SystemEigen::initSystem1D(char const * psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	char const * vs, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
 	Real mass, Real hbar)
 {
-	SystemImpl1D::init(psi, force_normalization,
+	SystemImpl1D::initSystem1D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, n, b, solver,
 		mass, hbar);
@@ -64,8 +64,7 @@ void SystemEigen::init(char const * psi, bool force_normalization,
 		//dump_comp(expDt, "expDt.txt");
 
 		psi0.resize(fN);
-		int r = psi0.rows();
-		int c = psi0.cols();
+
 		for (int i = 0; i < eigenvalues.size(); ++i) {
 			psi0(i) = fPsi[i];
 		}

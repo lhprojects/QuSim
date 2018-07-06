@@ -8,14 +8,12 @@ struct SystemHalfVTHalfV : SystemImpl1D {
 	std::vector<Complex> fTVPsi;
 	std::vector<Complex> fVTVPsi;
 
-	// extend infinity only
-	std::vector<Complex> fProp;
-	void *inv_fft_2N;
 	// period only
 	std::vector<Complex> fFTPsi;
 	void *fft_N;
 	void *inv_fft_N;
 	// infinite wall
+	void *inv_fft_2N;
 	std::vector<Complex> fIWPsi;
 	std::vector<Complex> fIWKPsi;
 
@@ -28,7 +26,7 @@ struct SystemHalfVTHalfV : SystemImpl1D {
 		inv_fft_2N = nullptr;
 	}
 
-	void init(char const *psi, bool force_normalization,
+	void initSystem1D(char const *psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		char const *vs, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,

@@ -3,7 +3,7 @@
 #include <vector>
 #include <complex>
 #include <cmath>
-
+#include "eigen/Eigen/Dense"
 
 using Real = double;
 using Complex = std::complex<Real>;
@@ -42,7 +42,7 @@ struct System {
 	Real KinEn();
 	Real EnPartialT();
 
-	System() { fImpl = nullptr; }
+	System();
 protected:
 	SystemImpl *fImpl;
 };
@@ -54,7 +54,7 @@ struct System1D : System {
 		Complex dt, bool force_normalization_each_step,
 		char const *vs, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar = 1);
+		Real mass, Real hbar);
 
 	PsiVector const &GetPsi();
 	std::vector<Real> const &GetV();
@@ -63,29 +63,28 @@ struct System1D : System {
 	Real NormLeft();
 	Real NormRight();
 
-	System1D() { fImpl = nullptr; }
+	System1D();
 protected:
 	SystemImpl1D * fImpl;
 
 };
 
 
-struct System2D : System {
+struct System2D : System
+{
+	System2D();
 
 	void init(char const *psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
-		char const *vs, Real x0, Real x1, size_t n,
+		char const *vs, Real x0, Real x1, size_t nx,
+		Real y0, Real y1, size_t ny,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar = 1);
+		Real mass, Real hbar);
 
-	PsiVector const &GetPsi();
-	std::vector<Real> const &GetV();
-	Real Xavg();
-	Real Norm2();
-	Real Time();
-	UInt GetN();
-	Real NormLeft();
-	Real NormRight();
+	Eigen::MatrixXcd const &GetPsi();
+	Eigen::MatrixXd const &GetV();
+	UInt GetNx();
+	UInt GetNy();
 
 protected:
 	SystemImpl2D * fImpl;

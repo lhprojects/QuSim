@@ -2,13 +2,13 @@
 #include "SystemHalfVTHalfV.h"
 #include "kissfft.hh"
 
-void SystemHalfVTHalfV::init(char const *psi, bool force_normalization,
+void SystemHalfVTHalfV::initSystem1D(char const *psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	char const *vs, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
 	Real mass, Real hbar)
 {
-	SystemImpl1D::init(psi, force_normalization,
+	SystemImpl1D::initSystem1D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, n, b, solver,
 		mass, hbar);
