@@ -3,9 +3,9 @@
 #include "System.h"
 #include "SystemImpl.h"
 #include "SplittingMethod.h"
-#include "ImplicitMidpointMethod.h"
-#include "SplittingMethodO2_2D.h"
 #include "EigenMethod.h"
+#include "ImplicitMidpointMethod.h"
+#include "SplittingMethod2D.h"
 
 using std::abs;
 
@@ -143,7 +143,9 @@ void System2D::init(char const * psi, bool force_normalization,
 	Real mass, Real hbar)
 {
 	if (solver == SolverMethod::SplittingMethodO2) {
-		fImpl = new SystemHalfVTHalfV2D();
+		fImpl = new SplittingMethod2D();
+	} else if (solver == SolverMethod::SplittingMethodO4) {
+		fImpl = new SplittingMethod2D();
 	} else {
 		throw std::runtime_error("unsupported solver");
 	}

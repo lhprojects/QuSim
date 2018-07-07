@@ -27,13 +27,19 @@
     <ClCompile Include="Test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\qsim\SystemEigen.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\SystemHalfVTHalfV.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\qsim\SystemImpl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qsim\SplittingMethod2D.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qsim\SplittingMethod.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qsim\ImplicitMidpointMethod.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qsim\EigenMethod.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

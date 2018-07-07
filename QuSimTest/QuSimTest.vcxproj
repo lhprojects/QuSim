@@ -144,9 +144,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\qsim\Cal.cpp" />
+    <ClCompile Include="..\qsim\EigenMethod.cpp" />
+    <ClCompile Include="..\qsim\ImplicitMidpointMethod.cpp" />
+    <ClCompile Include="..\qsim\SplittingMethod.cpp" />
+    <ClCompile Include="..\qsim\SplittingMethod2D.cpp" />
     <ClCompile Include="..\qsim\System.cpp" />
-    <ClCompile Include="..\qsim\SystemEigen.cpp" />
-    <ClCompile Include="..\qsim\SystemHalfVTHalfV.cpp" />
     <ClCompile Include="..\qsim\SystemImpl.cpp" />
     <ClCompile Include="..\qsim\TestCal.cpp" />
     <ClCompile Include="Test.cpp" />
