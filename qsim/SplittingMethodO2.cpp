@@ -1,8 +1,8 @@
 
-#include "SystemHalfVTHalfV.h"
+#include "SplittingMethodO2.h"
 #include "kissfft.hh"
 
-void SystemHalfVTHalfV::initSystem1D(char const *psi, bool force_normalization,
+void SplittingMethodO2::initSystem1D(char const *psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	char const *vs, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
@@ -34,7 +34,7 @@ void SystemHalfVTHalfV::initSystem1D(char const *psi, bool force_normalization,
 	}
 }
 
-void SystemHalfVTHalfV::initExpV()
+void SplittingMethodO2::initExpV()
 {
 	fExpV0Dot5Dt.resize(fN);
 
@@ -47,7 +47,7 @@ void SystemHalfVTHalfV::initExpV()
 
 
 
-void SystemHalfVTHalfV::ExpT(PsiVector &tpsi, PsiVector const &psi)
+void SplittingMethodO2::ExpT(PsiVector &tpsi, PsiVector const &psi)
 {
 	Zero(tpsi);
 	if (fBoundaryCondition == BoundaryCondition::Period) {
@@ -148,7 +148,7 @@ void SystemHalfVTHalfV::ExpT(PsiVector &tpsi, PsiVector const &psi)
 	}
 }
 
-void SystemHalfVTHalfV::update_psi()
+void SplittingMethodO2::update_psi()
 {
 	// exp( (h1+h2£©t) ~ 1 + h1 t + h2 t + 0.5 (h1 + h2 + h1 h2 + h2 h1) t^2
 	// exp( h1 t) ~ 1 + h1 t + 0.5 (h1 t)^2
@@ -168,7 +168,7 @@ void SystemHalfVTHalfV::update_psi()
 }
 
 // vpsi = exp(-i/hbar V Dt) psi
-void SystemHalfVTHalfV::ExpV(PsiVector &vpsi, PsiVector const &psi, double t)
+void SplittingMethodO2::ExpV(PsiVector &vpsi, PsiVector const &psi, double t)
 {
 	if (t == 0.5) { // because exp() is very slow
 		for (size_t i = 0; i < fN; ++i) {
@@ -182,7 +182,7 @@ void SystemHalfVTHalfV::ExpV(PsiVector &vpsi, PsiVector const &psi, double t)
 	}
 }
 
-Real SystemHalfVTHalfV::CalKinEn()
+Real SplittingMethodO2::CalKinEn()
 {
 	if (fBoundaryCondition == BoundaryCondition::Period) {
 		//Zero(fFTPsi);

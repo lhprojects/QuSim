@@ -3,7 +3,7 @@
 
 // https://en.wikipedia.org/wiki/Symplectic_integrator#Splitting_methods_for_separable_Hamiltonians
 
-struct SystemHalfVTHalfV : SystemImpl1D {
+struct SplittingMethodO2 : SystemImpl1D {
 
 	std::vector<Complex> fExpV0Dot5Dt;
 	std::vector<Complex> fVPsi;
@@ -20,7 +20,7 @@ struct SystemHalfVTHalfV : SystemImpl1D {
 	std::vector<Complex> fIWKPsi;
 
 
-	SystemHalfVTHalfV()
+	SplittingMethodO2()
 	{
 		fN = 0;
 		fft_N = nullptr;

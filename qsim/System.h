@@ -25,7 +25,8 @@ enum class BoundaryCondition {
 };
 
 enum class SolverMethod {
-	HalfVTHalfV,
+	SplittingMethodO2,
+	SplittingMethodO4,
 	Eigen,
 	ImplicitMidpointMethod,
 	RungeKuttaMethod

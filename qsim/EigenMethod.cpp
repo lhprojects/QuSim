@@ -1,10 +1,10 @@
-#include "SystemEigen.h"
+#include "EigenMethod.h"
 
-SystemEigen::SystemEigen()
+EigenMethod::EigenMethod()
 {
 }
 
-void SystemEigen::initSystem1D(char const * psi, bool force_normalization,
+void EigenMethod::initSystem1D(char const * psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	char const * vs, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
@@ -82,7 +82,7 @@ void SystemEigen::initSystem1D(char const * psi, bool force_normalization,
 
 }
 
-void SystemEigen::update_psi()
+void EigenMethod::update_psi()
 {
 	for (int i = 0; i < psi.size(); ++i) {
 		psi_eigenspace[i] *= expDt(i);

@@ -5,9 +5,9 @@
 #include "eigen/Eigen/Eigenvalues"
 
 
-struct SystemEigen : SystemImpl1D {
+struct EigenMethod : SystemImpl1D {
 
-	SystemEigen();
+	EigenMethod();
 
 	void initSystem1D(char const *psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,

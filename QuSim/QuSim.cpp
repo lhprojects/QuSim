@@ -517,7 +517,7 @@ void InitialASystem1D(System1D &syst)
 	} else if(midpoint) {
 		sl = SolverMethod::ImplicitMidpointMethod;
 	} else {
-		sl = SolverMethod::HalfVTHalfV;
+		sl = SolverMethod::SplittingMethodO2;
 	}
 	if (SendMessage(hInfiniteWall, BM_GETCHECK, 0, 0) == BST_CHECKED) {
 		bc = BoundaryCondition::InfiniteWall;
@@ -695,7 +695,7 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 
 	try {
 		syst.init(psi.c_str(), fn, 1, false, pot.c_str(),
-			x0, x1, n, BoundaryCondition::Period, SolverMethod::HalfVTHalfV, 1, 1);
+			x0, x1, n, BoundaryCondition::Period, SolverMethod::SplittingMethodO2, 1, 1);
 	} catch (...) {
 		MessageBox(hMainWin, L"err", L"err", MB_OK);
 		show_psi = false;
@@ -990,7 +990,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		hVTV = CreateWindow(
 			TEXT("BUTTON"),
-			TEXT("VTV"),
+			TEXT("SplitO2"),
 			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON | WS_GROUP,
 			x /*X坐标*/, y /*Y坐标*/, 80/*宽度*/, 30/*高度*/,
 			hWnd, (HMENU)0, hInst, NULL

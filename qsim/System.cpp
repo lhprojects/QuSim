@@ -2,10 +2,10 @@
 
 #include "System.h"
 #include "SystemImpl.h"
-#include "SystemHalfVTHalfV.h"
+#include "SplittingMethodO2.h"
 #include "ImplicitMidpointMethod.h"
-#include "SystemHalfVTHalfV2D.h"
-#include "SystemEigen.h"
+#include "SplittingMethodO2_2D.h"
+#include "EigenMethod.h"
 
 using std::abs;
 
@@ -63,10 +63,10 @@ void System1D::init(char const *psi, bool force_normalization,
 	BoundaryCondition b, SolverMethod solver,
 	Real mass, Real hbar)
 {
-	if (solver == SolverMethod::HalfVTHalfV) {
-		fImpl = new SystemHalfVTHalfV();
+	if (solver == SolverMethod::SplittingMethodO2) {
+		fImpl = new SplittingMethodO2();
 	} else if(solver == SolverMethod::Eigen) {
-		fImpl = new SystemEigen();
+		fImpl = new EigenMethod();
 	} else if (solver == SolverMethod::ImplicitMidpointMethod) {
 		fImpl = new ImplicitMidpointMethod();
 	} else {
@@ -140,7 +140,7 @@ void System2D::init(char const * psi, bool force_normalization,
 	BoundaryCondition b, SolverMethod solver,
 	Real mass, Real hbar)
 {
-	if (solver == SolverMethod::HalfVTHalfV) {
+	if (solver == SolverMethod::SplittingMethodO2) {
 		fImpl = new SystemHalfVTHalfV2D();
 	} else {
 		throw std::runtime_error("unsupported solver");

@@ -1,4 +1,4 @@
-#include "SystemHalfVTHalfV2D.h"
+#include "SplittingMethodO2_2D.h"
 //#include "kissfft.hh"
 
 void SystemHalfVTHalfV2D::initSystem2D(char const * psi, bool force_normalization,

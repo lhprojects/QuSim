@@ -159,9 +159,9 @@
     <ClInclude Include="..\qsim\erfz.h" />
     <ClInclude Include="..\qsim\kissfft.hh" />
     <ClInclude Include="..\qsim\ImplicitMidpointMethod.h" />
-    <ClInclude Include="..\qsim\SystemEigen.h" />
-    <ClInclude Include="..\qsim\SystemHalfVTHalfV.h" />
-    <ClInclude Include="..\qsim\SystemHalfVTHalfV2D.h" />
+    <ClInclude Include="..\qsim\EigenMethod.h" />
+    <ClInclude Include="..\qsim\SplittingMethodO2.h" />
+    <ClInclude Include="..\qsim\SplittingMethodO2_2D.h" />
     <ClInclude Include="..\qsim\SystemImpl.h" />
     <ClInclude Include="header.h" />
     <ClInclude Include="QuSim.h" />
@@ -172,10 +172,10 @@
     <ClCompile Include="..\qsim\Cal.cpp" />
     <ClCompile Include="..\qsim\ImplicitMidpointMethod.cpp" />
     <ClCompile Include="..\qsim\System.cpp" />
-    <ClCompile Include="..\qsim\SystemEigen.cpp" />
-    <ClCompile Include="..\qsim\SystemHalfVTHalfV2D.cpp" />
+    <ClCompile Include="..\qsim\EigenMethod.cpp" />
+    <ClCompile Include="..\qsim\SplittingMethodO2_2D.cpp" />
     <ClCompile Include="..\qsim\SystemImpl.cpp" />
-    <ClCompile Include="..\qsim\SystemHalfVTHalfV.cpp" />
+    <ClCompile Include="..\qsim\SplittingMethodO2.cpp" />
     <ClCompile Include="..\qsim\TestCal.cpp" />
     <ClCompile Include="QuSim.cpp" />
   </ItemGroup>
