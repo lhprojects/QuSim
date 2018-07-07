@@ -42,13 +42,13 @@
     <ClInclude Include="..\qsim\ImplicitMidpointMethod.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\qsim\SplittingMethodO2.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\qsim\SplittingMethodO2_2D.h">
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="..\qsim\EigenMethod.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\SplittingMethod.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,13 +71,13 @@
     <ClCompile Include="..\qsim\ImplicitMidpointMethod.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\qsim\SplittingMethodO2.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\qsim\SplittingMethodO2_2D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\qsim\EigenMethod.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qsim\SplittingMethod.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

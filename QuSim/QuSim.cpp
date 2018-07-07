@@ -45,6 +45,7 @@ HWND hHbar;
 HWND hMass;
 HWND hEigen;
 HWND hVTV;
+HWND hSplitO4;
 HWND hMidpoint;
 
 std::vector<HWND> enableControlList;
@@ -503,6 +504,7 @@ void InitialASystem1D(System1D &syst)
 	bool fn = false;
 	bool fnes = false;
 	bool eigen = false;
+	bool splito4 = false;
 	bool midpoint = false;
 	Complex deltaT;
 	BoundaryCondition bc;
@@ -512,10 +514,13 @@ void InitialASystem1D(System1D &syst)
 	fnes = SendMessage(hNormPsiEachStep, BM_GETCHECK, 0, 0) == BST_CHECKED;
 	eigen = SendMessage(hEigen, BM_GETCHECK, 0, 0) == BST_CHECKED;
 	midpoint = SendMessage(hMidpoint, BM_GETCHECK, 0, 0) == BST_CHECKED;
+	splito4 = SendMessage(hSplitO4, BM_GETCHECK, 0, 0) == BST_CHECKED;
 	if (eigen) {
 		sl = SolverMethod::Eigen;
 	} else if(midpoint) {
 		sl = SolverMethod::ImplicitMidpointMethod;
+	} else if (splito4) {
+		sl = SolverMethod::SplittingMethodO4;
 	} else {
 		sl = SolverMethod::SplittingMethodO2;
 	}
@@ -999,6 +1004,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SendMessage(hVTV, BM_SETCHECK, BST_CHECKED, NULL);
 		x += 80;
 		enableControlList.push_back(hVTV);
+
+		hSplitO4 = CreateWindow(
+			TEXT("BUTTON"),
+			TEXT("SplitO4"),
+			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON,
+			x /*X坐标*/, y /*Y坐标*/, 80/*宽度*/, 30/*高度*/,
+			hWnd, (HMENU)0, hInst, NULL
+		);
+		SendMessage(hSplitO4, WM_SETFONT, (LPARAM)guiFont, true);
+		x += 80;
+		enableControlList.push_back(hSplitO4);
 
 		hEigen = CreateWindow(
 			TEXT("BUTTON"),

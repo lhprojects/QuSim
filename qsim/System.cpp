@@ -2,7 +2,7 @@
 
 #include "System.h"
 #include "SystemImpl.h"
-#include "SplittingMethodO2.h"
+#include "SplittingMethod.h"
 #include "ImplicitMidpointMethod.h"
 #include "SplittingMethodO2_2D.h"
 #include "EigenMethod.h"
@@ -64,7 +64,9 @@ void System1D::init(char const *psi, bool force_normalization,
 	Real mass, Real hbar)
 {
 	if (solver == SolverMethod::SplittingMethodO2) {
-		fImpl = new SplittingMethodO2();
+		fImpl = new SplittingMethod();
+	} else if (solver == SolverMethod::SplittingMethodO4) {
+		fImpl = new SplittingMethod();
 	} else if(solver == SolverMethod::Eigen) {
 		fImpl = new EigenMethod();
 	} else if (solver == SolverMethod::ImplicitMidpointMethod) {
