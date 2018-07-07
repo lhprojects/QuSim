@@ -158,6 +158,7 @@
     <ClInclude Include="..\qsim\Cal.h" />
     <ClInclude Include="..\qsim\erfz.h" />
     <ClInclude Include="..\qsim\kissfft.hh" />
+    <ClInclude Include="..\qsim\ImplicitMidpointMethod.h" />
     <ClInclude Include="..\qsim\SystemEigen.h" />
     <ClInclude Include="..\qsim\SystemHalfVTHalfV.h" />
     <ClInclude Include="..\qsim\SystemHalfVTHalfV2D.h" />
@@ -169,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\qsim\Cal.cpp" />
+    <ClCompile Include="..\qsim\ImplicitMidpointMethod.cpp" />
     <ClCompile Include="..\qsim\System.cpp" />
     <ClCompile Include="..\qsim\SystemEigen.cpp" />
     <ClCompile Include="..\qsim\SystemHalfVTHalfV2D.cpp" />

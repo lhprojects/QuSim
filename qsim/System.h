@@ -27,6 +27,8 @@ enum class BoundaryCondition {
 enum class SolverMethod {
 	HalfVTHalfV,
 	Eigen,
+	ImplicitMidpointMethod,
+	RungeKuttaMethod
 };
 
 struct SystemImpl;

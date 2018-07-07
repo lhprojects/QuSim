@@ -1,6 +1,8 @@
 #pragma once
 #include "SystemImpl.h"
 
+// https://en.wikipedia.org/wiki/Symplectic_integrator#Splitting_methods_for_separable_Hamiltonians
+
 struct SystemHalfVTHalfV : SystemImpl1D {
 
 	std::vector<Complex> fExpV0Dot5Dt;

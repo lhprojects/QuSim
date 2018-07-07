@@ -45,6 +45,7 @@ HWND hHbar;
 HWND hMass;
 HWND hEigen;
 HWND hVTV;
+HWND hMidpoint;
 
 std::vector<HWND> enableControlList;
 void enableAllWindows(bool enable)
@@ -502,6 +503,7 @@ void InitialASystem1D(System1D &syst)
 	bool fn = false;
 	bool fnes = false;
 	bool eigen = false;
+	bool midpoint = false;
 	Complex deltaT;
 	BoundaryCondition bc;
 	SolverMethod sl;
@@ -509,8 +511,11 @@ void InitialASystem1D(System1D &syst)
 	fn = SendMessage(hNormInitPsi, BM_GETCHECK, 0, 0) == BST_CHECKED;
 	fnes = SendMessage(hNormPsiEachStep, BM_GETCHECK, 0, 0) == BST_CHECKED;
 	eigen = SendMessage(hEigen, BM_GETCHECK, 0, 0) == BST_CHECKED;
+	midpoint = SendMessage(hMidpoint, BM_GETCHECK, 0, 0) == BST_CHECKED;
 	if (eigen) {
 		sl = SolverMethod::Eigen;
+	} else if(midpoint) {
+		sl = SolverMethod::ImplicitMidpointMethod;
 	} else {
 		sl = SolverMethod::HalfVTHalfV;
 	}
@@ -690,7 +695,7 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 
 	try {
 		syst.init(psi.c_str(), fn, 1, false, pot.c_str(),
-			x0, x1, n, BoundaryCondition::Period, SolverMethod::HalfVTHalfV, 1);
+			x0, x1, n, BoundaryCondition::Period, SolverMethod::HalfVTHalfV, 1, 1);
 	} catch (...) {
 		MessageBox(hMainWin, L"err", L"err", MB_OK);
 		show_psi = false;
@@ -1005,6 +1010,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SendMessage(hEigen, WM_SETFONT, (LPARAM)guiFont, true);
 		x += 80;
 		enableControlList.push_back(hEigen);
+
+		hMidpoint = CreateWindow(
+			TEXT("BUTTON"),
+			TEXT("Midpoint"),
+			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON,
+			x /*X坐标*/, y /*Y坐标*/, 120 /*宽度*/, 30/*高度*/,
+			hWnd, (HMENU)0, hInst, NULL
+		);
+		SendMessage(hMidpoint, WM_SETFONT, (LPARAM)guiFont, true);
+		x += 120;
+		enableControlList.push_back(hMidpoint);
 
 
 		HWND hs4 = CreateWindow(

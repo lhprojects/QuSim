@@ -5,6 +5,8 @@
 #include "kissfft.hh"
 #include <memory>
 
+// https://en.wikipedia.org/wiki/Symplectic_integrator#Splitting_methods_for_separable_Hamiltonians
+
 struct SystemHalfVTHalfV2D : SystemImpl2D {
 	
 

@@ -3,6 +3,7 @@
 #include "System.h"
 #include "SystemImpl.h"
 #include "SystemHalfVTHalfV.h"
+#include "ImplicitMidpointMethod.h"
 #include "SystemHalfVTHalfV2D.h"
 #include "SystemEigen.h"
 
@@ -64,8 +65,12 @@ void System1D::init(char const *psi, bool force_normalization,
 {
 	if (solver == SolverMethod::HalfVTHalfV) {
 		fImpl = new SystemHalfVTHalfV();
-	} else {
+	} else if(solver == SolverMethod::Eigen) {
 		fImpl = new SystemEigen();
+	} else if (solver == SolverMethod::ImplicitMidpointMethod) {
+		fImpl = new ImplicitMidpointMethod();
+	} else {
+		throw std::runtime_error("unspported solver");
 	}
 	System::fImpl = fImpl;
 	fImpl->initSystem1D(psi, force_normalization,
