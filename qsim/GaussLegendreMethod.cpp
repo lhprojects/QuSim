@@ -14,16 +14,31 @@ void GaussLegendreMethod::initSystem1D(char const * psi, bool force_normalizatio
 		throw std::runtime_error("not supported boundary condition");
 	}
 
-	//            1 - 1/2 i H Dt /hbar - 1/12 (H Dt /hbar)^2 
-	//  psi  ->  --------------------------------------------   psi
-	//            1 + 1/2 i H Dt /hbar - 1/12 (H Dt /hbar)^2
+	//            1 - 1/2 i H Dt /hbar - 1/12 (H Dt /hbar)^2 + ... 
+	//  psi  ->  --------------------------------------------------   psi
+	//            1 + 1/2 i H Dt /hbar - 1/12 (H Dt /hbar)^2 + ...
 
 	fh.resize(fN, fN); // = H Dt / hbar
-	for (int i = 0; i < fN; ++i) {
-		fh.insert(i, i) = (fV[i] + hbar * hbar / (2 * fMass) * 2 / (fDx*fDx))*fDt / hbar;
-		fh.insert(i, i + 1 >= fN ? 0 : i + 1) = (hbar * hbar / (2 * fMass) * (-1) / (fDx*fDx))*fDt / hbar;
-		fh.insert(i, i - 1 < 0 ? fN - 1 : i - 1) = (hbar * hbar / (2 * fMass) * (-1) / (fDx*fDx))*fDt / hbar;
+
+	if (SolverMethod::GaussLegendreO4 == fSolverMethod) {
+		Complex f = -(hbar * hbar / (2 * fMass) * 1 / (fDx*fDx))*fDt / hbar;
+		for (int i = 0; i < fN; ++i) {
+
+			fh.insert(i, i - 2 < 0 ? fN + i - 2 : i - 2) = -1. / 12 * f;
+			fh.insert(i, i - 1 < 0 ? fN + i - 1 : i - 1) = 4. / 3 * f;
+			fh.insert(i, i + 0) = fV[i] * fDt / hbar - 5. / 2 * f;
+			fh.insert(i, i + 1 > fN - 1 ? i + 1 - fN : i + 1) = 4. / 3 * f;
+			fh.insert(i, i + 2 > fN - 1 ? i + 2 - fN : i + 2) = -1. / 12 * f;
+
+		}
+	} else {
+		for (int i = 0; i < fN; ++i) {
+			fh.insert(i, i) = (fV[i] + hbar * hbar / (2 * fMass) * 2 / (fDx*fDx))*fDt / hbar;
+			fh.insert(i, i + 1 >= fN ? 0 : i + 1) = (hbar * hbar / (2 * fMass) * (-1) / (fDx*fDx))*fDt / hbar;
+			fh.insert(i, i - 1 < 0 ? fN - 1 : i - 1) = (hbar * hbar / (2 * fMass) * (-1) / (fDx*fDx))*fDt / hbar;
+		}
 	}
+
 
 
 	Eigen::SparseMatrix<Complex> id(fN, fN);
