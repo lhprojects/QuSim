@@ -73,6 +73,8 @@ void System1D::init(char const *psi, bool force_normalization,
 		fImpl = new GaussLegendreMethod();
 	} else if (solver == SolverMethod::GaussLegendreO4) {
 		fImpl = new GaussLegendreMethod();
+	} else if (solver == SolverMethod::GaussLegendreO6) {
+		fImpl = new GaussLegendreMethod();
 	} else {
 		throw std::runtime_error("unspported solver");
 	}

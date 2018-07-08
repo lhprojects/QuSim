@@ -20,7 +20,7 @@ void GaussLegendreMethod::initSystem1D(char const * psi, bool force_normalizatio
 
 	fh.resize(fN, fN); // = H Dt / hbar
 
-	if (SolverMethod::GaussLegendreO4 == fSolverMethod) {
+	if (SolverMethod::GaussLegendreO4 == fSolverMethod || SolverMethod::GaussLegendreO6 == fSolverMethod) {
 		Complex f = -(hbar * hbar / (2 * fMass) * 1 / (fDx*fDx))*fDt / hbar;
 		for (int i = 0; i < fN; ++i) {
 
@@ -44,7 +44,10 @@ void GaussLegendreMethod::initSystem1D(char const * psi, bool force_normalizatio
 	Eigen::SparseMatrix<Complex> id(fN, fN);
 	id.setIdentity();
 
-	if (SolverMethod::GaussLegendreO4 == fSolverMethod) {
+	if (SolverMethod::GaussLegendreO6 == fSolverMethod) {
+		fn = id - 0.5 * fh * I - 1 / 10.0 * (fh*fh) + 1 / 120.0*I*(fh*fh*fh);
+		fd = id + 0.5 * fh * I - 1 / 10.0 * (fh*fh) - 1 / 120.0*I*(fh*fh*fh);
+	} else if (SolverMethod::GaussLegendreO4 == fSolverMethod) {
 		fn = id - 0.5 * fh * I - 1 / 12.0 * (fh*fh);
 		fd = id + 0.5 * fh * I - 1 / 12.0 * (fh*fh);
 	} else {

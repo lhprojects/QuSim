@@ -31,7 +31,8 @@ enum class SolverMethod {
 
 	//Runge¨CKutta family
 	ImplicitMidpointMethod, // which is same as GaussLegendreO2
-	GaussLegendreO4
+	GaussLegendreO4,
+	GaussLegendreO6,
 };
 
 struct SystemImpl;
