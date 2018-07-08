@@ -193,14 +193,14 @@ $$
 \Psi(j) = \frac{1}{2i} {\rm inv fft}(2N, \Phi^\prime(k), j)
 $$
 
-\section{Split Hamotanian}
+\section{Split Method}
 
-Second order approxmiation
+Second order approximation
 $$
 e^{t+v} = e^{1/2 v} e^{ t} e^{1/2 v}
 $$
 
-Fourth-order approxmiation
+Fourth-order approximation
 $$
 e^{t+v} = e^{c_1 v} e^{d_1 t} e^{c_2 v} e^{d_2 t} e^{ c_2 v} e^{ d_1 t} e^{ c_1 v}
 $$
@@ -218,6 +218,118 @@ $$
 $$
 d_2 = -2^{1/3}/(2-2^{1/3})
 $$
+
+\section{Eigen Method}
+
+\section{Gauss-Legendre Method}
+The SE, can be written as
+$$
+\frac{d\psi}{ dt} = - I h \psi
+$$
+the formal solution is
+$$
+\psi(t) = e^{ -I h t}\psi(0)
+$$
+
+In numerical analysis, many methods are special cases of Runge-Kutta methods.
+\begin{itemize}
+\item Euler Method
+\begin{itemize}
+    \item Forward Euler Method
+    \item Backward Euler Method
+\end{itemize}
+\item Gauss-Legendre Method
+\item ...
+\end{itemize}
+
+\subsection{Forward euler method}
+$$
+\psi(t + \Delta t) = (1 - I \Delta t h) \psi(t)
+$$
+
+In numerical methods two things we should take care of:
+\begin{itemize}
+\item the local time discrete error
+\item the numerical stability, numerical stability means the result are bounded
+\end{itemize}
+For the Forward euler method, the local time discrete error is $O(\Delta ^2 t)$
+$$
+\psi(t + \Delta t) = (1 - I \Delta t h)\psi(t) + O(\Delta t^2)
+$$
+We say this method is order One.
+
+Numerical stability requires
+$$
+|(1 - I \Delta t h)\psi(t)| < (1 + \epsilon)|\psi(t)|
+$$
+For every $\psi(t)$. for $\epsilon$ we need
+$$
+(1 + \epsilon)^{T/\Delta t} - 1 << 1
+$$
+or
+$$
+\epsilon \ll \Delta t / T
+$$
+we have
+$$
+|(1 - I \Delta t h)\psi(t)| < (1 + \Delta t / T)|\psi(t)|
+$$
+
+ For a eigenstate of eigenenergy of $e$, we have
+$$
+| 1 - I \Delta t e| \le (1 + \Delta t / T)
+$$
+$$
+(\Delta t e)^2 \le 2 \Delta t / T
+$$
+
+Because $T >> \Delta t$, so
+$$
+(\Delta t e)^2 << 1
+$$
+
+For a discrete eystem. the max energy is $\hbar^2/2m/(\Delta x)^2$. So we need
+$$
+\Delta t < (\hbar^2/2m(\Delta x)^2)^{-1}
+$$
+The requrement for $\Delta t$ is too strict.
+
+\subsection{Backward Euler method}
+
+$$
+\psi(t + \Delta t) = (1 + I \Delta t h)^{-1} \psi(t)
+$$
+
+This is an order of One method
+The stability requres
+$$
+|(1 + I \Delta t h)^{-1}\psi| < (1 + \Delta t / T) \psi
+$$
+Because for each eigenstate with eigenernery of $e$
+$$
+|(1 + I \Delta t e)^{-1}| < 1 < (1 + \Delta t / T)
+$$
+This methods is unconditional stable
+
+\subsection{Gauss-Legendre methods}
+
+Gauss-Legendre methods are implicit Runge-Kutta methods. The Gauss-legendre method of order two is also called implicit midpoint method.
+We don't decribe the details of Gauss-Legendre Methods. We only conclude some key points here.
+
+$$
+\psi(t + \Delta t) = (1 + 1/2 I \Delta t h)^{-1} (1 - 1/2 I \Delta t h) \psi(t)
+$$
+$$
+\psi(t + \Delta t) = \frac{1 - 1/2 I \Delta t h - 1/12 (\Delta t h)^2}{ 1 + 1/2 I \Delta t h - 1/12 (\Delta t h)^2} \psi(t)
+$$
+$$
+\psi(t + \Delta t) = \frac{1 - 1/2 I \Delta t h - 1/10 (\Delta t h)^2 + 1/120 I (\Delta t h)^3}{ 1 + 1/2 I \Delta t h - 1/10 (\Delta t h)^2 - 1/120 I (\Delta t h)^3} \psi(t)
+$$
+
+Order of two method.
+Stable unconditionally.
+The transform each step is unitary matrix, so that the probability and energy are conserved.
+
 
 
 \end{document}
