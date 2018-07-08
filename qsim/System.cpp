@@ -4,7 +4,7 @@
 #include "SystemImpl.h"
 #include "SplittingMethod.h"
 #include "EigenMethod.h"
-#include "ImplicitMidpointMethod.h"
+#include "GaussLegendreMethod.h"
 #include "SplittingMethod2D.h"
 
 using std::abs;
@@ -70,7 +70,9 @@ void System1D::init(char const *psi, bool force_normalization,
 	} else if(solver == SolverMethod::Eigen) {
 		fImpl = new EigenMethod();
 	} else if (solver == SolverMethod::ImplicitMidpointMethod) {
-		fImpl = new ImplicitMidpointMethod();
+		fImpl = new GaussLegendreMethod();
+	} else if (solver == SolverMethod::GaussLegendreO4) {
+		fImpl = new GaussLegendreMethod();
 	} else {
 		throw std::runtime_error("unspported solver");
 	}

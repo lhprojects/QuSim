@@ -36,10 +36,10 @@
     <ClCompile Include="..\qsim\SplittingMethod.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\qsim\ImplicitMidpointMethod.cpp">
+    <ClCompile Include="..\qsim\EigenMethod.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\qsim\EigenMethod.cpp">
+    <ClCompile Include="..\qsim\GaussLegendreMethod.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

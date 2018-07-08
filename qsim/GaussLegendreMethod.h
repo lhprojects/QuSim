@@ -1,9 +1,8 @@
 #pragma once
-
 #include "SystemImpl.h"
 #include "eigen/Eigen/Sparse"
-struct ImplicitMidpointMethod : SystemImpl1D
-{
+
+struct GaussLegendreMethod : SystemImpl1D {
 
 	void initSystem1D(char const *psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
@@ -13,8 +12,11 @@ struct ImplicitMidpointMethod : SystemImpl1D
 
 	// update fPsi
 	virtual void update_psi() override;
-	Eigen::VectorXcd fhPsi;
+	Eigen::VectorXcd ffnPsi;
 	Eigen::SparseMatrix<Complex> fh;
+	Eigen::SparseMatrix<Complex> fd;
+	Eigen::SparseMatrix<Complex> fn;
 	Eigen::SparseLU<Eigen::SparseMatrix<Complex> > fLU;
+
 
 };

@@ -28,8 +28,10 @@ enum class SolverMethod {
 	SplittingMethodO2,
 	SplittingMethodO4,
 	Eigen,
-	ImplicitMidpointMethod,
-	RungeKuttaMethod
+
+	//Runge¨CKutta family
+	ImplicitMidpointMethod, // which is same as GaussLegendreO2
+	GaussLegendreO4
 };
 
 struct SystemImpl;

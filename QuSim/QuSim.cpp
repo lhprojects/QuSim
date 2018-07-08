@@ -47,6 +47,7 @@ HWND hEigen;
 HWND hVTV;
 HWND hSplitO4;
 HWND hMidpoint;
+HWND hGauss;
 
 std::vector<HWND> enableControlList;
 void enableAllWindows(bool enable)
@@ -503,27 +504,25 @@ void InitialASystem1D(System1D &syst)
 	int n = 100;
 	bool fn = false;
 	bool fnes = false;
-	bool eigen = false;
-	bool splito4 = false;
-	bool midpoint = false;
 	Complex deltaT;
 	BoundaryCondition bc;
 	SolverMethod sl;
 
 	fn = SendMessage(hNormInitPsi, BM_GETCHECK, 0, 0) == BST_CHECKED;
 	fnes = SendMessage(hNormPsiEachStep, BM_GETCHECK, 0, 0) == BST_CHECKED;
-	eigen = SendMessage(hEigen, BM_GETCHECK, 0, 0) == BST_CHECKED;
-	midpoint = SendMessage(hMidpoint, BM_GETCHECK, 0, 0) == BST_CHECKED;
-	splito4 = SendMessage(hSplitO4, BM_GETCHECK, 0, 0) == BST_CHECKED;
-	if (eigen) {
+
+	if (SendMessage(hEigen, BM_GETCHECK, 0, 0) == BST_CHECKED) {
 		sl = SolverMethod::Eigen;
-	} else if(midpoint) {
+	} else if(SendMessage(hMidpoint, BM_GETCHECK, 0, 0) == BST_CHECKED) {
 		sl = SolverMethod::ImplicitMidpointMethod;
-	} else if (splito4) {
+	} else if (SendMessage(hSplitO4, BM_GETCHECK, 0, 0) == BST_CHECKED) {
 		sl = SolverMethod::SplittingMethodO4;
+	} else if(SendMessage(hGauss, BM_GETCHECK, 0, 0) == BST_CHECKED) {
+		sl = SolverMethod::GaussLegendreO4;
 	} else {
 		sl = SolverMethod::SplittingMethodO2;
 	}
+
 	if (SendMessage(hInfiniteWall, BM_GETCHECK, 0, 0) == BST_CHECKED) {
 		bc = BoundaryCondition::InfiniteWall;
 	} else if(SendMessage(hPeriod, BM_GETCHECK, 0, 0) == BST_CHECKED){
@@ -1037,6 +1036,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SendMessage(hMidpoint, WM_SETFONT, (LPARAM)guiFont, true);
 		x += 120;
 		enableControlList.push_back(hMidpoint);
+
+		hGauss = CreateWindow(
+			TEXT("BUTTON"),
+			TEXT("Gauss"),
+			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON,
+			x /*X坐标*/, y /*Y坐标*/, 120 /*宽度*/, 30/*高度*/,
+			hWnd, (HMENU)0, hInst, NULL
+		);
+		SendMessage(hGauss, WM_SETFONT, (LPARAM)guiFont, true);
+		x += 120;
+		enableControlList.push_back(hGauss);
 
 
 		HWND hs4 = CreateWindow(

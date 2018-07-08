@@ -158,7 +158,7 @@
   <ItemGroup>
     <ClCompile Include="..\qsim\Cal.cpp" />
     <ClCompile Include="..\qsim\EigenMethod.cpp" />
-    <ClCompile Include="..\qsim\ImplicitMidpointMethod.cpp" />
+    <ClCompile Include="..\qsim\GaussLegendreMethod.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod2D.cpp" />
     <ClCompile Include="..\qsim\System.cpp" />
