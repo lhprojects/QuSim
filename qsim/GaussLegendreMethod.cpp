@@ -28,7 +28,7 @@ void GaussLegendreMethod::initSystem1D(char const * psi, bool force_normalizatio
 	fh.resize(fN, fN); // = H Dt / hbar
 
 	bool split_time = fOpts.find("split_time_2") != fOpts.end() && fOpts.find("split_time_2")->second != "0";
-	split_time = true;
+
 	Complex hdt = fDt;
 	if (split_time) {
 		hdt /= 2;
