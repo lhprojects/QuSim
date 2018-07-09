@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimBenchmark", "QuSimBenc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimLib", "QuSimLib\QuSimLib.vcxproj", "{3A4B2681-4236-4A8A-9891-D7D3937F8648}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimPrecision", "QuSimPrecision\QuSimPrecision.vcxproj", "{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -61,6 +63,14 @@ Global
 		{3A4B2681-4236-4A8A-9891-D7D3937F8648}.Release|x64.Build.0 = Release|x64
 		{3A4B2681-4236-4A8A-9891-D7D3937F8648}.Release|x86.ActiveCfg = Release|x64
 		{3A4B2681-4236-4A8A-9891-D7D3937F8648}.Release|x86.Build.0 = Release|x64
+		{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}.Debug|x64.ActiveCfg = Debug|x64
+		{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}.Debug|x64.Build.0 = Debug|x64
+		{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}.Debug|x86.ActiveCfg = Debug|Win32
+		{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}.Debug|x86.Build.0 = Debug|Win32
+		{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}.Release|x64.ActiveCfg = Release|x64
+		{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}.Release|x64.Build.0 = Release|x64
+		{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}.Release|x86.ActiveCfg = Release|Win32
+		{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

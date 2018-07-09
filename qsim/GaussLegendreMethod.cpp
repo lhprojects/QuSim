@@ -28,13 +28,22 @@ void GaussLegendreMethod::initSystem1D(char const * psi, bool force_normalizatio
 	fh.resize(fN, fN); // = H Dt / hbar
 
 	bool split_time = fOpts.find("split_time_2") != fOpts.end() && fOpts.find("split_time_2")->second != "0";
-
-	Complex hdt = fDt;
-	if (split_time) {
-		hdt /= 2;
+	bool space_O2 = false;
+	if (fOpts.find("space_O2") != fOpts.end()) {
+		space_O2 = fOpts.find("space_O2")->second != "0";
+	} else if (SolverMethod::ImplicitMidpointMethod == fSolverMethod) {
+		space_O2 = true;
 	}
 
-	if (SolverMethod::GaussLegendreO4 == fSolverMethod || SolverMethod::GaussLegendreO6 == fSolverMethod) {
+	Complex hdt = split_time ? fDt /2.0 :  fDt;
+
+	if (space_O2) {
+		for (int i = 0; i < fN; ++i) {
+			fh.insert(i, i) = (fV[i] + hbar * hbar / (2 * fMass) * 2 / (fDx*fDx))*hdt / hbar;
+			fh.insert(i, i + 1 >= fN ? 0 : i + 1) = (hbar * hbar / (2 * fMass) * (-1) / (fDx*fDx))*hdt / hbar;
+			fh.insert(i, i - 1 < 0 ? fN - 1 : i - 1) = (hbar * hbar / (2 * fMass) * (-1) / (fDx*fDx))*hdt / hbar;
+		}
+	} else {
 		Complex f = -(hbar * hbar / (2 * fMass) * 1 / (fDx*fDx))*hdt / hbar;
 		for (int i = 0; i < fN; ++i) {
 
@@ -45,14 +54,7 @@ void GaussLegendreMethod::initSystem1D(char const * psi, bool force_normalizatio
 			fh.insert(i, i + 2 > fN - 1 ? i + 2 - fN : i + 2) = -1. / 12 * f;
 
 		}
-	} else {
-		for (int i = 0; i < fN; ++i) {
-			fh.insert(i, i) = (fV[i] + hbar * hbar / (2 * fMass) * 2 / (fDx*fDx))*hdt / hbar;
-			fh.insert(i, i + 1 >= fN ? 0 : i + 1) = (hbar * hbar / (2 * fMass) * (-1) / (fDx*fDx))*hdt / hbar;
-			fh.insert(i, i - 1 < 0 ? fN - 1 : i - 1) = (hbar * hbar / (2 * fMass) * (-1) / (fDx*fDx))*hdt / hbar;
-		}
 	}
-
 
 
 	Eigen::SparseMatrix<Complex> id(fN, fN);
