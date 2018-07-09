@@ -156,14 +156,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\qsim\Cal.cpp" />
-    <ClCompile Include="..\qsim\EigenMethod.cpp" />
-    <ClCompile Include="..\qsim\GaussLegendreMethod.cpp" />
-    <ClCompile Include="..\qsim\SplittingMethod.cpp" />
-    <ClCompile Include="..\qsim\SplittingMethod2D.cpp" />
-    <ClCompile Include="..\qsim\System.cpp" />
-    <ClCompile Include="..\qsim\SystemImpl.cpp" />
-    <ClCompile Include="..\qsim\TestCal.cpp" />
     <ClCompile Include="QuSim2D.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +164,11 @@
   <ItemGroup>
     <Image Include="QuSim2D.ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QuSimLib\QuSimLib.vcxproj">
+      <Project>{3a4b2681-4236-4a8a-9891-d7d3937f8648}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -36,48 +36,9 @@
     <ClInclude Include="..\qsim\erfz.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\qsim\SystemImpl.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\qsim\EigenMethod.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\qsim\SplittingMethod.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\qsim\SplittingMethod2D.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\qsim\GaussLegendreMethod.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="QuSim.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\Cal.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\TestCal.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\System.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\SystemImpl.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\EigenMethod.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\SplittingMethod.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\SplittingMethod2D.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\GaussLegendreMethod.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

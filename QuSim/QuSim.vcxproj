@@ -97,6 +97,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ProjectReference />
+    <ProjectReference />
+    <ProjectReference />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -113,6 +116,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ProjectReference />
+    <ProjectReference />
+    <ProjectReference />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -133,6 +139,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ProjectReference />
+    <ProjectReference />
+    <ProjectReference />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -153,30 +162,20 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ProjectReference />
+    <ProjectReference />
+    <ProjectReference />
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\Cal.h" />
     <ClInclude Include="..\qsim\erfz.h" />
-    <ClInclude Include="..\qsim\GaussLegendreMethod.h" />
     <ClInclude Include="..\qsim\kissfft.hh" />
-    <ClInclude Include="..\qsim\EigenMethod.h" />
-    <ClInclude Include="..\qsim\SplittingMethod.h" />
-    <ClInclude Include="..\qsim\SplittingMethod2D.h" />
-    <ClInclude Include="..\qsim\SystemImpl.h" />
     <ClInclude Include="header.h" />
     <ClInclude Include="QuSim.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\qsim\Cal.cpp" />
-    <ClCompile Include="..\qsim\GaussLegendreMethod.cpp" />
-    <ClCompile Include="..\qsim\SplittingMethod2D.cpp" />
-    <ClCompile Include="..\qsim\System.cpp" />
-    <ClCompile Include="..\qsim\EigenMethod.cpp" />
-    <ClCompile Include="..\qsim\SystemImpl.cpp" />
-    <ClCompile Include="..\qsim\SplittingMethod.cpp" />
-    <ClCompile Include="..\qsim\TestCal.cpp" />
     <ClCompile Include="QuSim.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +184,11 @@
   <ItemGroup>
     <Image Include="QuSim.ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QuSimLib\QuSimLib.vcxproj">
+      <Project>{3a4b2681-4236-4a8a-9891-d7d3937f8648}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
