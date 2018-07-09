@@ -36,7 +36,7 @@ struct SplittingMethod2D : SystemImpl2D {
 		char const *vs, Real x0, Real x1, size_t nx,
 		Real y0, Real y1, size_t ny,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar) override;
+		Real mass, Real hbar, std::map<std::string, std::string> const &opts) override;
 
 	void update_psi() override;
 	Real CalKinEn() const override;

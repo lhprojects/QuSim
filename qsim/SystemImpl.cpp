@@ -5,7 +5,7 @@
 void SystemImpl::initSystem(char const * psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	char const *vs, BoundaryCondition b,
-	SolverMethod solver,Real mass, Real hbar)
+	SolverMethod solver,Real mass, Real hbar, std::map<std::string, std::string> const &opts)
 {
 	fStep = 0;
 
@@ -21,7 +21,7 @@ void SystemImpl::initSystem(char const * psi, bool force_normalization,
 	fHbar = hbar;
 
 	fSolverMethod = solver;
-
+	const_cast< std::map<std::string, std::string> &>(fOpts) = opts;
 }
 
 
@@ -91,13 +91,13 @@ void SystemImpl1D::initSystem1D(char const *psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	char const *vs, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
-	Real mass, Real hbar)
+	Real mass, Real hbar, std::map<std::string, std::string> const &opts)
 {
 
 	initSystem(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, b, solver,
-		mass, hbar);
+		mass, hbar, opts);
 
 	fX0 = x0;
 	fDx = (x1 - x0) / n;
@@ -162,10 +162,10 @@ void SystemImpl2D::initSystem2D(char const * psi, bool force_normalization,
 	char const * vs, Real x0, Real x1, size_t nx,
 	Real y0, Real y1, size_t ny,
 	BoundaryCondition b,
-	SolverMethod solver, Real mass, Real hbar)
+	SolverMethod solver, Real mass, Real hbar, std::map<std::string, std::string> const &opts)
 {
 	initSystem(psi, force_normalization, dt, force_normalization_each_step,
-		vs, b, solver, mass, hbar);
+		vs, b, solver, mass, hbar, opts);
 
 	fX0 = x0;
 	fDx = (x1 - x0) / nx;

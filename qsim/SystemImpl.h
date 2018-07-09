@@ -70,13 +70,15 @@ struct SystemImpl
 	bool fFN;
 	Int fStep;
 
+	std::map<std::string, std::string> const fOpts;
+
 	// init fPsi
 	// init fV
 	// init fN
 	void initSystem(char const *psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		char const *vs, BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar = 1);
+		Real mass, Real hbar, std::map<std::string, std::string> const &opts);
 
 	virtual void step() = 0;
 	virtual Real PotEn() = 0;
@@ -126,7 +128,7 @@ struct SystemImpl1D : SystemImpl {
 		Complex dt, bool force_normalization_each_step,
 		char const *vs, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar);
+		Real mass, Real hbar, std::map<std::string, std::string> const &opts);
 
 	virtual Real CalPotEn();
 	virtual Real CalKinEn();
@@ -264,7 +266,7 @@ struct SystemImpl2D : SystemImpl {
 		char const *vs, Real x0, Real x1, size_t nx,
 		Real y0, Real y1, size_t ny,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar = 1);
+		Real mass, Real hbar, std::map<std::string, std::string> const &opts);
 	virtual Real CalPotEn() const;
 	virtual Real CalKinEn() const;
 	// update fPsi

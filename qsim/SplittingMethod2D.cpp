@@ -6,11 +6,12 @@ void SplittingMethod2D::initSystem2D(char const * psi, bool force_normalization,
 	char const * vs, Real x0, Real x1,
 	size_t nx, Real y0, Real y1,
 	size_t ny, BoundaryCondition b,
-	SolverMethod solver, Real mass, Real hbar)
+	SolverMethod solver, Real mass, Real hbar,
+	std::map<std::string, std::string> const &opts)
 {
 	SystemImpl2D::initSystem2D(psi, force_normalization, dt, force_normalization_each_step,
 		vs, x0, x1, nx, y0, y1, ny,
-		b, solver, mass, hbar);
+		b, solver, mass, hbar, opts);
 
 	fVPsi.resize(fNy, fNx);
 	fTVPsi.resize(fNy, fNx);

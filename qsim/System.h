@@ -3,6 +3,7 @@
 #include <vector>
 #include <complex>
 #include <cmath>
+#include <map>
 #include "eigen/Eigen/Dense"
 
 using Real = double;
@@ -60,7 +61,8 @@ struct System1D : System {
 		Complex dt, bool force_normalization_each_step,
 		char const *vs, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar);
+		Real mass, Real hbar,
+		std::map<std::string, std::string> const &opts);
 
 	PsiVector const &GetPsi();
 	std::vector<Real> const &GetV();
@@ -85,7 +87,8 @@ struct System2D : System
 		char const *vs, Real x0, Real x1, size_t nx,
 		Real y0, Real y1, size_t ny,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar);
+		Real mass, Real hbar,
+		std::map<std::string, std::string> const &opts);
 
 	Eigen::MatrixXcd const &GetPsi();
 	Eigen::MatrixXd const &GetV();

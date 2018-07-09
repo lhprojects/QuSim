@@ -60,7 +60,8 @@ void System1D::init(char const *psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	char const *vs, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
-	Real mass, Real hbar)
+	Real mass, Real hbar,
+	std::map<std::string, std::string> const &opts)
 {
 	if (solver == SolverMethod::SplittingMethodO2) {
 		fImpl = new SplittingMethod();
@@ -81,7 +82,7 @@ void System1D::init(char const *psi, bool force_normalization,
 	fImpl->initSystem1D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, n, b, solver,
-		mass, hbar);
+		mass, hbar, opts);
 }
 
 System1D::System1D() {
@@ -143,7 +144,8 @@ void System2D::init(char const * psi, bool force_normalization,
 	char const * vs, Real x0, Real x1, size_t nx,
 	Real y0, Real y1, size_t ny,
 	BoundaryCondition b, SolverMethod solver,
-	Real mass, Real hbar)
+	Real mass, Real hbar,
+	std::map<std::string, std::string> const &opts)
 {
 	if (solver == SolverMethod::SplittingMethodO2) {
 		fImpl = new SplittingMethod2D();
@@ -158,7 +160,7 @@ void System2D::init(char const * psi, bool force_normalization,
 		vs, x0, x1, nx,
 		y0, y1, ny,
 		b, solver,
-		mass, hbar);
+		mass, hbar, std::map<std::string, std::string>());
 
 }
 

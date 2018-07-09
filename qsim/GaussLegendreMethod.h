@@ -8,7 +8,8 @@ struct GaussLegendreMethod : SystemImpl1D {
 		Complex dt, bool force_normalization_each_step,
 		char const *vs, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar) override;
+		Real mass, Real hbar,
+		std::map<std::string, std::string> const &opts) override;
 
 	// update fPsi
 	virtual void update_psi() override;
