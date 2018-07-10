@@ -4,7 +4,6 @@
 
 #include "kissfft.hh"
 
-// https://en.wikipedia.org/wiki/Symplectic_integrator#Splitting_methods_for_separable_Hamiltonians
 
 struct SplittingMethod : SystemImpl1D {
 
