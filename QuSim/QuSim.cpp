@@ -202,13 +202,13 @@ std::thread simulator;
 
 #define MAX_LOADSTRING 100
 
-// 全局变量: 
-HINSTANCE hInst;                                // 当前实例
-WCHAR szTitle[MAX_LOADSTRING];                  // 标题栏文本
+
+HINSTANCE hInst;                                
+WCHAR szTitle[MAX_LOADSTRING];                 
 WCHAR szWindowClass[MAX_LOADSTRING];
 WCHAR szCanvasWindowClass[] = { L"Canvas" };
 
-// 此代码模块中包含的函数的前向声明: 
+
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 ATOM                RegisterCanvasClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -228,8 +228,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// windows theme
 	InitCommonControls();
 
-	// 在第一次使用GDI + 对象前，调用以下代码：
-	ULONG_PTR gdiplusToken; // 这个变量需要保存下来
+	ULONG_PTR gdiplusToken; 
 	GdiplusStartupInput gdiplusStartupInput;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
@@ -238,15 +237,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    // TODO: 在此放置代码。
 
-    // 初始化全局字符串
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_QUSIM, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 	RegisterCanvasClass(hInstance);
 
-    // 执行应用程序初始化: 
     if (!InitInstance (hInstance, nCmdShow))
     {
         return FALSE;
@@ -256,7 +252,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
-    // 主消息循环: 
     while (GetMessage(&msg, nullptr, 0, 0))
     {
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
@@ -266,7 +261,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
-	// 在最后一次使用GDI+对象之后，调用以下代码：
 	GdiplusShutdown(gdiplusToken);
 
 	auto native_handler = simulator.native_handle();
@@ -278,11 +272,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 
-//
-//  函数: MyRegisterClass()
-//
-//  目的: 注册窗口类。
-//
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
     WNDCLASSEXW wcex;
@@ -305,11 +294,6 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 }
 
 
-//
-//  函数: MyRegisterClass()
-//
-//  目的: 注册窗口类。
-//
 ATOM RegisterCanvasClass(HINSTANCE hInstance)
 {
 	WNDCLASSEXW wcex;
@@ -331,19 +315,9 @@ ATOM RegisterCanvasClass(HINSTANCE hInstance)
 	return RegisterClassExW(&wcex);
 }
 
-//
-//   函数: InitInstance(HINSTANCE, int)
-//
-//   目的: 保存实例句柄并创建主窗口
-//
-//   注释: 
-//
-//        在此函数中，我们在全局变量中保存实例句柄并
-//        创建和显示主程序窗口。
-//
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // 将实例句柄存储在全局变量中
+   hInst = hInstance;
 
 #if 0
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
@@ -406,7 +380,7 @@ void DrawPotential(Gdiplus::Graphics &graphics,
 
 		wchar_t bf[100];
 		swprintf(bf, 100, L"% 5g", (double)(i/10.0*axis_max));
-		PointF layoutRect(b.X - 100, b.Y - 10);
+		PointF layoutRect((float)(b.X - 100), (float)(b.Y - 10));
 
 		graphics.DrawString(bf, lstrlenW(bf), &myFont, layoutRect, &blackBrush);
 	}
@@ -423,7 +397,7 @@ void DrawPotential(Gdiplus::Graphics &graphics,
 	}
 
 	Pen      pen4(Color(255, 0, 255, 0));
-	graphics.DrawLines(&pen4, vc.data(), vc.size());
+	graphics.DrawLines(&pen4, vc.data(), (int)vc.size());
 
 	exp(Complex(0, 1));
 }
@@ -439,10 +413,10 @@ void DrawPsi(Gdiplus::Graphics &graphics,
 
 
 	for (int i = 0; i < w; i += 1) {
-		int xi = (int)(1.0 * i / w * (psi.size() - 1));
-		int ab = -abs(psi[xi]) * 100 + h / 2;
-		int re = -psi[xi].real() * 100 + h / 2;
-		int im = -psi[xi].imag() * 100 + h / 2;
+		int xi = (int)((1.0 * i / w * (psi.size() - 1)));
+		int ab = (int)(-abs(psi[xi]) * 100 + h / 2);
+		int re = (int)(-psi[xi].real() * 100 + h / 2);
+		int im = (int)(-psi[xi].imag() * 100 + h / 2);
 		abc.push_back(Point(i, ab));
 		rec.push_back(Point(i, re));
 		imc.push_back(Point(i, im));
@@ -451,9 +425,9 @@ void DrawPsi(Gdiplus::Graphics &graphics,
 	Pen      pen1(Color(255, 0, 0, 255));
 	Pen      pen2(Color(255, 0, 255, 255));
 	Pen      pen3(Color(255, 255, 0, 255));
-	graphics.DrawCurve(&pen1, abc.data(), abc.size());
-	graphics.DrawCurve(&pen2, rec.data(), rec.size());
-	graphics.DrawCurve(&pen3, imc.data(), imc.size());
+	graphics.DrawCurve(&pen1, abc.data(), (int)abc.size());
+	graphics.DrawCurve(&pen2, rec.data(), (int)rec.size());
+	graphics.DrawCurve(&pen3, imc.data(), (int)imc.size());
 
 }
 
@@ -465,7 +439,7 @@ void OnPaint1(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 	if (!gui.data_ready) return;
 
 	Font myFont(L"Courier New", 14);
-	RectF layoutRect(left+25, top+20, 500.0f, 800.0f);
+	RectF layoutRect((float)(left+25), (float)(top+20), 500.0f, 800.0f);
 	StringFormat format;
 	format.SetAlignment(StringAlignmentNear);
 	SolidBrush blackBrush(Color(255, 0, 0, 0));
@@ -756,16 +730,7 @@ LRESULT CALLBACK CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	return 0;
 }
 
-//
-//  函数: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  目的:    处理主窗口的消息。
-//
-//  WM_COMMAND  - 处理应用程序菜单
-//  WM_PAINT    - 绘制主窗口
-//  WM_DESTROY  - 发送退出消息并返回
-//
-//
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -796,7 +761,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		x += 180;
 
 		hInitalPsi = CreateWindow(TEXT("EDIT"), TEXT("gauss(x, -20, 5)*exp(I*x)"),
-			WS_CHILD | WS_VISIBLE | WS_BORDER /*边框*/ | ES_AUTOHSCROLL /*水平滚动*/,
+			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
 			x, y, 500, 30,
 			hWnd, (HMENU)NULL, hInst, NULL
 		);
@@ -850,7 +815,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		x += 180;
 
 		hPotential = CreateWindow(TEXT("EDIT"), TEXT("exp(-x*x)"),
-			WS_CHILD | WS_VISIBLE | WS_BORDER /*边框*/ | ES_AUTOHSCROLL /*水平滚动*/,
+			WS_CHILD | WS_VISIBLE | WS_BORDER| ES_AUTOHSCROLL,
 			x, y, 500, 30,
 			hWnd, (HMENU)NULL, hInst, NULL
 		);
@@ -868,7 +833,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		x += 50;
 
 		hX0 = CreateWindow(TEXT("EDIT"), TEXT("-50"),
-			WS_CHILD | WS_VISIBLE | WS_BORDER /*边框*/ | ES_AUTOHSCROLL,
+			WS_CHILD | WS_VISIBLE | WS_BORDER| ES_AUTOHSCROLL,
 			x, y, 80, 30,
 			hWnd, (HMENU)NULL, hInst, NULL
 		);
@@ -886,7 +851,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		x += 50;
 
 		hX1 = CreateWindow(TEXT("EDIT"), TEXT("50"),
-			WS_CHILD | WS_VISIBLE | WS_BORDER /*边框*/ | ES_AUTOHSCROLL,
+			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
 			x, y, 80, 30,
 			hWnd, (HMENU)NULL, hInst, NULL
 		);
@@ -964,7 +929,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TEXT("BUTTON"),
 			TEXT("Run"),
 			WS_TABSTOP | WS_VISIBLE | WS_CHILD,
-			x /*X坐标*/, y /*Y坐标*/, 100 /*宽度*/, 30/*高度*/,
+			x, y, 100, 30,
 			hWnd, (HMENU)0, hInst, NULL
 		);
 		SendMessage(hRun, WM_SETFONT, (LPARAM)guiFont, true);
@@ -974,7 +939,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TEXT("BUTTON"),
 			TEXT("Stop"),
 			WS_TABSTOP | WS_VISIBLE | WS_CHILD,
-			x /*X坐标*/, y /*Y坐标*/, 100 /*宽度*/, 30/*高度*/,
+			x, y, 100, 30,
 			hWnd, (HMENU)0, hInst, NULL
 		);
 		SendMessage(hStop, WM_SETFONT, (LPARAM)guiFont, true);
@@ -996,7 +961,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TEXT("BUTTON"),
 			TEXT("SplitO2"),
 			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON | WS_GROUP,
-			x /*X坐标*/, y /*Y坐标*/, 80/*宽度*/, 30/*高度*/,
+			x, y, 80, 30,
 			hWnd, (HMENU)0, hInst, NULL
 		);
 		SendMessage(hVTV, WM_SETFONT, (LPARAM)guiFont, true);
@@ -1008,7 +973,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TEXT("BUTTON"),
 			TEXT("SplitO4"),
 			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON,
-			x /*X坐标*/, y /*Y坐标*/, 80/*宽度*/, 30/*高度*/,
+			x, y, 80, 30,
 			hWnd, (HMENU)0, hInst, NULL
 		);
 		SendMessage(hSplitO4, WM_SETFONT, (LPARAM)guiFont, true);
@@ -1019,7 +984,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TEXT("BUTTON"),
 			TEXT("Eigen"),
 			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON,
-			x /*X坐标*/, y /*Y坐标*/, 80 /*宽度*/, 30/*高度*/,
+			x , y , 80 , 30,
 			hWnd, (HMENU)0, hInst, NULL
 		);
 		SendMessage(hEigen, WM_SETFONT, (LPARAM)guiFont, true);
@@ -1030,7 +995,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TEXT("BUTTON"),
 			TEXT("Midpoint"),
 			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON,
-			x /*X坐标*/, y /*Y坐标*/, 120 /*宽度*/, 30/*高度*/,
+			x , y, 120, 30,
 			hWnd, (HMENU)0, hInst, NULL
 		);
 		SendMessage(hMidpoint, WM_SETFONT, (LPARAM)guiFont, true);
@@ -1041,7 +1006,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TEXT("BUTTON"),
 			TEXT("Gauss"),
 			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON,
-			x /*X坐标*/, y /*Y坐标*/, 120 /*宽度*/, 30/*高度*/,
+			x , y, 120, 30,
 			hWnd, (HMENU)0, hInst, NULL
 		);
 		SendMessage(hGauss, WM_SETFONT, (LPARAM)guiFont, true);
@@ -1062,7 +1027,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TEXT("BUTTON"),
 			TEXT("Infinite Wall"),
 			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON | WS_GROUP,
-			x /*X坐标*/, y /*Y坐标*/, 120/*宽度*/, 30/*高度*/,
+			x, y, 120, 30,
 			hWnd, (HMENU)0, hInst, NULL
 		);
 		SendMessage(hInfiniteWall, WM_SETFONT, (LPARAM)guiFont, true);
@@ -1074,7 +1039,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TEXT("BUTTON"),
 			TEXT("Periodic"),
 			WS_CHILD | WS_VISIBLE | BS_LEFT | BS_AUTORADIOBUTTON,
-			x /*X坐标*/, y /*Y坐标*/, 100 /*宽度*/, 30/*高度*/,
+			x, y, 100, 30,
 			hWnd, (HMENU)0, hInst, NULL
 		);
 		SendMessage(hPeriod, WM_SETFONT, (LPARAM)guiFont, true);
@@ -1091,7 +1056,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		x += 60;
 
 		hHbar = CreateWindow(TEXT("EDIT"), TEXT("1"),
-			WS_CHILD | WS_VISIBLE | WS_BORDER /*边框*/ | ES_AUTOHSCROLL,
+			WS_CHILD | WS_VISIBLE | WS_BORDER| ES_AUTOHSCROLL,
 			x, y, 120, 30,
 			hWnd, (HMENU)NULL, hInst, NULL
 		);
@@ -1109,7 +1074,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		x += 60;
 
 		hMass = CreateWindow(TEXT("EDIT"), TEXT("1"),
-			WS_CHILD | WS_VISIBLE | WS_BORDER /*边框*/ | ES_AUTOHSCROLL,
+			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
 			x, y, 120, 30,
 			hWnd, (HMENU)NULL, hInst, NULL
 		);
@@ -1205,7 +1170,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		} else {
 			int wmId = LOWORD(wParam);
-			// 分析菜单选择: 
+
 			switch (wmId) {
 			case IDM_ABOUT:
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
@@ -1239,7 +1204,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-// “关于”框的消息处理程序。
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
