@@ -1,5 +1,8 @@
 #pragma once
 #include "SystemImpl.h"
+#include <memory>
+
+#include "kissfft.hh"
 
 // https://en.wikipedia.org/wiki/Symplectic_integrator#Splitting_methods_for_separable_Hamiltonians
 
@@ -12,21 +15,15 @@ struct SplittingMethod : SystemImpl1D {
 
 	// period only
 	std::vector<Complex> fFTPsi;
-	void *fft_N;
-	void *inv_fft_N;
+	std::shared_ptr<kissfft<Real> > fft_N;
+	std::shared_ptr<kissfft<Real> > inv_fft_N;
 	// infinite wall
-	void *inv_fft_2N;
+	std::shared_ptr<kissfft<Real> > inv_fft_2N;
 	std::vector<Complex> fIWPsi;
 	std::vector<Complex> fIWKPsi;
 
 
-	SplittingMethod()
-	{
-		fN = 0;
-		fft_N = nullptr;
-		inv_fft_N = nullptr;
-		inv_fft_2N = nullptr;
-	}
+	SplittingMethod();
 
 	void initSystem1D(char const *psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,

@@ -1,6 +1,14 @@
 
 #include "SplittingMethod.h"
-#include "kissfft.hh"
+
+SplittingMethod::SplittingMethod()
+{
+	fN = 0;
+	fft_N = nullptr;
+	inv_fft_N = nullptr;
+	inv_fft_2N = nullptr;
+}
+
 
 void SplittingMethod::initSystem1D(char const *psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
@@ -22,14 +30,11 @@ void SplittingMethod::initSystem1D(char const *psi, bool force_normalization,
 	if (fBoundaryCondition == BoundaryCondition::Period) {
 		fFTPsi.resize(n);
 
-		if (fft_N) delete (kissfft<Real>*)fft_N;
-		fft_N = new kissfft<Real>((int)fN, false);
-		if (inv_fft_N) delete (kissfft<Real>*)(inv_fft_N);
-		inv_fft_N = new kissfft<Real>((int)fN, true);
+		fft_N.reset(new kissfft<Real>((int)fN, false));
+		inv_fft_N.reset(new kissfft<Real>((int)fN, true));
 
 	} else if (fBoundaryCondition == BoundaryCondition::InfiniteWall) {
-		if (inv_fft_2N) delete (kissfft<Real>*)fft_N;
-		inv_fft_2N = new kissfft<Real>(2 * (int)fN, true);
+		inv_fft_2N.reset(new kissfft<Real>(2 * (int)fN, true));
 		fIWPsi.resize(2 * n);
 		fIWKPsi.resize(2 * n);
 	}
@@ -55,12 +60,10 @@ void SplittingMethod::ExpT(PsiVector &tpsi, PsiVector const &psi, Real tt)
 		//Zero(fFTPsi);
 		//fKinEnergy = 0;
 
-		kissfft<Real> &fft = *(kissfft<Real>*)this->fft_N;
-		kissfft<Real> &inv_fft = *(kissfft<Real>*)this->inv_fft_N;
 		//kiss_fft_cfg kiss_cfg =  kiss_fft_alloc(fN, false, NULL, NULL);
 		//kiss_fft_cfg kiss_cfg_inv = kiss_fft_alloc(fN, true, NULL, NULL);
 
-		fft.transform(psi.data(), fFTPsi.data());
+		fft_N->transform(psi.data(), fFTPsi.data());
 		//kiss_fft(kiss_cfg, (kiss_fft_cpx*)psi.data(), (kiss_fft_cpx*)fFTPsi.data());
 
 		Scale(fFTPsi, 1.0 / sqrt(1.0*fN));
@@ -88,7 +91,7 @@ void SplittingMethod::ExpT(PsiVector &tpsi, PsiVector const &psi, Real tt)
 		}
 		//fKinEnergy /= Norm2(fFTPsi);
 
-		inv_fft.transform(fFTPsi.data(), tpsi.data());
+		inv_fft_N->transform(fFTPsi.data(), tpsi.data());
 		//kiss_fft(kiss_cfg_inv, (kiss_fft_cpx*)fFTPsi.data(), (kiss_fft_cpx*)tpsi.data());
 
 		Scale(tpsi, 1.0 / sqrt(1.0*fN));
@@ -101,7 +104,6 @@ void SplittingMethod::ExpT(PsiVector &tpsi, PsiVector const &psi, Real tt)
 		//fKinEnergy = 0;
 		//Real kinEnergyNorm2 = 0;
 
-		kissfft<Real> &inv_fft = *(kissfft<Real>*)this->inv_fft_2N;
 
 		//kiss_fft_cfg kiss_cfg_inv = kiss_fft_alloc(2*fN, true, NULL, NULL);
 
@@ -112,7 +114,7 @@ void SplittingMethod::ExpT(PsiVector &tpsi, PsiVector const &psi, Real tt)
 			fIWPsi[i] = -fIWPsi[2 * fN - i];
 		}
 
-		inv_fft.transform(fIWPsi.data(), fIWKPsi.data());
+		inv_fft_2N->transform(fIWPsi.data(), fIWKPsi.data());
 		//kiss_fft(kiss_cfg_inv, (kiss_fft_cpx*)fIWPsi.data(), (kiss_fft_cpx*)fIWKPsi.data());
 
 		Scale(fIWKPsi, 1.0 / (1.0*fN*I));
@@ -140,7 +142,7 @@ void SplittingMethod::ExpT(PsiVector &tpsi, PsiVector const &psi, Real tt)
 			fIWKPsi[i] = -fIWKPsi[2 * fN - i];
 		}
 
-		inv_fft.transform(fIWKPsi.data(), fIWPsi.data());
+		inv_fft_2N->transform(fIWKPsi.data(), fIWPsi.data());
 		//kiss_fft(kiss_cfg_inv, (kiss_fft_cpx*)fIWKPsi.data(), (kiss_fft_cpx*)fIWPsi.data());
 
 		Scale(fIWPsi, 1.0 / (2.0 * I));
@@ -206,10 +208,9 @@ Real SplittingMethod::CalKinEn()
 	if (fBoundaryCondition == BoundaryCondition::Period) {
 		//Zero(fFTPsi);
 
-		kissfft<Real> &fft = *(kissfft<Real>*)this->fft_N;
 		//kiss_fft_cfg kiss_cfg = kiss_fft_alloc(fN, false, NULL, NULL);
 
-		fft.transform(fPsi.data(), fFTPsi.data());
+		fft_N->transform(fPsi.data(), fFTPsi.data());
 		//kiss_fft(kiss_cfg, (kiss_fft_cpx*)fPsi.data(), (kiss_fft_cpx*)fFTPsi.data());
 
 		Real kinen = 0;
@@ -231,7 +232,6 @@ Real SplittingMethod::CalKinEn()
 
 	} else if (fBoundaryCondition == BoundaryCondition::InfiniteWall) {
 
-		kissfft<Real> &inv_fft = *(kissfft<Real>*)inv_fft_2N;
 
 		std::copy(fPsi.begin(), fPsi.end(), fIWPsi.begin());
 		fIWPsi[0] = 0;
@@ -240,7 +240,7 @@ Real SplittingMethod::CalKinEn()
 			fIWPsi[i] = -fIWPsi[2 * fN - i];
 		}
 
-		inv_fft.transform(fIWPsi.data(), fIWKPsi.data());
+		inv_fft_2N->transform(fIWPsi.data(), fIWKPsi.data());
 
 
 		Real kinen = 0;

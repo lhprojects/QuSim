@@ -2,8 +2,8 @@
 
 #include "SystemImpl.h"
 #include "eigen/Eigen/Dense"
-#include "kissfft.hh"
 #include <memory>
+#include "kissfft.hh"
 
 // https://en.wikipedia.org/wiki/Symplectic_integrator#Splitting_methods_for_separable_Hamiltonians
 

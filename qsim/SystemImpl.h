@@ -89,7 +89,7 @@ struct SystemImpl
 	// or int abs2(psi) dx dy for 2D
 	//( sum_ij psi_ij Dx Dy)
 	virtual Real Norm2() = 0;
-
+	virtual ~SystemImpl() { }
 
 	Real Time()
 	{

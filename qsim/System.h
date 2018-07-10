@@ -4,6 +4,7 @@
 #include <complex>
 #include <cmath>
 #include <map>
+#include <memory>
 #include "eigen/Eigen/Dense"
 
 using Real = double;
@@ -50,8 +51,9 @@ struct System {
 	Real EnPartialT();
 
 	System();
+	~System();
 protected:
-	SystemImpl *fImpl;
+	std::shared_ptr<SystemImpl> fImpl;
 };
 
 
@@ -72,8 +74,6 @@ struct System1D : System {
 	Real NormRight();
 
 	System1D();
-protected:
-	SystemImpl1D * fImpl;
 
 };
 
@@ -95,7 +95,5 @@ struct System2D : System
 	UInt GetNx();
 	UInt GetNy();
 
-protected:
-	SystemImpl2D * fImpl;
 
 };

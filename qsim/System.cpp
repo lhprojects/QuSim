@@ -12,6 +12,11 @@ System::System() {
 	fImpl = nullptr;
 }
 
+System::~System()
+{
+	
+}
+
 void System::step()
 {
 	fImpl->step();
@@ -64,22 +69,22 @@ void System1D::init(char const *psi, bool force_normalization,
 	std::map<std::string, std::string> const &opts)
 {
 	if (solver == SolverMethod::SplittingMethodO2) {
-		fImpl = new SplittingMethod();
+		fImpl.reset(new SplittingMethod());
 	} else if (solver == SolverMethod::SplittingMethodO4) {
-		fImpl = new SplittingMethod();
+		fImpl.reset(new SplittingMethod());
 	} else if(solver == SolverMethod::Eigen) {
-		fImpl = new EigenMethod();
+		fImpl.reset(new EigenMethod());
 	} else if (solver == SolverMethod::ImplicitMidpointMethod) {
-		fImpl = new GaussLegendreMethod();
+		fImpl.reset(new GaussLegendreMethod());
 	} else if (solver == SolverMethod::GaussLegendreO4) {
-		fImpl = new GaussLegendreMethod();
+		fImpl.reset(new GaussLegendreMethod());
 	} else if (solver == SolverMethod::GaussLegendreO6) {
-		fImpl = new GaussLegendreMethod();
+		fImpl.reset(new GaussLegendreMethod());
 	} else {
 		throw std::runtime_error("unspported solver");
 	}
-	System::fImpl = fImpl;
-	fImpl->initSystem1D(psi, force_normalization,
+
+	((SystemImpl1D*)fImpl.get())->initSystem1D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, n, b, solver,
 		mass, hbar, opts);
@@ -92,32 +97,32 @@ System1D::System1D() {
 
 PsiVector const & System1D::GetPsi()
 {
-	return fImpl->fPsi;
+	return ((SystemImpl1D*)fImpl.get())->fPsi;
 }
 
 std::vector<Real> const & System1D::GetV()
 {
-	return fImpl->fV;
+	return ((SystemImpl1D*)fImpl.get())->fV;
 }
 
 Real System1D::Xavg()
 {
-	return fImpl->Xavg();
+	return ((SystemImpl1D*)fImpl.get())->Xavg();
 }
 
 UInt System1D::GetN()
 {
-	return fImpl->fN;
+	return ((SystemImpl1D*)fImpl.get())->fN;
 }
 
 Real System1D::NormLeft()
 {
-	return fImpl->NormLeft();
+	return ((SystemImpl1D*)fImpl.get())->NormLeft();
 }
 
 Real System1D::NormRight()
 {
-	return fImpl->NormRight();
+	return ((SystemImpl1D*)fImpl.get())->NormRight();
 }
 
 
@@ -148,14 +153,14 @@ void System2D::init(char const * psi, bool force_normalization,
 	std::map<std::string, std::string> const &opts)
 {
 	if (solver == SolverMethod::SplittingMethodO2) {
-		fImpl = new SplittingMethod2D();
+		fImpl.reset(new SplittingMethod2D());
 	} else if (solver == SolverMethod::SplittingMethodO4) {
-		fImpl = new SplittingMethod2D();
+		fImpl.reset(new SplittingMethod2D());
 	} else {
 		throw std::runtime_error("unsupported solver");
 	}
-	System::fImpl = fImpl;
-	fImpl->initSystem2D(psi, force_normalization,
+
+	((SystemImpl2D*)fImpl.get())->initSystem2D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, nx,
 		y0, y1, ny,
@@ -167,20 +172,20 @@ void System2D::init(char const * psi, bool force_normalization,
 Eigen::MatrixXcd const & System2D::GetPsi()
 {
 	//double x = Norm2();
-	return fImpl->fPsi;
+	return ((SystemImpl2D*)fImpl.get())->fPsi;
 }
 
 Eigen::MatrixXd const & System2D::GetV()
 {
-	return fImpl->fV;
+	return ((SystemImpl2D*)fImpl.get())->fV;
 }
 
 UInt System2D::GetNx()
 {
-	return fImpl->fNx;
+	return ((SystemImpl2D*)fImpl.get())->fNx;
 }
 
 UInt System2D::GetNy()
 {
-	return fImpl->fNy;
+	return ((SystemImpl2D*)fImpl.get())->fNy;
 }
