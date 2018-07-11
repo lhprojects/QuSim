@@ -11,7 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSim2D", "QuSim2D\QuSim2D.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimBenchmark", "QuSimBenchmark\QuSimBenchmark.vcxproj", "{87A63853-3D4D-4961-AFE1-35AF486E1EFF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimLib", "QuSimLib\QuSimLib.vcxproj", "{3A4B2681-4236-4A8A-9891-D7D3937F8648}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimCore", "QuSimCore\QuSimCore.vcxproj", "{3A4B2681-4236-4A8A-9891-D7D3937F8648}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimPrecision", "QuSimPrecision\QuSimPrecision.vcxproj", "{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}"
 EndProject

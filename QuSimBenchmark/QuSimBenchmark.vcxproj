@@ -150,7 +150,7 @@
     <ClCompile Include="QuSimBenchmark.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QuSimLib\QuSimLib.vcxproj">
+    <ProjectReference Include="..\QuSimCore\QuSimCore.vcxproj">
       <Project>{3a4b2681-4236-4a8a-9891-d7d3937f8648}</Project>
     </ProjectReference>
   </ItemGroup>
