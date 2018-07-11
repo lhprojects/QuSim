@@ -25,10 +25,15 @@ enum CalExprType {
 
 	CALE_SIN,
 	CALE_COS,
+	CALE_TAN,
 	CALE_EXP,
 	CALE_TANH,
+
 	CALE_ASIN,
 	CALE_ACOS,
+	CALE_ATAN,
+	CALE_LOG,
+	CALE_ATANH,
 
 	CALE_SIGN,
 	CALE_ABS,
@@ -112,17 +117,29 @@ struct CalExpr {
 		case CALE_TANH:
 			return tanh(fSubExprs.at(0)->Val(cal));
 			break;
+		case CALE_LOG:
+			return log(fSubExprs.at(0)->Val(cal));
+			break;
+		case CALE_ATANH:
+			return atanh(fSubExprs.at(0)->Val(cal));
+			break;
 		case CALE_SIN:
 			return sin(fSubExprs.at(0)->Val(cal));
 			break;
 		case CALE_COS:
 			return cos(fSubExprs.at(0)->Val(cal));
 			break;
+		case CALE_TAN:
+			return tan(fSubExprs.at(0)->Val(cal));
+			break;
 		case CALE_ASIN:
 			return asin(fSubExprs.at(0)->Val(cal));
 			break;
 		case CALE_ACOS:
 			return acos(fSubExprs.at(0)->Val(cal));
+			break;
+		case CALE_ATAN:
+			return atan(fSubExprs.at(0)->Val(cal));
 			break;
 		case CALE_SIGN:
 			return fSubExprs.at(0)->Val(cal).real() > 0;
@@ -239,16 +256,24 @@ CalExpr *parseFunc(char const *&s)
 				type = CALE_SIN;
 			} else if (name == "cos") {
 				type = CALE_COS;
+			} else if (name == "tan") {
+				type = CALE_TAN;
 			} else if (name == "asin") {
 				type = CALE_ASIN;
 			} else if (name == "acos") {
 				type = CALE_ACOS;
+			} else if (name == "atan") {
+				type = CALE_ATAN;
 			} else if (name == "sign") {
 				type = CALE_SIGN;
 			} else if (name == "exp") {
 				type = CALE_EXP;
 			} else if (name == "tanh") {
 				type = CALE_TANH;
+			} else if (name == "log") {
+				type = CALE_LOG;
+			} else if (name == "atanh") {
+				type = CALE_ATANH;
 			} else if (name == "abs") {
 				type = CALE_ABS;
 			} else if (name == "sqrt") {
@@ -259,9 +284,10 @@ CalExpr *parseFunc(char const *&s)
 				throw std::runtime_error("unkown function");
 			}
 
-			if (type == CALE_SIN || type == CALE_COS ||
-				type == CALE_ASIN || type == CALE_ACOS ||
+			if (type == CALE_SIN || type == CALE_COS || type == CALE_TAN ||
+				type == CALE_ASIN || type == CALE_ACOS || type == CALE_ATAN ||
 				type == CALE_EXP || type == CALE_TANH ||
+				type == CALE_LOG || type == CALE_ATANH ||
 				type == CALE_ABS || type == CALE_SQRT) {
 				++s;
 				skipEmpty(s);

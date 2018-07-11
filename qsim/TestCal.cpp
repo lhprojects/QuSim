@@ -70,6 +70,10 @@ void testCal()
 		Cal cal(" cos(3.1415926)");
 		ASS(abs(cal.Val().real() - -1) < 0.001);
 	}
+	{
+		Cal cal(" tan(3.1415926/4)");
+		ASS(abs(cal.Val().real() - 1) < 0.001);
+	}
 
 	{
 		Cal cal(" asin(1)");
@@ -79,6 +83,21 @@ void testCal()
 	{
 		Cal cal(" acos(1)");
 		ASS(abs(cal.Val().real() - 0) < 0.001);
+	}
+
+	{
+		Cal cal(" atan(1)");
+		ASS(abs(cal.Val().real() - 3.1415926 / 4) < 0.001);
+	}
+
+	{
+		Cal cal(" exp(1)");
+		ASS(abs(cal.Val().real() - 2.718281) < 0.001);
+	}
+
+	{
+		Cal cal(" log(1)");
+		ASS(abs(cal.Val().real() - 0.0) < 0.001);
 	}
 
 	{
