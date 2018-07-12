@@ -5,6 +5,7 @@
 #include "EigenMethod.h"
 #include "GaussLegendreMethod.h"
 #include "SplittingMethod2D.h"
+#include "Cal.h"
 
 using std::abs;
 
@@ -61,9 +62,9 @@ Real System::EnPartialT()
 
 
 
-void System1D::init(char const *psi, bool force_normalization,
+void System1D::init(std::function<Complex(Real)> const &psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
-	char const *vs, Real x0, Real x1, size_t n,
+	std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
 	Real mass, Real hbar,
 	std::map<std::string, std::string> const &opts)
@@ -144,9 +145,9 @@ System2D::System2D()
 	fImpl = nullptr;
 }
 
-void System2D::init(char const * psi, bool force_normalization,
+void System2D::init(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
-	char const * vs, Real x0, Real x1, size_t nx,
+	std::function<Complex(Real, Real)> const &vs, Real x0, Real x1, size_t nx,
 	Real y0, Real y1, size_t ny,
 	BoundaryCondition b, SolverMethod solver,
 	Real mass, Real hbar,
@@ -188,4 +189,42 @@ UInt System2D::GetNx()
 UInt System2D::GetNy()
 {
 	return ((SystemImpl2D*)fImpl.get())->fNy;
+}
+
+
+
+
+
+
+
+
+
+
+FunctorWrapper::FunctorWrapper(char const *str) : fCal(std::make_shared<Cal>(str))
+{
+}
+
+Complex FunctorWrapper::operator()(Real x)
+{
+	fCal->SetVarVal("x", x);
+	return fCal->Val();
+}
+
+FunctorWrapper::~FunctorWrapper()
+{
+}
+
+Functor2DWrapper::Functor2DWrapper(char const *str) : fCal(std::make_shared<Cal>(str))
+{
+}
+
+Complex Functor2DWrapper::operator()(Real x, Real y)
+{
+	fCal->SetVarVal("x", x);
+	fCal->SetVarVal("y", y);
+	return fCal->Val();
+}
+
+Functor2DWrapper::~Functor2DWrapper()
+{
 }

@@ -1,9 +1,9 @@
 #include "SplittingMethod2D.h"
 //#include "kissfft.hh"
 
-void SplittingMethod2D::initSystem2D(char const * psi, bool force_normalization,
+void SplittingMethod2D::initSystem2D(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
-	char const * vs, Real x0, Real x1,
+	std::function<Complex(Real, Real)> const &vs, Real x0, Real x1,
 	size_t nx, Real y0, Real y1,
 	size_t ny, BoundaryCondition b,
 	SolverMethod solver, Real mass, Real hbar,

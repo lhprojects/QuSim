@@ -5,6 +5,7 @@
 #include "System.h"
 #include "eigen/Eigen/Dense"
 #include <stdio.h>
+#include <functional>
 
 template<class PsiVector>
 inline void dump_comp(PsiVector const &v, char const *fn)
@@ -61,12 +62,9 @@ struct SystemImpl
 	Real fMass;
 	Real fHbar;
 
-	std::string fVStr;
-
 	BoundaryCondition fBoundaryCondition;
 	SolverMethod fSolverMethod;
 
-	std::string fPsiStr;
 	bool fFN;
 	Int fStep;
 
@@ -75,9 +73,9 @@ struct SystemImpl
 	// init fPsi
 	// init fV
 	// init fN
-	void initSystem(char const *psi, bool force_normalization,
+	void initSystem(bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
-		char const *vs, BoundaryCondition b, SolverMethod solver,
+		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar, std::map<std::string, std::string> const &opts);
 
 	virtual void step() = 0;
@@ -103,10 +101,11 @@ struct SystemImpl1D : SystemImpl {
 	Real fX0;
 	Real fDx;
 	size_t fN;
+
+	std::function<Complex(Real)> fVFunc;
 	std::vector<Real> fV;
 
-
-
+	std::function<Complex(Real)> fPsi0Func;
 	std::vector<Complex> fLastLastPsi;
 	std::vector<Complex> fLastPsi;
 	std::vector<Complex> fPsi;
@@ -124,9 +123,9 @@ struct SystemImpl1D : SystemImpl {
 	// init fPsi
 	// init fV
 	// init fN
-	virtual void initSystem1D(char const *psi, bool force_normalization,
+	virtual void initSystem1D(std::function<Complex(Real)> const & psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
-		char const *vs, Real x0, Real x1, size_t n,
+		std::function<Complex(Real)> const &v, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar, std::map<std::string, std::string> const &opts);
 
@@ -235,7 +234,9 @@ struct SystemImpl2D : SystemImpl {
 	size_t fNx;
 	size_t fNy;
 	Eigen::MatrixXd fV;
+	std::function<Complex(Real, Real)> fVFunc;
 
+	std::function<Complex(Real, Real)> fPsi0Func;
 	// col major
 	// y major
 	Eigen::MatrixXcd fLastLastPsi;
@@ -261,9 +262,9 @@ struct SystemImpl2D : SystemImpl {
 	// init fPsi
 	// init fV
 	// init fN
-	virtual void initSystem2D(char const *psi, bool force_normalization,
+	virtual void initSystem2D(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
-		char const *vs, Real x0, Real x1, size_t nx,
+		std::function<Complex(Real, Real)> const &v, Real x0, Real x1, size_t nx,
 		Real y0, Real y1, size_t ny,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar, std::map<std::string, std::string> const &opts);

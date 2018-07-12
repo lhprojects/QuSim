@@ -52,7 +52,7 @@ void test_tunneling()
 
 	if (0) {
 		System1D syst;
-		syst.init("gauss(x, -20, 5)*exp(I*x)", true, 5E-3, false, "exp(-x*x)",
+		syst.init(FunctorWrapper("gauss(x, -20, 5)*exp(I*x)"), true, 5E-3, false, FunctorWrapper("exp(-x*x)"),
 			-100, 100, 8000, BoundaryCondition::Period, SolverMethod::SplittingMethodO4, 1, 1,
 			std::map<std::string, std::string>());
 		for (; syst.Time() < 64;) {
@@ -63,7 +63,7 @@ void test_tunneling()
 
 	if (0) {
 		System1D syst;
-		syst.init("gauss(x, -20, 5)*exp(I*x)", true, 5E-3, false, "exp(-x*x)",
+		syst.init(FunctorWrapper("gauss(x, -20, 5)*exp(I*x)"), true, 5E-3, false, FunctorWrapper("exp(-x*x)"),
 			-100, 100, 8000, BoundaryCondition::Period, SolverMethod::GaussLegendreO6, 1, 1,
 			std::map<std::string, std::string>());
 		for (; syst.Time() < 64;) {
@@ -94,7 +94,7 @@ void test_tunneling()
 				double time = times[k];
 
 				System1D syst;
-				syst.init("gauss(x, -20, 5)*exp(I*x)", true, time, false, "exp(-x*x)",
+				syst.init(FunctorWrapper("gauss(x, -20, 5)*exp(I*x)"), true, time, false, FunctorWrapper("exp(-x*x)"),
 					-100, 100, dims[j], BoundaryCondition::Period, tests[i].met, 1, 1,
 					tests[i].opts);
 
@@ -177,7 +177,7 @@ void test_speed()
 				double time = times[k];
 
 				System1D syst;
-				syst.init("gauss(x, 0, 5)*exp(I*x)", true, time, false, "0",
+				syst.init(FunctorWrapper("gauss(x, 0, 5)*exp(I*x)"), true, time, false, FunctorWrapper("0"),
 					-100, 100, dims[j], BoundaryCondition::Period, tests[i].met, 1, 1,
 					tests[i].opts);
 

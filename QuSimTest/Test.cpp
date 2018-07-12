@@ -10,7 +10,7 @@ int main()
 	SplittingMethod sm;
 	int n = 10;
 	double t = 1E-7;
-	sm.initSystem1D("1", true, t, false, "0", -10, 10, n,
+	sm.initSystem1D(FunctorWrapper("1"), true, t, false, FunctorWrapper("0"), -10, 10, n,
 		BoundaryCondition::Period, SolverMethod::SplittingMethodO2, 1, 1, std::map<std::string, std::string>());
 
 	double dx = 20. / n;

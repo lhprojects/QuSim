@@ -1,18 +1,15 @@
 #include "SystemImpl.h"
-#include "Cal.h"
 
 
-void SystemImpl::initSystem(char const * psi, bool force_normalization,
+void SystemImpl::initSystem(bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
-	char const *vs, BoundaryCondition b,
+	BoundaryCondition b,
 	SolverMethod solver,Real mass, Real hbar, std::map<std::string, std::string> const &opts)
 {
 	fStep = 0;
 
 	fFN = force_normalization;
-	fPsiStr = psi;
 
-	fVStr = vs;
 	fBoundaryCondition = b;
 
 	fDt = dt;
@@ -87,17 +84,20 @@ Real SystemImpl1D::Norm2()
 	return Norm2(fPsi);
 }
 
-void SystemImpl1D::initSystem1D(char const *psi, bool force_normalization,
+void SystemImpl1D::initSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
-	char const *vs, Real x0, Real x1, size_t n,
+	std::function<Complex(Real)> const &v, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
 	Real mass, Real hbar, std::map<std::string, std::string> const &opts)
 {
 
-	initSystem(psi, force_normalization,
+	initSystem(force_normalization,
 		dt, force_normalization_each_step,
-		vs, b, solver,
+		b, solver,
 		mass, hbar, opts);
+
+	fPsi0Func = psi;
+	fVFunc = v;
 
 	fX0 = x0;
 	fDx = (x1 - x0) / n;
@@ -113,13 +113,11 @@ void SystemImpl1D::initSystem1D(char const *psi, bool force_normalization,
 
 void SystemImpl1D::initPotential()
 {
-	Cal cal(fVStr.c_str());
 	fV.resize(fN);
 
 	for (size_t i = 0; i < fN; ++i) {
 		Real x = getX(i);
-		cal.SetVarVal("x", Complex(x));
-		Complex com = cal.Val();
+		Complex com = fVFunc(x);
 		fV[i] = com.real();
 
 	}
@@ -129,11 +127,9 @@ void SystemImpl1D::initPotential()
 void SystemImpl1D::initPsi()
 {
 	fPsi.resize(fN);
-	Cal cal(fPsiStr.c_str());
 	for (size_t i = 0; i < fN; ++i) {
 		Real x = getX(i);
-		cal.SetVarVal("x", Complex(x));
-		Complex com = cal.Val();
+		Complex com = fPsi0Func(x);
 		fPsi[i] = com;
 	}
 
@@ -157,15 +153,19 @@ void SystemImpl1D::initPsi()
 
 
 
-void SystemImpl2D::initSystem2D(char const * psi, bool force_normalization,
+void SystemImpl2D::initSystem2D(std::function<Complex(Real, Real)> const &psi,
+	bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
-	char const * vs, Real x0, Real x1, size_t nx,
+	std::function<Complex(Real, Real)> const &v, Real x0, Real x1, size_t nx,
 	Real y0, Real y1, size_t ny,
 	BoundaryCondition b,
 	SolverMethod solver, Real mass, Real hbar, std::map<std::string, std::string> const &opts)
 {
-	initSystem(psi, force_normalization, dt, force_normalization_each_step,
-		vs, b, solver, mass, hbar, opts);
+	initSystem(force_normalization, dt, force_normalization_each_step,
+		b, solver, mass, hbar, opts);
+
+	fVFunc = v;
+	fPsi0Func = psi;
 
 	fX0 = x0;
 	fDx = (x1 - x0) / nx;
@@ -186,14 +186,11 @@ void SystemImpl2D::initSystem2D(char const * psi, bool force_normalization,
 void SystemImpl2D::initPsi()
 {
 	fPsi.resize(fNy, fNx);
-	Cal cal(fPsiStr.c_str());
 	for (size_t i = 0; i < fNx; ++i) {
 		for (size_t j = 0; j < fNy; ++j) {
 			Real x = getX(i);
 			Real y = getY(j);
-			cal.SetVarVal("x", Complex(x));
-			cal.SetVarVal("y", Complex(y));
-			Complex com = cal.Val();
+			Complex com = fPsi0Func(x, y);
 			fPsi(j, i) = com;
 		}
 	}
@@ -209,14 +206,11 @@ void SystemImpl2D::initPsi()
 void SystemImpl2D::initPotential()
 {
 	fV.resize(fNy, fNx);
-	Cal cal(fVStr.c_str());
 	for (size_t i = 0; i < fNx; ++i) {
 		for (size_t j = 0; j < fNy; ++j) {
 			Real x = getX(i);
 			Real y = getY(j);
-			cal.SetVarVal("x", Complex(x));
-			cal.SetVarVal("y", Complex(y));
-			Complex com = cal.Val();
+			Complex com = fVFunc(x, y);
 			fV(j, i) = com.real();
 		}
 	}

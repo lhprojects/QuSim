@@ -5,6 +5,7 @@
 #include <cmath>
 #include <map>
 #include <memory>
+#include <functional>
 #include "eigen/Eigen/Dense"
 
 using Real = double;
@@ -37,6 +38,7 @@ enum class SolverMethod {
 	GaussLegendreO6,
 };
 
+struct Cal;
 struct SystemImpl;
 struct SystemImpl1D;
 struct SystemImpl2D;
@@ -56,12 +58,28 @@ protected:
 	std::shared_ptr<SystemImpl> fImpl;
 };
 
+struct FunctorWrapper
+{
+	FunctorWrapper(char const *);
+	Complex operator()(Real x);
+	~FunctorWrapper();
+private:
+	std::shared_ptr<Cal> fCal;
+};
+
+struct Functor2DWrapper {
+	Functor2DWrapper(char const *);
+	Complex operator()(Real x, Real y);
+	~Functor2DWrapper();
+private:
+	std::shared_ptr<Cal> fCal;
+};
 
 struct System1D : System {
 
-	void init(char const *psi, bool force_normalization,
+	void init(std::function<Complex(Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
-		char const *vs, Real x0, Real x1, size_t n,
+		std::function<Complex(Real)> const &v, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar,
 		std::map<std::string, std::string> const &opts);
@@ -82,9 +100,9 @@ struct System2D : System
 {
 	System2D();
 
-	void init(char const *psi, bool force_normalization,
+	void init(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
-		char const *vs, Real x0, Real x1, size_t nx,
+		std::function<Complex(Real, Real)> const &v, Real x0, Real x1, size_t nx,
 		Real y0, Real y1, size_t ny,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar,

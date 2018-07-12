@@ -4,9 +4,9 @@
 
 struct GaussLegendreMethod : SystemImpl1D {
 
-	void initSystem1D(char const *psi, bool force_normalization,
+	void initSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
-		char const *vs, Real x0, Real x1, size_t n,
+		std::function<Complex(Real)> const &v, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar,
 		std::map<std::string, std::string> const &opts) override;

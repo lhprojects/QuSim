@@ -584,7 +584,7 @@ void InitialASystem1D(System1D &syst)
 		deltaT = cal.Val();
 	}
 
-	syst.init(psi.c_str(), fn, deltaT, fnes, pot.c_str(),
+	syst.init(FunctorWrapper(psi.c_str()), fn, deltaT, fnes, FunctorWrapper(pot.c_str()),
 		x0, x1, n, bc, sl, mass, hbar, std::map<std::string, std::string>());
 
 }
@@ -672,7 +672,7 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 	}
 
 	try {
-		syst.init(psi.c_str(), fn, 1, false, pot.c_str(),
+		syst.init(FunctorWrapper(psi.c_str()), fn, 1, false, FunctorWrapper(pot.c_str()),
 			x0, x1, n, BoundaryCondition::Period, SolverMethod::SplittingMethodO2, 1, 1, std::map<std::string, std::string>());
 	} catch (...) {
 		MessageBox(hMainWin, L"err", L"err", MB_OK);
