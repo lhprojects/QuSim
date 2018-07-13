@@ -40,8 +40,6 @@ enum class SolverMethod {
 
 struct Cal;
 struct EvolverImpl;
-struct EvolverImpl1D;
-struct EvolverImpl2D;
 
 struct FunctorWrapper
 {
