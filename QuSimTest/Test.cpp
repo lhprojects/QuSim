@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "../qsim/System.h"
+#include "../qsim/QuSim.h"
 #include "../qsim/Cal.h"
 #include "../qsim/SplittingMethod.h"
 

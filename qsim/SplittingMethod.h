@@ -1,11 +1,11 @@
 #pragma once
-#include "SystemImpl.h"
+#include "EvolverImpl.h"
 #include <memory>
 
 #include "kissfft.hh"
 
 
-struct SplittingMethod : SystemImpl1D {
+struct SplittingMethod : EvolverImpl1D {
 
 	std::vector<Complex> fExpV0Dot5Dt;
 	std::vector<Complex> fVPsi;

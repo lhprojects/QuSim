@@ -156,8 +156,8 @@
     <ClCompile Include="..\qsim\GaussLegendreMethod.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod2D.cpp" />
-    <ClCompile Include="..\qsim\System.cpp" />
-    <ClCompile Include="..\qsim\SystemImpl.cpp" />
+    <ClCompile Include="..\qsim\QuSim.cpp" />
+    <ClCompile Include="..\qsim\EvolverImpl.cpp" />
     <ClCompile Include="..\qsim\TestCal.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,8 +168,8 @@
     <ClInclude Include="..\qsim\kissfft.hh" />
     <ClInclude Include="..\qsim\SplittingMethod.h" />
     <ClInclude Include="..\qsim\SplittingMethod2D.h" />
-    <ClInclude Include="..\qsim\System.h" />
-    <ClInclude Include="..\qsim\SystemImpl.h" />
+    <ClInclude Include="..\qsim\QuSim.h" />
+    <ClInclude Include="..\qsim\EvolverImpl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

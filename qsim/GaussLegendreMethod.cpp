@@ -7,7 +7,7 @@ void GaussLegendreMethod::initSystem1D(std::function<Complex(Real)> const &psi, 
 	BoundaryCondition b, SolverMethod solver, Real mass, Real hbar,
 	std::map<std::string, std::string> const &opts)
 {
-	SystemImpl1D::initSystem1D(psi, force_normalization,
+	EvolverImpl1D::initSystem1D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, n, b, solver,
 		mass, hbar, opts);

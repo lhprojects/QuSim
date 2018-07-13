@@ -1,8 +1,8 @@
 #pragma once
-#include "SystemImpl.h"
+#include "EvolverImpl.h"
 #include "eigen/Eigen/Sparse"
 
-struct GaussLegendreMethod : SystemImpl1D {
+struct GaussLegendreMethod : EvolverImpl1D {
 
 	void initSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,

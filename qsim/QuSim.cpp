@@ -1,6 +1,6 @@
 
-#include "System.h"
-#include "SystemImpl.h"
+#include "QuSim.h"
+#include "EvolverImpl.h"
 #include "SplittingMethod.h"
 #include "EigenMethod.h"
 #include "GaussLegendreMethod.h"
@@ -9,42 +9,42 @@
 
 using std::abs;
 
-System::System() {
+Evolver::Evolver() {
 	fImpl = nullptr;
 }
 
-System::~System()
+Evolver::~Evolver()
 {
 	
 }
 
-void System::step()
+void Evolver::step()
 {
 	fImpl->step();
 }
 
-Real System::Norm2()
+Real Evolver::Norm2()
 {
 	return fImpl->Norm2();
 }
 
-Real System::Time()
+Real Evolver::Time()
 {
 	return fImpl->Time();
 }
 
 
-Real System::PotEn()
+Real Evolver::PotEn()
 {
 	return fImpl->PotEn();
 }
 
-Real System::KinEn()
+Real Evolver::KinEn()
 {
 	return fImpl->KinEn();
 }
 
-Real System::EnPartialT()
+Real Evolver::EnPartialT()
 {
 	return fImpl->EnPartialT();
 }
@@ -62,7 +62,7 @@ Real System::EnPartialT()
 
 
 
-void System1D::init(std::function<Complex(Real)> const &psi, bool force_normalization,
+void Evolver1D::init(std::function<Complex(Real)> const &psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
@@ -85,45 +85,45 @@ void System1D::init(std::function<Complex(Real)> const &psi, bool force_normaliz
 		throw std::runtime_error("unspported solver");
 	}
 
-	((SystemImpl1D*)fImpl.get())->initSystem1D(psi, force_normalization,
+	((EvolverImpl1D*)fImpl.get())->initSystem1D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, n, b, solver,
 		mass, hbar, opts);
 }
 
-System1D::System1D() {
+Evolver1D::Evolver1D() {
 	fImpl = nullptr;
 }
 
 
-PsiVector const & System1D::GetPsi()
+PsiVector const & Evolver1D::GetPsi()
 {
-	return ((SystemImpl1D*)fImpl.get())->fPsi;
+	return ((EvolverImpl1D*)fImpl.get())->fPsi;
 }
 
-std::vector<Real> const & System1D::GetV()
+std::vector<Real> const & Evolver1D::GetV()
 {
-	return ((SystemImpl1D*)fImpl.get())->fV;
+	return ((EvolverImpl1D*)fImpl.get())->fV;
 }
 
-Real System1D::Xavg()
+Real Evolver1D::Xavg()
 {
-	return ((SystemImpl1D*)fImpl.get())->Xavg();
+	return ((EvolverImpl1D*)fImpl.get())->Xavg();
 }
 
-UInt System1D::GetN()
+UInt Evolver1D::GetN()
 {
-	return ((SystemImpl1D*)fImpl.get())->fN;
+	return ((EvolverImpl1D*)fImpl.get())->fN;
 }
 
-Real System1D::NormLeft()
+Real Evolver1D::NormLeft()
 {
-	return ((SystemImpl1D*)fImpl.get())->NormLeft();
+	return ((EvolverImpl1D*)fImpl.get())->NormLeft();
 }
 
-Real System1D::NormRight()
+Real Evolver1D::NormRight()
 {
-	return ((SystemImpl1D*)fImpl.get())->NormRight();
+	return ((EvolverImpl1D*)fImpl.get())->NormRight();
 }
 
 
@@ -140,12 +140,12 @@ Real System1D::NormRight()
 
 
 
-System2D::System2D()
+Evolver2D::Evolver2D()
 {
 	fImpl = nullptr;
 }
 
-void System2D::init(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
+void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	std::function<Complex(Real, Real)> const &vs, Real x0, Real x1, size_t nx,
 	Real y0, Real y1, size_t ny,
@@ -161,7 +161,7 @@ void System2D::init(std::function<Complex(Real, Real)> const &psi, bool force_no
 		throw std::runtime_error("unsupported solver");
 	}
 
-	((SystemImpl2D*)fImpl.get())->initSystem2D(psi, force_normalization,
+	((EvolverImpl2D*)fImpl.get())->initSystem2D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, nx,
 		y0, y1, ny,
@@ -170,25 +170,25 @@ void System2D::init(std::function<Complex(Real, Real)> const &psi, bool force_no
 
 }
 
-Eigen::MatrixXcd const & System2D::GetPsi()
+Eigen::MatrixXcd const & Evolver2D::GetPsi()
 {
 	//double x = Norm2();
-	return ((SystemImpl2D*)fImpl.get())->fPsi;
+	return ((EvolverImpl2D*)fImpl.get())->fPsi;
 }
 
-Eigen::MatrixXd const & System2D::GetV()
+Eigen::MatrixXd const & Evolver2D::GetV()
 {
-	return ((SystemImpl2D*)fImpl.get())->fV;
+	return ((EvolverImpl2D*)fImpl.get())->fV;
 }
 
-UInt System2D::GetNx()
+UInt Evolver2D::GetNx()
 {
-	return ((SystemImpl2D*)fImpl.get())->fNx;
+	return ((EvolverImpl2D*)fImpl.get())->fNx;
 }
 
-UInt System2D::GetNy()
+UInt Evolver2D::GetNy()
 {
-	return ((SystemImpl2D*)fImpl.get())->fNy;
+	return ((EvolverImpl2D*)fImpl.get())->fNy;
 }
 
 

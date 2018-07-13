@@ -1,12 +1,12 @@
 #pragma once
 
-#include "SystemImpl.h"
+#include "EvolverImpl.h"
 #include "eigen/Eigen/Dense"
 #include <memory>
 #include "kissfft.hh"
 
 
-struct SplittingMethod2D : SystemImpl2D {
+struct SplittingMethod2D : EvolverImpl2D {
 	
 
 	Eigen::MatrixXcd fExpV0Dot5Dt;

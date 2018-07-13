@@ -9,7 +9,7 @@ void SplittingMethod2D::initSystem2D(std::function<Complex(Real, Real)> const &p
 	SolverMethod solver, Real mass, Real hbar,
 	std::map<std::string, std::string> const &opts)
 {
-	SystemImpl2D::initSystem2D(psi, force_normalization, dt, force_normalization_each_step,
+	EvolverImpl2D::initSystem2D(psi, force_normalization, dt, force_normalization_each_step,
 		vs, x0, x1, nx, y0, y1, ny,
 		b, solver, mass, hbar, opts);
 

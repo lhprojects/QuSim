@@ -1,11 +1,11 @@
 #pragma once
 
-#include "SystemImpl.h"
+#include "EvolverImpl.h"
 #include "eigen/Eigen/Dense"
 #include "eigen/Eigen/Eigenvalues"
 
 
-struct EigenMethod : SystemImpl1D {
+struct EigenMethod : EvolverImpl1D {
 
 	EigenMethod();
 

@@ -2,7 +2,7 @@
 //#define _CRT_SECURE_NO_WARNINGS
 //#define _SCL_SECURE_NO_WARNINGS
 
-#include "System.h"
+#include "QuSim.h"
 #include "eigen/Eigen/Dense"
 #include <stdio.h>
 #include <functional>
@@ -54,7 +54,7 @@ inline void dump_matrix_comp(Matrix const &v, char const *fn)
 	fclose(f);
 };
 
-struct SystemImpl
+struct EvolverImpl
 {
 	Complex fDt;
 	bool fFNES;
@@ -87,7 +87,7 @@ struct SystemImpl
 	// or int abs2(psi) dx dy for 2D
 	//( sum_ij psi_ij Dx Dy)
 	virtual Real Norm2() = 0;
-	virtual ~SystemImpl() { }
+	virtual ~EvolverImpl() { }
 
 	Real Time()
 	{
@@ -96,7 +96,7 @@ struct SystemImpl
 
 };
 
-struct SystemImpl1D : SystemImpl {
+struct EvolverImpl1D : EvolverImpl {
 
 	Real fX0;
 	Real fDx;
@@ -110,7 +110,7 @@ struct SystemImpl1D : SystemImpl {
 	std::vector<Complex> fLastPsi;
 	std::vector<Complex> fPsi;
 	
-	SystemImpl1D()
+	EvolverImpl1D()
 	{
 		fN = 0;
 	}
@@ -225,7 +225,7 @@ public:
 
 };
 
-struct SystemImpl2D : SystemImpl {
+struct EvolverImpl2D : EvolverImpl {
 
 	Real fX0;
 	Real fDx;
@@ -243,7 +243,7 @@ struct SystemImpl2D : SystemImpl {
 	Eigen::MatrixXcd fLastPsi;
 	Eigen::MatrixXcd fPsi;
 
-	SystemImpl2D()
+	EvolverImpl2D()
 	{
 		fNx = 0;
 		fNy = 0;

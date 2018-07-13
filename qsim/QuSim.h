@@ -39,24 +39,9 @@ enum class SolverMethod {
 };
 
 struct Cal;
-struct SystemImpl;
-struct SystemImpl1D;
-struct SystemImpl2D;
-
-struct System {
-
-	void step();
-	Real Norm2();
-	Real Time();
-	Real PotEn();
-	Real KinEn();
-	Real EnPartialT();
-
-	System();
-	~System();
-protected:
-	std::shared_ptr<SystemImpl> fImpl;
-};
+struct EvolverImpl;
+struct EvolverImpl1D;
+struct EvolverImpl2D;
 
 struct FunctorWrapper
 {
@@ -75,7 +60,23 @@ private:
 	std::shared_ptr<Cal> fCal;
 };
 
-struct System1D : System {
+
+struct Evolver {
+
+	void step();
+	Real Norm2();
+	Real Time();
+	Real PotEn();
+	Real KinEn();
+	Real EnPartialT();
+
+	~Evolver();
+protected:
+	Evolver();
+	std::shared_ptr<EvolverImpl> fImpl;
+};
+
+struct Evolver1D : Evolver {
 
 	void init(std::function<Complex(Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
@@ -91,14 +92,14 @@ struct System1D : System {
 	Real NormLeft();
 	Real NormRight();
 
-	System1D();
+	Evolver1D();
 
 };
 
 
-struct System2D : System
+struct Evolver2D : Evolver
 {
-	System2D();
+	Evolver2D();
 
 	void init(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,

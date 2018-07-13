@@ -1,7 +1,7 @@
-#include "SystemImpl.h"
+#include "EvolverImpl.h"
 
 
-void SystemImpl::initSystem(bool force_normalization,
+void EvolverImpl::initSystem(bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	BoundaryCondition b,
 	SolverMethod solver,Real mass, Real hbar, std::map<std::string, std::string> const &opts)
@@ -32,7 +32,7 @@ void SystemImpl::initSystem(bool force_normalization,
 
 
 
-Real SystemImpl1D::CalPotEn()
+Real EvolverImpl1D::CalPotEn()
 {
 	Real norm2 = 0;
 	for (size_t i = 0; i < fN; ++i) {
@@ -41,22 +41,22 @@ Real SystemImpl1D::CalPotEn()
 	return norm2 / Norm2();
 }
 
-Real SystemImpl1D::CalKinEn()
+Real EvolverImpl1D::CalKinEn()
 {
 	return 0;
 }
 
-Real SystemImpl1D::PotEn()
+Real EvolverImpl1D::PotEn()
 {
 	return CalPotEn();
 }
 
-Real SystemImpl1D::KinEn()
+Real EvolverImpl1D::KinEn()
 {
 	return CalKinEn();
 }
 
-Real SystemImpl1D::EnPartialT()
+Real EvolverImpl1D::EnPartialT()
 {
 	Complex en = 0;
 	for (size_t i = 0; i < fN; ++i) {
@@ -65,7 +65,7 @@ Real SystemImpl1D::EnPartialT()
 	return en.real() / Norm2();
 }
 
-void SystemImpl1D::step()
+void EvolverImpl1D::step()
 {
 	fLastLastPsi = fLastPsi;
 	fLastPsi = fPsi;
@@ -79,12 +79,12 @@ void SystemImpl1D::step()
 
 }
 
-Real SystemImpl1D::Norm2()
+Real EvolverImpl1D::Norm2()
 {
 	return Norm2(fPsi);
 }
 
-void SystemImpl1D::initSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
+void EvolverImpl1D::initSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	std::function<Complex(Real)> const &v, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
@@ -111,7 +111,7 @@ void SystemImpl1D::initSystem1D(std::function<Complex(Real)> const &psi, bool fo
 
 }
 
-void SystemImpl1D::initPotential()
+void EvolverImpl1D::initPotential()
 {
 	fV.resize(fN);
 
@@ -124,7 +124,7 @@ void SystemImpl1D::initPotential()
 	//dump(fV, "V.txt");
 }
 
-void SystemImpl1D::initPsi()
+void EvolverImpl1D::initPsi()
 {
 	fPsi.resize(fN);
 	for (size_t i = 0; i < fN; ++i) {
@@ -153,7 +153,7 @@ void SystemImpl1D::initPsi()
 
 
 
-void SystemImpl2D::initSystem2D(std::function<Complex(Real, Real)> const &psi,
+void EvolverImpl2D::initSystem2D(std::function<Complex(Real, Real)> const &psi,
 	bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	std::function<Complex(Real, Real)> const &v, Real x0, Real x1, size_t nx,
@@ -183,7 +183,7 @@ void SystemImpl2D::initSystem2D(std::function<Complex(Real, Real)> const &psi,
 
 }
 
-void SystemImpl2D::initPsi()
+void EvolverImpl2D::initPsi()
 {
 	fPsi.resize(fNy, fNx);
 	for (size_t i = 0; i < fNx; ++i) {
@@ -203,7 +203,7 @@ void SystemImpl2D::initPsi()
 
 }
 
-void SystemImpl2D::initPotential()
+void EvolverImpl2D::initPotential()
 {
 	fV.resize(fNy, fNx);
 	for (size_t i = 0; i < fNx; ++i) {
@@ -220,7 +220,7 @@ void SystemImpl2D::initPotential()
 }
 
 
-void SystemImpl2D::step()
+void EvolverImpl2D::step()
 {
 	Real y = Norm2();
 	fLastLastPsi = fLastPsi;
@@ -236,7 +236,7 @@ void SystemImpl2D::step()
 
 }
 
-Real SystemImpl2D::EnPartialT()
+Real EvolverImpl2D::EnPartialT()
 {
 
 	Real pot = 0;
@@ -253,12 +253,12 @@ Real SystemImpl2D::EnPartialT()
 }
 
 
-Real SystemImpl2D::Norm2()
+Real EvolverImpl2D::Norm2()
 {
 	return fPsi.squaredNorm()*fDx*fDy;
 }
 
-Real SystemImpl2D::CalPotEn() const
+Real EvolverImpl2D::CalPotEn() const
 {
 	Real pot = 0;
 	Real norm2 = 0;
@@ -271,7 +271,7 @@ Real SystemImpl2D::CalPotEn() const
 	return pot / norm2;
 }
 
-Real SystemImpl2D::CalKinEn() const
+Real EvolverImpl2D::CalKinEn() const
 {
 	return 0;
 }
