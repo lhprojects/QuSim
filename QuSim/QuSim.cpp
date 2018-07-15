@@ -527,7 +527,7 @@ void InitialASystem1D(Evolver1D &syst)
 
 	{
 		std::vector<char> psiStr;
-		int len = GetWindowTextLength(hInitalPsi);
+		int len = GetWindowTextLength(hX0);
 		psiStr.resize(len + 1);
 		GetWindowTextA(hX0, psiStr.data(), len + 1);
 		int na = sscanf(psiStr.data(), "%lf", &x0);
@@ -538,7 +538,7 @@ void InitialASystem1D(Evolver1D &syst)
 
 	{
 		std::vector<char> psiStr;
-		int len = GetWindowTextLength(hInitalPsi);
+		int len = GetWindowTextLength(hX1);
 		psiStr.resize(len + 1);
 		GetWindowTextA(hX1, psiStr.data(), len + 1);
 		int na = sscanf(psiStr.data(), "%lf", &x1);
