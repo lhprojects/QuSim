@@ -258,9 +258,12 @@ void SolverImpl1D::Calculate()
 		// i k2 t = i k2 (T11 + T12 i k1) + r i k2 (T11 - T12 i k1)
 		// i k2 t =  T21 + T22 i k1 + r (T21 - T22 i k1)
 		Complex r = -(I * k2*(T11 + T12 * I*k1) - (T21 + T22 * I*k1)) / (I*k2*(T11 - T12*I*k1) - (T21 - T22*I*k1));
-		Complex t = T11 + T12 * I*k1 + r * (T11 - T12 * I*k1);
-		Complex a = (T21 + T22 * I*k1 + r * (T21 - T22 * I*k1))/(I*k2);
-		fT = abs2(t)*k2 / k1;
+		
+		Complex One = (-T12 * T21 + T11 * T22);
+		One = 1;
+		Complex t = 2 * k1 * One / (k2*T11 - I * k1*k2*T12 + I * T21 + k1 * T22);
+
+		fT = abs2(t) * k2 / k1;
 		fR = abs2(r);
 	} while (false);
 
