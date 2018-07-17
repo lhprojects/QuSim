@@ -179,14 +179,16 @@ void SolverImpl1D::Calculate()
 			Real a12 = 1. / 4 - sqrt(3) / 6;
 			Real a21 = 1. / 4 + sqrt(3) / 6;
 			Eigen::Matrix2d AA = A1.inverse() - 1. / 4 * fDx * Eigen::Matrix2d::Identity();
-			Eigen::Matrix2d AA_inv = AA.inverse();
+			//Eigen::Matrix2d AA_inv = AA.inverse();
 			Real BB = -a12 * fDx;
 			Real CC = -a21 * fDx;
 			Eigen::Matrix2d DD = A2.inverse() - 1. / 4 * fDx * Eigen::Matrix2d::Identity();
-			Eigen::Matrix2d DD_inv = DD.inverse();
+			//Eigen::Matrix2d DD_inv = DD.inverse();
 
-			Eigen::Matrix2d kk1 = (AA / BB - DD_inv * CC).inverse() * (Eigen::Matrix2d::Identity() / BB - DD_inv);
-			Eigen::Matrix2d kk2 = (AA.inverse() * BB - DD / CC).inverse() * (AA_inv - Eigen::Matrix2d::Identity()/CC);
+			//Eigen::Matrix2d kk1 = (AA / BB - DD_inv * CC).inverse() * (Eigen::Matrix2d::Identity() / BB - DD_inv);
+			//Eigen::Matrix2d kk2 = (AA_inv * BB - DD / CC).inverse() * (AA_inv - Eigen::Matrix2d::Identity()/CC);
+			Eigen::Matrix2d kk1 = (DD * AA - CC * BB * Eigen::Matrix2d::Identity()).inverse() * (DD - Eigen::Matrix2d::Identity() * BB);
+			Eigen::Matrix2d kk2 = (BB * CC * Eigen::Matrix2d::Identity() - AA * DD).inverse() * (CC * Eigen::Matrix2d::Identity() - AA);
 
 			Eigen::Matrix2d glo4 = Eigen::Matrix2d::Identity() + fDx * 0.5*(kk1 + kk2);
 
@@ -197,7 +199,7 @@ void SolverImpl1D::Calculate()
 
 		}
 		
-		if (1) {
+		if (0) {
 			Eigen::Matrix2cd U;
 			Eigen::Matrix2cd O;
 			U(0, 0) = f_11;
@@ -213,6 +215,7 @@ void SolverImpl1D::Calculate()
 				err(0, 0);
 			}
 		}
+
 		Real t11 = T11;
 		Real t12 = T12;
 		Real t21 = T21;
