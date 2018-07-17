@@ -39,6 +39,9 @@
     <ClCompile Include="..\qsim\EvolverImpl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\SolverImpl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\SplittingMethod2D.h">
@@ -67,6 +70,9 @@
     </ClInclude>
     <ClInclude Include="..\qsim\EvolverImpl.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\SolverImpl.h">
+      <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

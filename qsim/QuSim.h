@@ -28,18 +28,22 @@ enum class BoundaryCondition {
 };
 
 enum class SolverMethod {
+	// for evolver only & H is time independent
 	SplittingMethodO2,
 	SplittingMethodO4,
 	Eigen,
 
-	//Runge¨CKutta family
+	// One Step Method
+	// Runge¨CKutta family
 	ImplicitMidpointMethod, // which is same as GaussLegendreO2
+	ExplicitRungeKuttaO4Classical,
 	GaussLegendreO4,
 	GaussLegendreO6,
 };
 
 struct Cal;
 struct EvolverImpl;
+struct SolverImpl;
 
 struct FunctorWrapper
 {
@@ -114,3 +118,43 @@ struct Evolver2D : Evolver
 
 
 };
+
+struct Solver {
+
+	void Compute();
+	~Solver();
+protected:
+	Solver();
+	std::shared_ptr<SolverImpl> fImpl;
+};
+
+
+struct Solver1D : Solver {
+
+
+	void init(
+		std::function<Complex(Real)> const & v,
+		Real x0,
+		Real x1,
+		size_t n,
+		Real en,
+		Complex initPsi,
+		Complex initPsiPrime,
+		SolverMethod met,
+		Real mass,
+		Real hbar);
+
+	PsiVector const &GetPsi();
+	std::vector<Real> const &GetV();
+
+	UInt GetNPoints();
+	Eigen::Matrix2cd GetTMat();
+	Real GetT();
+	Real GetR();
+	Complex InitPsi();
+	Complex InitPsiPrime();
+	Complex FinalPsi();
+	Complex FinalPsiPrime();
+
+};
+

@@ -1,6 +1,7 @@
 
 #include "QuSim.h"
 #include "EvolverImpl.h"
+#include "SolverImpl.h"
 #include "SplittingMethod.h"
 #include "EigenMethod.h"
 #include "GaussLegendreMethod.h"
@@ -228,3 +229,81 @@ Complex Functor2DWrapper::operator()(Real x, Real y)
 Functor2DWrapper::~Functor2DWrapper()
 {
 }
+
+
+void Solver::Compute()
+{
+	return fImpl->Calculate();
+}
+
+Solver::Solver()
+{
+	fImpl = nullptr;
+}
+
+Solver::~Solver()
+{
+}
+
+
+void Solver1D::init(std::function<Complex(Real)> const & v,
+	Real x0, Real x1, size_t n,
+	Real en,
+	Complex initPsi,
+	Complex initPsiPrime, SolverMethod met,
+	Real mass, Real hbar)
+{
+	fImpl.reset(new SolverImpl1D());
+	((SolverImpl1D*)fImpl.get())->initSystem1D(v, x0, x1, n, en, initPsi, initPsiPrime, met, mass, hbar);
+}
+
+PsiVector const & Solver1D::GetPsi()
+{
+	return ((SolverImpl1D*)fImpl.get())->fPsi;
+}
+
+std::vector<Real> const & Solver1D::GetV()
+{
+	return ((SolverImpl1D*)fImpl.get())->fV;
+}
+
+UInt Solver1D::GetNPoints()
+{
+	return ((SolverImpl1D*)fImpl.get())->fNPoints;
+}
+
+Eigen::Matrix2cd Solver1D::GetTMat()
+{
+	return ((SolverImpl1D*)fImpl.get())->fTMat;
+}
+
+Real Solver1D::GetT()
+{
+	return ((SolverImpl1D*)fImpl.get())->fT;
+}
+
+Real Solver1D::GetR()
+{
+	return ((SolverImpl1D*)fImpl.get())->fR;
+}
+
+Complex Solver1D::InitPsi()
+{
+	return ((SolverImpl1D*)fImpl.get())->fPsi[0];
+}
+
+Complex Solver1D::InitPsiPrime()
+{
+	return ((SolverImpl1D*)fImpl.get())->fPsiPrime[0];
+}
+
+Complex Solver1D::FinalPsi()
+{
+	return ((SolverImpl1D*)fImpl.get())->fPsi[((SolverImpl1D*)fImpl.get())->fNPoints - 1];
+}
+
+Complex Solver1D::FinalPsiPrime()
+{
+	return ((SolverImpl1D*)fImpl.get())->fPsiPrime[((SolverImpl1D*)fImpl.get())->fNPoints - 1];
+}
+
