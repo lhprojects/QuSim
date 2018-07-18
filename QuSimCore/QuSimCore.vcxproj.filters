@@ -74,5 +74,8 @@
     <ClInclude Include="..\qsim\SolverImpl.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\qsim\Matrix2.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

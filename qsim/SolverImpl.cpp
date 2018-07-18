@@ -1,4 +1,5 @@
 #include "SolverImpl.h"
+#include "Matrix2.h"
 
 SolverImpl::SolverImpl() : fMass(0), fHbar(0), fE(0)
 {
@@ -104,17 +105,21 @@ void SolverImpl1D::Calculate()
 	//
 	//   a = -2m/hbar^2 (E - V)
 	//
-	//   2rd Order
+	//   Midpoint method
 	//                       1 + 1/2 A(x + 1/2dx) dx
 	//      Psi(x + dx) =  -------------------------- Psi(x)
 	//                       1 - 1/2 A(x + 1/2dx) dx
-	//   Classical Runge Kutta 4rd Order
-	//                      
-	//      Psi(x + dx) =   () Psi(x)
-	//                       
 
 	//Real amax = -10000;
 	//Real amin = +10000;
+
+	//typedef Eigen::Matrix2d Matrix;
+	typedef Mat2<Real> Matrix;
+	Real const a12 = 1. / 4 - sqrt(3) / 6;
+	Real const a21 = 1. / 4 + sqrt(3) / 6;
+	Real const BB = -a12 * fDx;
+	Real const CC = -a21 * fDx;
+	Real const FF = 1. / 16 * fDx*fDx - CC * BB;
 
 	for (size_t i = 0; i < fNBins; ++i) {
 
@@ -144,21 +149,21 @@ void SolverImpl1D::Calculate()
 			//amax = std::max(a, amax);
 			//amin = std::min(a, amin);
 
-			Eigen::Matrix2d A1;
+			Matrix A1;
 			A1(0, 0) = A1(1, 1) = 0; A1(0, 1) = 1; A1(1, 0) = a1;
-			Eigen::Matrix2d A2;
+			Matrix A2;
 			A2(0, 0) = A2(1, 1) = 0; A2(0, 1) = 1; A2(1, 0) = a2;
-			Eigen::Matrix2d const &A3 = A2;
-			Eigen::Matrix2d A4;
+			Matrix const &A3 = A2;
+			Matrix A4;
 			A4(0, 0) = A4(1, 1) = 0; A4(0, 1) = 1; A4(1, 0) = a4;
 
-			Eigen::Matrix2d const &K1 = A1;
-			Eigen::Matrix2d K2 = A2 * (Eigen::Matrix2d::Identity() + 1. / 2 * fDx*K1);
-			Eigen::Matrix2d K3 = A3 * (Eigen::Matrix2d::Identity() + 1. / 2 * fDx*K2);
-			Eigen::Matrix2d K4 = A4 * (Eigen::Matrix2d::Identity() + fDx*K3);
+			Matrix const &K1 = A1;
+			Matrix K2 = A2 * (Matrix::Identity() + 1. / 2 * fDx*K1);
+			Matrix K3 = A3 * (Matrix::Identity() + 1. / 2 * fDx*K2);
+			Matrix K4 = A4 * (Matrix::Identity() + fDx*K3);
 
-			Eigen::Matrix2d ARK4 = Eigen::Matrix2d::Identity() + 1. / 6 * fDx * (
-				K1 + 2 * K2 + 2 * K3 + K4
+			Matrix ARK4 = Matrix::Identity() + 1. / 6 * fDx * (
+				K1 + 2. * K2 + 2. * K3 + K4
 				);
 
 			f_11 = ARK4(0, 0);
@@ -171,31 +176,44 @@ void SolverImpl1D::Calculate()
 			Real a1 = e - vk * fV[2 * i];
 			Real a2 = e - vk * fV[2 * i + 1];
 
-			Eigen::Matrix2d A1;
-			A1(0, 0) = A1(1, 1) = 0; A1(0, 1) = 1; A1(1, 0) = a1;
-			Eigen::Matrix2d A2;
-			A2(0, 0) = A2(1, 1) = 0; A2(0, 1) = 1; A2(1, 0) = a2;
 
-			Real a12 = 1. / 4 - sqrt(3) / 6;
-			Real a21 = 1. / 4 + sqrt(3) / 6;
-			Eigen::Matrix2d AA = A1.inverse() - 1. / 4 * fDx * Eigen::Matrix2d::Identity();
-			//Eigen::Matrix2d AA_inv = AA.inverse();
-			Real BB = -a12 * fDx;
-			Real CC = -a21 * fDx;
-			Eigen::Matrix2d DD = A2.inverse() - 1. / 4 * fDx * Eigen::Matrix2d::Identity();
-			//Eigen::Matrix2d DD_inv = DD.inverse();
+			if (0) {
+				Matrix A1;
+				A1(0, 0) = A1(1, 1) = 0; A1(0, 1) = 1; A1(1, 0) = a1;
+				Matrix A2;
+				A2(0, 0) = A2(1, 1) = 0; A2(0, 1) = 1; A2(1, 0) = a2;
 
-			//Eigen::Matrix2d kk1 = (AA / BB - DD_inv * CC).inverse() * (Eigen::Matrix2d::Identity() / BB - DD_inv);
-			//Eigen::Matrix2d kk2 = (AA_inv * BB - DD / CC).inverse() * (AA_inv - Eigen::Matrix2d::Identity()/CC);
-			Eigen::Matrix2d kk1 = (DD * AA - CC * BB * Eigen::Matrix2d::Identity()).inverse() * (DD - Eigen::Matrix2d::Identity() * BB);
-			Eigen::Matrix2d kk2 = (BB * CC * Eigen::Matrix2d::Identity() - AA * DD).inverse() * (CC * Eigen::Matrix2d::Identity() - AA);
+				Matrix AA = A1.inverse() - 1. / 4 * fDx * Matrix::Identity();
+				Matrix DD = A2.inverse() - 1. / 4 * fDx * Matrix::Identity();
 
-			Eigen::Matrix2d glo4 = Eigen::Matrix2d::Identity() + fDx * 0.5*(kk1 + kk2);
+				Matrix kk1 = (DD * AA - CC * BB * Matrix::Identity()).inverse() * (DD - Matrix::Identity() * BB);
+				Matrix kk2 = (BB * CC * Matrix::Identity() - AA * DD).inverse() * (CC * Matrix::Identity() - AA);
 
-			f_11 = glo4(0, 0);
-			f_12 = glo4(0, 1);
-			f_21 = glo4(1, 0);
-			f_22 = glo4(1, 1);
+				Matrix glo4 = Matrix::Identity() + fDx * 0.5*(kk1 + kk2);
+
+				f_11 = glo4(0, 0);
+				f_12 = glo4(0, 1);
+				f_21 = glo4(1, 0);
+				f_22 = glo4(1, 1);
+			} else { // same implementation, but faster
+
+				Matrix A1;
+				A1(0, 0) = A1(1, 1) = 0; A1(0, 1) = 1; A1(1, 0) = a1;
+				Matrix A2;
+				A2(0, 0) = A2(1, 1) = 0; A2(0, 1) = 1; A2(1, 0) = a2;
+
+				Matrix tmp = 0.25*fDx*(A1 + A2);
+				Matrix kk1 = A1 * (Matrix::Identity() - tmp + FF * A2 * A1).inverse() * (Matrix::Identity() - (1. / 4 * fDx + BB)*A2);
+				Matrix kk2 = A2 * (Matrix::Identity() - tmp + FF * A1 * A2).inverse() * (Matrix::Identity() - (1. / 4 * fDx + CC)*A1);
+
+
+				Matrix glo4 = Matrix::Identity() + fDx * 0.5*(kk1 + kk2);
+
+				f_11 = glo4(0, 0);
+				f_12 = glo4(0, 1);
+				f_21 = glo4(1, 0);
+				f_22 = glo4(1, 1);
+			}
 
 		}
 		
