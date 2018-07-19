@@ -39,11 +39,11 @@ void GaussLegendreMethod2D::initSystem2D(std::function<Complex(Real, Real)> cons
 		for (ptrdiff_t i = 0; i < (ptrdiff_t)fNx; ++i) {
 			for (ptrdiff_t j = 0; j < (ptrdiff_t)fNy; ++j) {
 
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i, j), -2.*fkx - 2.*fky + fV(j, i)*fv));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i, j+1), fky));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i, j-1), fky));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i+1, j), fkx));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i-1, j), fkx));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i, j), -2.*fkx - 2.*fky + fV(j, i)*fv));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i, j+1), fky));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i, j-1), fky));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i+1, j), fkx));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i-1, j), fkx));
 			}
 		}
 
@@ -52,15 +52,15 @@ void GaussLegendreMethod2D::initSystem2D(std::function<Complex(Real, Real)> cons
 		for (ptrdiff_t i = 0; i < (ptrdiff_t)fNx; ++i) {
 			for (ptrdiff_t j = 0; j < (ptrdiff_t)fNy; ++j) {
 
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i, j), -5. / 2 * fkx - 5. / 2 * fky + fV(j, i) * fv));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i - 1, j), 4. / 3 * fkx));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i + 1, j), 4. / 3 * fkx));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i - 2, j), -1. / 12 * fkx));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i + 2, j), -1. / 12 * fkx));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i, j - 1), 4. / 3 * fky));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i, j + 1), 4. / 3 * fky));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i, j - 2), -1. / 12 * fky));
-				elems.push_back(Eigen::Triplet<Complex>(Index(i, j), IndexP(i, j + 2), -1. / 12 * fky));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i, j), -5. / 2 * fkx - 5. / 2 * fky + fV(j, i) * fv));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i - 1, j), 4. / 3 * fkx));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i + 1, j), 4. / 3 * fkx));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i - 2, j), -1. / 12 * fkx));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i + 2, j), -1. / 12 * fkx));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i, j - 1), 4. / 3 * fky));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i, j + 1), 4. / 3 * fky));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i, j - 2), -1. / 12 * fky));
+				elems.push_back(Eigen::Triplet<Complex>((int)Index(i, j), (int)IndexP(i, j + 2), -1. / 12 * fky));
 			}
 		}
 
