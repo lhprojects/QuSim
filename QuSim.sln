@@ -3,25 +3,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2043
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSim", "QuSim\QuSim.vcxproj", "{A9622653-D042-47BB-96D6-30AAAE17D219}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuEvol1D", "QuEvol1D\QuEvol1D.vcxproj", "{A9622653-D042-47BB-96D6-30AAAE17D219}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimTest", "QuSimTest\QuSimTest.vcxproj", "{9F3E805E-2EDF-4033-AFF3-7673A80C4C14}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSim2D", "QuSim2D\QuSim2D.vcxproj", "{0B375AAD-830B-4E0F-9915-319223B75916}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuEvol2D", "QuEvol2D\QuEvol2D.vcxproj", "{0B375AAD-830B-4E0F-9915-319223B75916}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimBenchmark", "QuSimBenchmark\QuSimBenchmark.vcxproj", "{87A63853-3D4D-4961-AFE1-35AF486E1EFF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuEvol1DBenchmark", "QuEvol1DBenchmark\QuEvol1DBenchmark.vcxproj", "{87A63853-3D4D-4961-AFE1-35AF486E1EFF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimCore", "QuSimCore\QuSimCore.vcxproj", "{3A4B2681-4236-4A8A-9891-D7D3937F8648}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSimPrecision", "QuSimPrecision\QuSimPrecision.vcxproj", "{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuEvol1DPrecision", "QuEvol1DPrecision\QuEvol1DPrecision.vcxproj", "{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSolver", "QuSolver\QuSolver.vcxproj", "{1F23587F-506E-4522-9979-BFAE9EE90E85}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSolver1D", "QuSolver1D\QuSolver1D.vcxproj", "{1F23587F-506E-4522-9979-BFAE9EE90E85}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSolverPrecision", "QuSolverPrecision\QuSolverPrecision.vcxproj", "{857D3DC3-EDB8-4215-A355-E52A860AE7F0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSolver1DPrecision", "QuSolver1DPrecision\QuSolver1DPrecision.vcxproj", "{857D3DC3-EDB8-4215-A355-E52A860AE7F0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSolverBenchmark", "QuSolverBenchmark\QuSolverBenchmark.vcxproj", "{664E1133-D1E6-45B6-84B3-DDBD864B817A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSolver1DBenchmark", "QuSolver1DBenchmark\QuSolver1DBenchmark.vcxproj", "{664E1133-D1E6-45B6-84B3-DDBD864B817A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuSim2DBenchmark", "QuSim2DBenchmark\QuSim2DBenchmark.vcxproj", "{CF2866F2-A37A-4A5B-95EA-837B48EB6786}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuEvol2DBenchmark", "QuEvol2DBenchmark\QuEvol2DBenchmark.vcxproj", "{CF2866F2-A37A-4A5B-95EA-837B48EB6786}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
