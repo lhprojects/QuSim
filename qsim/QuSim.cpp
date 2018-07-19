@@ -6,6 +6,7 @@
 #include "EigenMethod.h"
 #include "GaussLegendreMethod.h"
 #include "SplittingMethod2D.h"
+#include "GaussLegendreMethod2D.h"
 #include "Cal.h"
 
 using std::abs;
@@ -158,6 +159,10 @@ void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_n
 		fImpl.reset(new SplittingMethod2D());
 	} else if (solver == SolverMethod::SplittingMethodO4) {
 		fImpl.reset(new SplittingMethod2D());
+	} else if (solver == SolverMethod::ImplicitMidpointMethod
+		|| solver == SolverMethod::GaussLegendreO4
+		|| solver == SolverMethod::GaussLegendreO6) {
+		fImpl.reset(new GaussLegendreMethod2D());
 	} else {
 		throw std::runtime_error("unsupported solver");
 	}

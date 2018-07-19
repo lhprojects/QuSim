@@ -42,6 +42,9 @@
     <ClCompile Include="..\qsim\SolverImpl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\GaussLegendreMethod2D.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\SplittingMethod2D.h">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="..\qsim\Matrix2.h">
       <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\GaussLegendreMethod2D.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
