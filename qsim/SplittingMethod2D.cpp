@@ -20,17 +20,32 @@ void SplittingMethod2D::initSystem2D(std::function<Complex(Real, Real)> const &p
 	fPsiYOut.resize(fNx);
 
 	initExpV();
+
+	FourierTransformLibrary lib = FourierTransformLibrary::KISS;
+	{
+		auto it = opts.find("fft_lib");
+		if (it != opts.end()) {
+			if (it->second == "kiss") {
+				lib = FourierTransformLibrary::KISS;
+			} else if (it->second == "FFTW") {
+				lib = FourierTransformLibrary::FFTW;
+			} else if (it->second == "cuda") {
+				lib = FourierTransformLibrary::CUDA;
+			}
+		}
+	}
+
 	if (b == BoundaryCondition::Period) {
 		fFTPsi.resize(fNy, fNx);
 
-		fft_Nx.reset(new kissfft<Real>((int)fNx, false));
-		inv_fft_Nx.reset(new kissfft<Real>((int)fNx, true));
+		fft_Nx.reset(FourierTransform::Create(fNx, false, lib));
+		inv_fft_Nx.reset(FourierTransform::Create(fNx, true, lib));
 		if (fNx == fNy) {
 			fft_Ny = fft_Nx;
 			inv_fft_Ny = inv_fft_Nx;
 		} else {
-			fft_Ny.reset(new kissfft<Real>((int)fNy, false));
-			inv_fft_Ny.reset(new kissfft<Real>((int)fNy, true));
+			fft_Ny.reset(FourierTransform::Create(fNy, false, lib));
+			inv_fft_Ny.reset(FourierTransform::Create(fNy, true, lib));
 		}
 
 	} else {
@@ -105,7 +120,7 @@ void SplittingMethod2D::ExpT(Eigen::MatrixXcd &tpsi, Eigen::MatrixXcd const &psi
 	//double x = Norm2();
 
 	for (size_t i = 0; i < fNx; ++i) {
-		fft_Ny->transform(psi.data() + i * fNy, fFTPsi.data() + i * fNy);
+		fft_Ny->Transform(psi.data() + i * fNy, fFTPsi.data() + i * fNy);
 	}
 
 	//double y = fFTPsi.squaredNorm()*fDx*fDy;
@@ -114,7 +129,7 @@ void SplittingMethod2D::ExpT(Eigen::MatrixXcd &tpsi, Eigen::MatrixXcd const &psi
 		for (size_t j = 0; j < fNx; ++j) {
 			fPsiYIn.data()[j] = fFTPsi.data()[j*fNy + i];
 		}
-		fft_Nx->transform(fPsiYIn.data(), fPsiYOut.data());
+		fft_Nx->Transform(fPsiYIn.data(), fPsiYOut.data());
 		for (size_t j = 0; j < fNx; ++j) {
 			fFTPsi.data()[j*fNy + i] = fPsiYOut[j];
 		}
@@ -141,13 +156,13 @@ void SplittingMethod2D::ExpT(Eigen::MatrixXcd &tpsi, Eigen::MatrixXcd const &psi
 		for (size_t j = 0; j < fNx; ++j) {
 			fPsiYIn[j] = fFTPsi.data()[j*fNy + i];
 		}
-		inv_fft_Nx->transform(fPsiYIn.data(), fPsiYOut.data());
+		inv_fft_Nx->Transform(fPsiYIn.data(), fPsiYOut.data());
 		for (size_t j = 0; j < fNx; ++j) {
 			fFTPsi.data()[j*fNy + i] = fPsiYOut[j];
 		}
 	}
 	for (size_t i = 0; i < fNx; ++i) {
-		inv_fft_Ny->transform(fFTPsi.data() + i * fNy, tpsi.data() + i * fNy);
+		inv_fft_Ny->Transform(fFTPsi.data() + i * fNy, tpsi.data() + i * fNy);
 	}
 
 	tpsi *= 1.0 / sqrt(fNx * fNy);
@@ -159,14 +174,14 @@ void SplittingMethod2D::ExpT(Eigen::MatrixXcd &tpsi, Eigen::MatrixXcd const &psi
 Real SplittingMethod2D::CalKinEn() const
 {
 	for (size_t i = 0; i < fNx; ++i) {
-		fft_Ny->transform(fPsi.data() + i * fNy, fFTPsi.data() + i * fNy);
+		fft_Ny->Transform(fPsi.data() + i * fNy, fFTPsi.data() + i * fNy);
 	}
 
 	for (size_t i = 0; i < fNy; ++i) {
 		for (size_t j = 0; j < fNx; ++j) {
 			fPsiYIn[j] = fFTPsi.data()[j*fNy + i];
 		}
-		fft_Nx->transform(fPsiYIn.data(), fPsiYOut.data());
+		fft_Nx->Transform(fPsiYIn.data(), fPsiYOut.data());
 		for (size_t j = 0; j < fNx; ++j) {
 			fFTPsi.data()[j*fNy + i] = fPsiYOut[j];
 		}

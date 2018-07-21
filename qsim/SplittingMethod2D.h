@@ -3,8 +3,7 @@
 #include "EvolverImpl.h"
 #include "eigen/Eigen/Dense"
 #include <memory>
-#include "kissfft.hh"
-
+#include "FourierTransform.h"
 
 struct SplittingMethod2D : EvolverImpl2D {
 	
@@ -18,10 +17,10 @@ struct SplittingMethod2D : EvolverImpl2D {
 	mutable Eigen::MatrixXcd fFTPsi;
 	mutable Eigen::VectorXcd fPsiYIn;
 	mutable Eigen::VectorXcd fPsiYOut;
-	std::shared_ptr<kissfft<Real> > fft_Nx;
-	std::shared_ptr<kissfft<Real> > inv_fft_Nx;
-	std::shared_ptr<kissfft<Real> > fft_Ny;
-	std::shared_ptr<kissfft<Real> > inv_fft_Ny;
+	std::shared_ptr<FourierTransform > fft_Nx;
+	std::shared_ptr<FourierTransform > inv_fft_Nx;
+	std::shared_ptr<FourierTransform > fft_Ny;
+	std::shared_ptr<FourierTransform > inv_fft_Ny;
 
 
 	SplittingMethod2D()

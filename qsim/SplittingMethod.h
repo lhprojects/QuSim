@@ -1,8 +1,7 @@
 #pragma once
 #include "EvolverImpl.h"
+#include "FourierTransform.h"
 #include <memory>
-
-#include "kissfft.hh"
 
 
 struct SplittingMethod : EvolverImpl1D {
@@ -14,10 +13,11 @@ struct SplittingMethod : EvolverImpl1D {
 
 	// period only
 	std::vector<Complex> fFTPsi;
-	std::shared_ptr<kissfft<Real> > fft_N;
-	std::shared_ptr<kissfft<Real> > inv_fft_N;
+	
+	std::shared_ptr<FourierTransform> fft_N;
+	std::shared_ptr<FourierTransform> inv_fft_N;
 	// infinite wall
-	std::shared_ptr<kissfft<Real> > inv_fft_2N;
+	std::shared_ptr<FourierTransform> inv_fft_2N;
 	std::vector<Complex> fIWPsi;
 	std::vector<Complex> fIWKPsi;
 

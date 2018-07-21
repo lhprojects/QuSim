@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="..\qsim\Cal.cpp" />
     <ClCompile Include="..\qsim\EigenMethod.cpp" />
+    <ClCompile Include="..\qsim\FourierTransform.cpp" />
     <ClCompile Include="..\qsim\GaussLegendreMethod.cpp" />
     <ClCompile Include="..\qsim\GaussLegendreMethod2D.cpp" />
     <ClCompile Include="..\qsim\SolverImpl.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="..\qsim\AdptiveSimpsonQuadrature.h" />
     <ClInclude Include="..\qsim\Cal.h" />
     <ClInclude Include="..\qsim\EigenMethod.h" />
+    <ClInclude Include="..\qsim\FourierTransform.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod2D.h" />
     <ClInclude Include="..\qsim\kissfft.hh" />
