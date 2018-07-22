@@ -48,6 +48,9 @@
     <ClCompile Include="..\qsim\FourierTransform.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\CUDAFourierTransform.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\SplittingMethod2D.h">
@@ -89,10 +92,8 @@
     <ClInclude Include="..\qsim\FourierTransform.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\qsim\CUFFT.cu">
-      <Filter>源文件</Filter>
-    </None>
+    <ClInclude Include="..\qsim\CUDAFourierTransform.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

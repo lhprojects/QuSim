@@ -65,9 +65,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="CUDA 9.1.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="CUDA 9.1.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -104,10 +106,10 @@
     </Link>
     <Lib />
     <Lib>
-      <AdditionalDependencies>libfftw3-3.lib</AdditionalDependencies>
+      <AdditionalDependencies>libfftw3-3.lib;cudart.lib;cufft.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\fftw-3.3.5-dll64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\fftw-3.3.5-dll64;$(CudaToolkitLibDir)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -142,10 +144,10 @@
     </Link>
     <Lib />
     <Lib>
-      <AdditionalDependencies>libfftw3-3.lib</AdditionalDependencies>
+      <AdditionalDependencies>libfftw3-3.lib;cudart.lib;cufft.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\fftw-3.3.5-dll64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\fftw-3.3.5-dll64;$(CudaToolkitLibDir)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -175,6 +177,7 @@
     <ClCompile Include="..\qsim\GaussLegendreMethod.cpp" />
     <ClCompile Include="..\qsim\GaussLegendreMethod2D.cpp" />
     <ClCompile Include="..\qsim\SolverImpl.cpp" />
+    <ClCompile Include="..\qsim\CUDAFourierTransform.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod2D.cpp" />
     <ClCompile Include="..\qsim\QuSim.cpp" />
@@ -188,6 +191,7 @@
     <ClInclude Include="..\qsim\FourierTransform.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod2D.h" />
+    <ClInclude Include="..\qsim\CUDAFourierTransform.h" />
     <ClInclude Include="..\qsim\kissfft.hh" />
     <ClInclude Include="..\qsim\Matrix2.h" />
     <ClInclude Include="..\qsim\SolverImpl.h" />
@@ -195,14 +199,6 @@
     <ClInclude Include="..\qsim\SplittingMethod2D.h" />
     <ClInclude Include="..\qsim\QuSim.h" />
     <ClInclude Include="..\qsim\EvolverImpl.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\qsim\CUFFT.cu" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CUFFT\CUFFT.vcxproj">
-      <Project>{0034ac4f-a246-425f-b0ef-69062c1f3a70}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,7 +3,7 @@
 
 #if defined(_M_X64) 
 #include "../fftw-3.3.5-dll64/fftw3.h"
-#include "cudaFFT.h"
+#include "CUDAFourierTransform.h"
 #endif
 
 struct KissFourierTransform : FourierTransform {

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="..\qsim\cudaFFT.cu">
+    <CudaCompile Include="..\qsim\cudaFFT.cpp">
       <Runtime Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MT</Runtime>
     </CudaCompile>
   </ItemGroup>

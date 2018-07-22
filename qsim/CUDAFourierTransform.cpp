@@ -1,4 +1,4 @@
-#include "cudaFFT.h"
+#include "CUDAFourierTransform.h"
 #include <cuda_runtime.h>
 #include <cufft.h>
 
@@ -44,7 +44,8 @@ CUDAFourierTransform::CUDAFourierTransform(size_t n, bool inverse)
 
 }
 
-CUDAFourierTransform::~CUDAFourierTransform() {
+CUDAFourierTransform::~CUDAFourierTransform()
+{
 	cufftDestroy(plan);
 	cudaFree(data);
 }
