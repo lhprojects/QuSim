@@ -18,8 +18,12 @@ int main()
 	std::map<std::string, std::string> space_O4;
 	space_O4["space_O2"] = "0";
 
+	std::map<std::string, std::string> fftw;
+	fftw["fft_lib"] = "FFTW";
+
 	Test tests[] = {
-		{ SolverMethod::SplittingMethodO2 , "splitO2", std::map<std::string, std::string>() },
+		{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
+	{ SolverMethod::SplittingMethodO2 , "splitO2", std::map<std::string, std::string>() },
 	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", std::map<std::string, std::string>() },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO4", space_O4 },
@@ -54,7 +58,7 @@ int main()
 				tests[i].opts);
 
 			int dim = dims[j];
-			int iter = 500000 * 10 / (dim*dim);
+			int iter = 5000000 * 10 / (dim*dim);
 
 			auto t0 = std::chrono::system_clock::now();
 			for (int it = 0; it < iter; ++it) {

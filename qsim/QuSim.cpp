@@ -172,7 +172,7 @@ void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_n
 		vs, x0, x1, nx,
 		y0, y1, ny,
 		b, solver,
-		mass, hbar, std::map<std::string, std::string>());
+		mass, hbar, opts);
 
 }
 

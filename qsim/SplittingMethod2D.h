@@ -9,18 +9,21 @@ struct SplittingMethod2D : EvolverImpl2D {
 	
 
 	Eigen::MatrixXcd fExpV0Dot5Dt;
+	Eigen::MatrixXcd fExpTDt;
+	Eigen::MatrixXcd fExpTD1Dt;
+	Eigen::MatrixXcd fExpTD2Dt;
 	Eigen::MatrixXcd fVPsi;
 	Eigen::MatrixXcd fTVPsi;
 	Eigen::MatrixXcd fVTVPsi;
+	Real fD1;
+	Real fD2;
 
 	// period only
 	mutable Eigen::MatrixXcd fFTPsi;
 	mutable Eigen::VectorXcd fPsiYIn;
 	mutable Eigen::VectorXcd fPsiYOut;
-	std::shared_ptr<FourierTransform > fft_Nx;
-	std::shared_ptr<FourierTransform > inv_fft_Nx;
-	std::shared_ptr<FourierTransform > fft_Ny;
-	std::shared_ptr<FourierTransform > inv_fft_Ny;
+	std::shared_ptr<FourierTransform2D > fft;
+	std::shared_ptr<FourierTransform2D > inv_fft;
 
 
 	SplittingMethod2D()
@@ -41,6 +44,7 @@ struct SplittingMethod2D : EvolverImpl2D {
 
 private:
 	void initExpV();
+	void initExpT();
 	// vpsi = exp(-i/hbar V Dt) psi
 	void ExpV(Eigen::MatrixXcd &vpsi, Eigen::MatrixXcd const &psi, Real t);
 	void ExpT(Eigen::MatrixXcd &tpsi, Eigen::MatrixXcd const &psi, Real tt);
