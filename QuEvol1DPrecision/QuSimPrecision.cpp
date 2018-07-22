@@ -23,12 +23,12 @@ void test_tunneling()
 	space_O4["space_O2"] = "0";
 
 	Test tests[] = {
-		{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", std::map<std::string, std::string>() },
+		{ SolverMethod::SplittingMethodO2 , "splitO2", std::map<std::string, std::string>() },
+	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },
+	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", std::map<std::string, std::string>() },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO4", space_O4 },
 	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO2", space_O2 },
 	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", std::map<std::string, std::string>() },
-	{ SolverMethod::SplittingMethodO2 , "splitO2", std::map<std::string, std::string>() },
-	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },
 	{ SolverMethod::Eigen , "eigen", std::map<std::string, std::string>() },
 	};
 
@@ -128,13 +128,17 @@ void test_speed()
 	std::map<std::string, std::string> space_O4;
 	space_O4["space_O2"] = "0";
 
+	std::map<std::string, std::string> fftw;
+	fftw["fft_lib"] = "FFTW";
+
 	Test tests[] = {
-		{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", std::map<std::string, std::string>() },
+		{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
+	{ SolverMethod::SplittingMethodO2 , "splitO2+kiss", std::map<std::string, std::string>() },
+	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },
+	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", std::map<std::string, std::string>() },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO4", space_O4 },
 	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO2", space_O2 },
 	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", std::map<std::string, std::string>() },
-	{ SolverMethod::SplittingMethodO2 , "splitO2", std::map<std::string, std::string>() },
-	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },
 	{ SolverMethod::Eigen , "eigen", std::map<std::string, std::string>() },
 	};
 
