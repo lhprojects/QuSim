@@ -72,14 +72,10 @@ void SplittingMethod::ExpT(PsiVector &tpsi, PsiVector const &psi, Real tt)
 {
 	Zero(tpsi);
 	if (fBoundaryCondition == BoundaryCondition::Period) {
-		//Zero(fFTPsi);
-		//fKinEnergy = 0;
 
-		//kiss_fft_cfg kiss_cfg =  kiss_fft_alloc(fN, false, NULL, NULL);
-		//kiss_fft_cfg kiss_cfg_inv = kiss_fft_alloc(fN, true, NULL, NULL);
-
+		//double x = Norm2(psi);
 		fft_N->Transform(psi.data(), fFTPsi.data());
-		//kiss_fft(kiss_cfg, (kiss_fft_cpx*)psi.data(), (kiss_fft_cpx*)fFTPsi.data());
+		//double y = Norm2(fFTPsi);
 
 		Scale(fFTPsi, 1.0 / sqrt(1.0*fN));
 
@@ -102,25 +98,16 @@ void SplittingMethod::ExpT(PsiVector &tpsi, PsiVector const &psi, Real tt)
 			Complex f = exp(-I * (t * fDt * tt));
 			fFTPsi[i] *= f;
 
-			//fKinEnergy += t*fHbar*abs2(fFTPsi[i]);
 		}
-		//fKinEnergy /= Norm2(fFTPsi);
 
 		inv_fft_N->Transform(fFTPsi.data(), tpsi.data());
-		//kiss_fft(kiss_cfg_inv, (kiss_fft_cpx*)fFTPsi.data(), (kiss_fft_cpx*)tpsi.data());
 
 		Scale(tpsi, 1.0 / sqrt(1.0*fN));
-
-		//free(kiss_cfg);
-		//free(kiss_cfg_inv);
-
 
 	} else if (fBoundaryCondition == BoundaryCondition::InfiniteWall) {
 		//fKinEnergy = 0;
 		//Real kinEnergyNorm2 = 0;
 
-
-		//kiss_fft_cfg kiss_cfg_inv = kiss_fft_alloc(2*fN, true, NULL, NULL);
 
 		std::copy(psi.begin(), psi.end(), fIWPsi.begin());
 		fIWPsi[0] = 0;
@@ -130,7 +117,6 @@ void SplittingMethod::ExpT(PsiVector &tpsi, PsiVector const &psi, Real tt)
 		}
 
 		inv_fft_2N->Transform(fIWPsi.data(), fIWKPsi.data());
-		//kiss_fft(kiss_cfg_inv, (kiss_fft_cpx*)fIWPsi.data(), (kiss_fft_cpx*)fIWKPsi.data());
 
 		Scale(fIWKPsi, 1.0 / (1.0*fN*I));
 
@@ -145,11 +131,7 @@ void SplittingMethod::ExpT(PsiVector &tpsi, PsiVector const &psi, Real tt)
 			Complex f = exp(-I * (t * fDt * tt));
 			fIWKPsi[i] *= f;
 
-			//fKinEnergy += t * fHbar*abs2(fIWKPsi[i]);
-			//kinEnergyNorm2 += abs2(fIWKPsi[i]);
 		}
-
-		//fKinEnergy /= kinEnergyNorm2;
 
 		fIWKPsi[0] = 0;
 		fIWKPsi[fN] = 0;
@@ -158,7 +140,6 @@ void SplittingMethod::ExpT(PsiVector &tpsi, PsiVector const &psi, Real tt)
 		}
 
 		inv_fft_2N->Transform(fIWKPsi.data(), fIWPsi.data());
-		//kiss_fft(kiss_cfg_inv, (kiss_fft_cpx*)fIWKPsi.data(), (kiss_fft_cpx*)fIWPsi.data());
 
 		Scale(fIWPsi, 1.0 / (2.0 * I));
 		std::copy(fIWPsi.begin(), fIWPsi.begin() + fN, tpsi.begin());

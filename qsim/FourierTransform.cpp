@@ -1,7 +1,9 @@
 #include "FourierTransform.h"
 #include "kissfft.hh"
+
 #if defined(_M_X64) 
 #include "../fftw-3.3.5-dll64/fftw3.h"
+#include "cudaFFT.h"
 #endif
 
 struct KissFourierTransform : FourierTransform {
@@ -49,11 +51,14 @@ struct FFTWFourierTransform : FourierTransform {
 
 FourierTransform * FourierTransform::Create(size_t n, bool inverse, FourierTransformLibrary lib)
 {
+	//return CreateCUDAFourierTransform(n, inverse);
 	if (lib == FourierTransformLibrary::KISS) {
 		return new KissFourierTransform(n, inverse);
 #if defined(_M_X64) 
 	} else if (lib == FourierTransformLibrary::FFTW) {
 		return new FFTWFourierTransform(n, inverse);
+	} else if (lib == FourierTransformLibrary::CUDA) {
+		return CreateCUDAFourierTransform(n, inverse);
 #endif
 	} else {
 		throw std::runtime_error("not supported fft library");

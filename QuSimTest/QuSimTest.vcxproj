@@ -23,7 +23,7 @@
     <ProjectGuid>{9F3E805E-2EDF-4033-AFF3-7673A80C4C14}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>QuSimTest</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

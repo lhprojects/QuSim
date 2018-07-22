@@ -23,7 +23,7 @@
     <ProjectGuid>{3A4B2681-4236-4A8A-9891-D7D3937F8648}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>QuSimLib</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -195,6 +195,14 @@
     <ClInclude Include="..\qsim\SplittingMethod2D.h" />
     <ClInclude Include="..\qsim\QuSim.h" />
     <ClInclude Include="..\qsim\EvolverImpl.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\qsim\CUFFT.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CUFFT\CUFFT.vcxproj">
+      <Project>{0034ac4f-a246-425f-b0ef-69062c1f3a70}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
