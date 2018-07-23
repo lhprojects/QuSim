@@ -73,10 +73,10 @@
     </Link>
     <Lib />
     <Lib>
-      <AdditionalDependencies>libfftw3-3.lib;cudart.lib;cufft.lib</AdditionalDependencies>
+      <AdditionalDependencies>cudart.lib;cufft.lib;libfftw-3.3.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\fftw-3.3.5-dll64;$(CudaToolkitLibDir)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(CudaToolkitLibDir);$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -95,10 +95,10 @@
     </Link>
     <Lib />
     <Lib>
-      <AdditionalDependencies>libfftw3-3.lib;cudart.lib;cufft.lib</AdditionalDependencies>
+      <AdditionalDependencies>cudart.lib;cufft.lib;libfftw-3.3.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\fftw-3.3.5-dll64;$(CudaToolkitLibDir)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(CudaToolkitLibDir);$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -136,6 +136,9 @@
   <ItemGroup>
     <ProjectReference Include="..\CudaUtility\CudaUtility.vcxproj">
       <Project>{0fac6007-a0a7-4c30-9b38-1503cf9de5ce}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\fftw-3.3.2\fftw-3.3-libs\libfftw-3.3\libfftw-3.3.vcxproj">
+      <Project>{ea3dcc95-2423-4ea0-a508-7a427b4c0594}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

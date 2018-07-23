@@ -97,7 +97,7 @@ void SplittingMethod2DCUDA::initSystem2D(std::function<Complex(Real, Real)> cons
 		check_err(cudaMemcpy(fExpVC2Dt, tmp2.data(), fNx*fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
 	}
 
-	check_err(cufftPlan2d(&plan, fNx, fNy, CUFFT_Z2Z));
+	check_err(cufftPlan2d(&plan, (int)fNx, (int)fNy, CUFFT_Z2Z));
 }
 
 
@@ -153,15 +153,15 @@ Real SplittingMethod2DCUDA::CalKinEn() const
 SplittingMethod2DCUDA::~SplittingMethod2DCUDA()
 {
 	if (fSolverMethod == SolverMethod::SplittingMethodO2) {
-		check_err(cudaFree(fExpV0Dot5Dt));
-		check_err(cudaFree(fExpTDt));
+		cudaFree(fExpV0Dot5Dt);
+		cudaFree(fExpTDt);
 	} else {
-		check_err(cudaFree(fExpVC1Dt));
-		check_err(cudaFree(fExpVC2Dt));
-		check_err(cudaFree(fExpTD1Dt));
-		check_err(cudaFree(fExpTD2Dt));
+		cudaFree(fExpVC1Dt);
+		cudaFree(fExpVC2Dt);
+		cudaFree(fExpTD1Dt);
+		cudaFree(fExpTD2Dt);
 	}
-	check_err(cudaFree(fTmp1));
-	check_err(cudaFree(fTmp2));
+	cudaFree(fTmp1);
+	cudaFree(fTmp2);
 
 }

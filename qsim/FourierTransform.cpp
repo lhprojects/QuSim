@@ -1,10 +1,9 @@
 #include "FourierTransform.h"
 #include "kissfft.hh"
 
-#if defined(_M_X64) 
-#include "../fftw-3.3.5-dll64/fftw3.h"
+#include "../fftw-3.3.2/api/fftw3.h"
+//#include "../fftw-3.3.5-dll64/fftw3.h"
 #include "CUDAFourierTransform.h"
-#endif
 
 struct KissFourierTransform : FourierTransform {
 	kissfft<double> impl;
@@ -20,7 +19,6 @@ struct KissFourierTransform : FourierTransform {
 
 };
 
-#if defined(_M_X64) 
 struct FFTWFourierTransform : FourierTransform {
 	fftw_plan plan;
 	fftw_complex *in;
@@ -47,19 +45,16 @@ struct FFTWFourierTransform : FourierTransform {
 		fftw_free(out);
 	}
 };
-#endif
 
 FourierTransform * FourierTransform::Create(size_t n, bool inverse, FourierTransformLibrary lib)
 {
 	//return CreateCUDAFourierTransform(n, inverse);
 	if (lib == FourierTransformLibrary::KISS) {
 		return new KissFourierTransform(n, inverse);
-#if defined(_M_X64) 
 	} else if (lib == FourierTransformLibrary::FFTW) {
 		return new FFTWFourierTransform(n, inverse);
 	} else if (lib == FourierTransformLibrary::CUDA) {
 		return CreateCUDAFourierTransform(n, inverse);
-#endif
 	} else {
 		throw std::runtime_error("not supported fft library");
 	}
@@ -156,10 +151,8 @@ FourierTransform2D * FourierTransform2D::Create(size_t n1, size_t n2, bool inver
 {
 	if (lib == FourierTransformLibrary::KISS) {
 		return new KissFourierTransform2D(n1, n2, inverse);
-#if defined(_M_X64) 
 	} else if (lib == FourierTransformLibrary::FFTW) {
 		return new FFTWFourierTransform2D(n1, n2, inverse);
-#endif
 	} else {
 		throw std::runtime_error("not supported fft library");
 	}
