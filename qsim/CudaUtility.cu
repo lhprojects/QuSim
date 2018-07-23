@@ -26,6 +26,22 @@ struct my_scale {
 	}
 };
 
+#if 0
+__global__
+void mul(size_t n, cuDoubleComplex *out, cuDoubleComplex *x, cuDoubleComplex *y)
+{
+	size_t i = blockIdx.x*blockDim.x + threadIdx.x;
+	if(i < n) out[i] = cuCmul(x[i], y[i]);
+}
+
+cudaError cudaProduct(cuDoubleComplex *out, cuDoubleComplex * f2, cuDoubleComplex * f1, size_t n)
+{
+	saxpy <<< (n + 255) / 256, 256 >>>(n, out, f2, f1);
+
+	return cudaSuccess;
+}
+
+#else
 cudaError cudaProduct(cuDoubleComplex *out, cuDoubleComplex * f2, cuDoubleComplex * f1, size_t n)
 {
 	thrust::device_ptr<cuDoubleComplex> d_f1 = thrust::device_pointer_cast(f1);
@@ -36,6 +52,8 @@ cudaError cudaProduct(cuDoubleComplex *out, cuDoubleComplex * f2, cuDoubleComple
 	thrust::transform(d_f1, d_f1_e, d_f2, d_out, my_multiplies());
 	return cudaSuccess;
 }
+#endif
+
 
 cudaError cudaScale(cuDoubleComplex *out, cuDoubleComplex *in, double alpha, size_t n)
 {

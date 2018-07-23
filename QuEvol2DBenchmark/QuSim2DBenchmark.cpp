@@ -60,7 +60,8 @@ int main()
 	}
 	printf("\n");
 
-	for (int i = 0; i < sizeof(tests) / sizeof(Test); ++i) {
+	int ntest = sizeof(tests) / sizeof(Test);
+	for (int i = 0; i < ntest; ++i) {
 		printf("%-30s ", tests[i].name);
 		printf("%25s ", "Iters*Dim/Time [M/s]");
 		int n = sizeof(dims) / sizeof(int);
@@ -75,6 +76,7 @@ int main()
 			if (tests[i].opts.count("batch") != 0) {
 				iter /= 10;
 			}
+			if (iter < 2) iter = 2;
 
 			auto t0 = std::chrono::system_clock::now();
 			for (int it = 0; it < iter; ++it) {

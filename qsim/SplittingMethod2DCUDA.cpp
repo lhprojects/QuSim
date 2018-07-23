@@ -133,7 +133,9 @@ void SplittingMethod2DCUDA::step()
 
 void SplittingMethod2DCUDA::update_psi()
 {
-	check_err(cudaMemcpy(fTmp1, fPsi.data(), fNx * fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
+	if (fStep == 0) {
+		check_err(cudaMemcpy(fTmp1, fPsi.data(), fNx * fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
+	}
 	for (size_t i = 0; i < fBatch; ++i) {
 		if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
 
