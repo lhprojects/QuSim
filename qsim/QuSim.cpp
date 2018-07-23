@@ -6,6 +6,7 @@
 #include "EigenMethod.h"
 #include "GaussLegendreMethod.h"
 #include "SplittingMethod2D.h"
+#include "SplittingMethod2DCUDA.h"
 #include "GaussLegendreMethod2D.h"
 #include "Cal.h"
 
@@ -156,9 +157,19 @@ void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_n
 	std::map<std::string, std::string> const &opts)
 {
 	if (solver == SolverMethod::SplittingMethodO2) {
-		fImpl.reset(new SplittingMethod2D());
+		auto it = opts.find("fft_lib");
+		if (it != opts.end() && it->second == "cuda") {
+			fImpl.reset(new SplittingMethod2DCUDA());
+		} else {
+			fImpl.reset(new SplittingMethod2DCUDA());
+		}
 	} else if (solver == SolverMethod::SplittingMethodO4) {
-		fImpl.reset(new SplittingMethod2D());
+		auto it = opts.find("fft_lib");
+		if (it != opts.end() && it->second == "cuda") {
+			fImpl.reset(new SplittingMethod2DCUDA());
+		} else {
+			fImpl.reset(new SplittingMethod2D());
+		}
 	} else if (solver == SolverMethod::ImplicitMidpointMethod
 		|| solver == SolverMethod::GaussLegendreO4
 		|| solver == SolverMethod::GaussLegendreO6) {

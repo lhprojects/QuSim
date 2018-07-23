@@ -182,6 +182,7 @@
     <ClCompile Include="..\qsim\SplittingMethod2D.cpp" />
     <ClCompile Include="..\qsim\QuSim.cpp" />
     <ClCompile Include="..\qsim\EvolverImpl.cpp" />
+    <ClCompile Include="..\qsim\SplittingMethod2DCUDA.cpp" />
     <ClCompile Include="..\qsim\TestCal.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -199,6 +200,12 @@
     <ClInclude Include="..\qsim\SplittingMethod2D.h" />
     <ClInclude Include="..\qsim\QuSim.h" />
     <ClInclude Include="..\qsim\EvolverImpl.h" />
+    <ClInclude Include="..\qsim\SplittingMethod2DCUDA.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CudaUtility\CudaUtility.vcxproj">
+      <Project>{0fac6007-a0a7-4c30-9b38-1503cf9de5ce}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

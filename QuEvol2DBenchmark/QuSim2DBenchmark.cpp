@@ -21,8 +21,12 @@ int main()
 	std::map<std::string, std::string> fftw;
 	fftw["fft_lib"] = "FFTW";
 
+	std::map<std::string, std::string> cuda;
+	cuda["fft_lib"] = "cuda";
+
 	Test tests[] = {
-		{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
+		{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
+	{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
 	{ SolverMethod::SplittingMethodO2 , "splitO2", std::map<std::string, std::string>() },
 	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", std::map<std::string, std::string>() },
@@ -36,6 +40,7 @@ int main()
 		100,
 		200,
 		400,
+		800,
 	};
 
 	printf("%-30s ", "");

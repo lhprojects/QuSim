@@ -109,7 +109,7 @@ void SplittingMethod2D::initExpT()
 			Real t = fHbar * (kx*kx + ky * ky) / (2 * fMass);
 			fExpTD1Dt(j, i) = exp(-I * (t * fDt* fD1));
 			fExpTD2Dt(j, i) = exp(-I * (t * fDt* fD2));
-			fExpTDt(j, i) = exp(-I * (t * fDt* 0.5));
+			fExpTDt(j, i) = exp(-I * (t * fDt* 1.0));
 		}
 	}
 
