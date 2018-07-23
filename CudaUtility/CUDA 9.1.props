@@ -74,7 +74,7 @@
       <GenerateRelocatableDeviceCode>false</GenerateRelocatableDeviceCode>
       <NvccCompilation>compile</NvccCompilation>
       <CudaRuntime>Static</CudaRuntime>
-      <TargetMachinePlatform>32</TargetMachinePlatform>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
       <!-- Project schema: Driver properties -->
       <InterleaveSourceInPTX>false</InterleaveSourceInPTX>
       <CodeGeneration>compute_30,sm_30</CodeGeneration>
@@ -172,7 +172,6 @@ set CUDAFE_FLAGS=--sdk_dir "$(WindowsSdkDir)"
     </CudaLink>
     <Link>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(CudaToolkitLibDir)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cudart.lib;cufft.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
