@@ -1,4 +1,5 @@
 #pragma once
+#ifdef USE_CUDA
 
 #include "EvolverImpl.h"
 #include <cufft.h>
@@ -38,3 +39,5 @@ struct SplittingMethod2DCUDA : EvolverImpl2D {
 	~SplittingMethod2DCUDA();
 
 };
+
+#endif

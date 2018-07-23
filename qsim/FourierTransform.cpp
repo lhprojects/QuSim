@@ -54,7 +54,11 @@ FourierTransform * FourierTransform::Create(size_t n, bool inverse, FourierTrans
 	} else if (lib == FourierTransformLibrary::FFTW) {
 		return new FFTWFourierTransform(n, inverse);
 	} else if (lib == FourierTransformLibrary::CUDA) {
+#ifdef USE_CUDA
 		return CreateCUDAFourierTransform(n, inverse);
+#else
+		throw std::runtime_error("cuda not supported");
+#endif
 	} else {
 		throw std::runtime_error("not supported fft library");
 	}

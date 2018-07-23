@@ -1,3 +1,5 @@
+#ifdef USE_CUDA
+
 #include "SplittingMethod2DCUDA.h"
 #include "CudaUtility.h"
 #include <cuda_runtime.h>
@@ -165,3 +167,5 @@ SplittingMethod2DCUDA::~SplittingMethod2DCUDA()
 	cudaFree(fTmp2);
 
 }
+
+#endif

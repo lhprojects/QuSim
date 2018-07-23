@@ -25,7 +25,9 @@ int main()
 	cuda["fft_lib"] = "cuda";
 
 	Test tests[] = {
+#ifdef USE_CUDA
 		{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
+#endif
 	{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
 	{ SolverMethod::SplittingMethodO2 , "splitO2", std::map<std::string, std::string>() },
 	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },

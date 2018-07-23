@@ -137,7 +137,9 @@ void test_speed()
 	Test tests[] = {
 	
 	{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
+#ifdef USE_CUDA
 	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
+#endif
 	{ SolverMethod::SplittingMethodO2 , "splitO2+kiss", std::map<std::string, std::string>() },
 	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", std::map<std::string, std::string>() },

@@ -1,3 +1,5 @@
+#ifdef USE_CUDA
+
 #include "CUDAFourierTransform.h"
 #include <cuda_runtime.h>
 #include <cufft.h>
@@ -77,3 +79,4 @@ void CUDAFourierTransform::Transform(std::complex<double> const * from, std::com
 
 }
 
+#endif
