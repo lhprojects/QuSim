@@ -161,7 +161,7 @@ void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_n
 		if (it != opts.end() && it->second == "cuda") {
 			fImpl.reset(new SplittingMethod2DCUDA());
 		} else {
-			fImpl.reset(new SplittingMethod2DCUDA());
+			fImpl.reset(new SplittingMethod2D());
 		}
 	} else if (solver == SolverMethod::SplittingMethodO4) {
 		auto it = opts.find("fft_lib");
