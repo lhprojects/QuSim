@@ -222,7 +222,7 @@ void EvolverImpl2D::initPotential()
 
 void EvolverImpl2D::step()
 {
-	Real y = Norm2();
+	//Real y = Norm2();
 	fLastLastPsi = fLastPsi;
 	fLastPsi = fPsi;
 

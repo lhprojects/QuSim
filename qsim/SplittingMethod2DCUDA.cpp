@@ -1,5 +1,5 @@
 #ifdef USE_CUDA
-
+#define _CRT_SECURE_NO_WARNINGS
 #include "SplittingMethod2DCUDA.h"
 #include "CudaUtility.h"
 #include <cuda_runtime.h>
@@ -34,6 +34,18 @@ void SplittingMethod2DCUDA::initSystem2D(std::function<Complex(Real, Real)> cons
 	EvolverImpl2D::initSystem2D(psi, force_normalization, dt, force_normalization_each_step,
 		vs, x0, x1, nx, y0, y1, ny,
 		b, solver, mass, hbar, opts);
+
+	{
+		auto it = opts.find("batch");
+		if (it != opts.end()) {
+			auto x = it->second;
+			int d;
+			if (sscanf(x.c_str(), "%d", &d) < 0) {
+				throw std::runtime_error("batch parse error");
+			}
+			fBatch = d;
+		}
+	}
 
 	check_err(cudaMalloc((void**)&fTmp1, nx*ny * sizeof(cuDoubleComplex)));
 	check_err(cudaMalloc((void**)&fTmp2, nx*ny * sizeof(cuDoubleComplex)));
@@ -102,47 +114,63 @@ void SplittingMethod2DCUDA::initSystem2D(std::function<Complex(Real, Real)> cons
 	check_err(cufftPlan2d(&plan, (int)fNx, (int)fNy, CUFFT_Z2Z));
 }
 
+void SplittingMethod2DCUDA::step()
+{
+	//Real y = Norm2();
+	fLastLastPsi = fLastPsi;
+	fLastPsi = fPsi;
+
+	//Real x = Norm2();
+	update_psi();
+
+	if (fFNES) {
+		fPsi *= 1.0 / sqrt(Norm2());
+	}
+	fStep += fBatch;
+
+}
 
 void SplittingMethod2DCUDA::update_psi()
 {
 	check_err(cudaMemcpy(fTmp1, fPsi.data(), fNx * fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
-	if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
+	for (size_t i = 0; i < fBatch; ++i) {
+		if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
 
-		for (int i = 0; i < 1; ++i) {
 			check_err(cudaProduct(fTmp2, fExpV0Dot5Dt, fTmp1, fNx*fNy));
 			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_FORWARD));
 			check_err(cudaProduct(fTmp2, fExpTDt, fTmp1, fNx*fNy));
 			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_INVERSE));
 			check_err(cudaProduct(fTmp2, fExpV0Dot5Dt, fTmp1, fNx*fNy));
 			check_err(cudaScale(fTmp1, fTmp2, 1. / (fNx*fNy), fNx * fNy));
+
+
+
+		} else {
+
+			check_err(cudaProduct(fTmp2, fExpVC1Dt, fTmp1, fNx*fNy));
+
+			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_FORWARD));
+			check_err(cudaProduct(fTmp2, fExpTD1Dt, fTmp1, fNx*fNy));
+			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_INVERSE));
+
+			check_err(cudaProduct(fTmp2, fExpVC2Dt, fTmp1, fNx*fNy));
+
+			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_FORWARD));
+			check_err(cudaProduct(fTmp2, fExpTD2Dt, fTmp1, fNx*fNy));
+			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_INVERSE));
+
+			check_err(cudaProduct(fTmp2, fExpVC2Dt, fTmp1, fNx*fNy));
+
+			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_FORWARD));
+			check_err(cudaProduct(fTmp2, fExpTD1Dt, fTmp1, fNx*fNy));
+			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_INVERSE));
+
+			check_err(cudaProduct(fTmp2, fExpVC1Dt, fTmp1, fNx*fNy));
+			check_err(cudaScale(fTmp1, fTmp2, 1. / (fNx*fNy) / (fNx*fNy) / (fNx*fNy), fNx * fNy));
+
 		}
-
-
-
-	} else {
-
-		check_err(cudaProduct(fTmp2, fExpVC1Dt, fTmp1, fNx*fNy));
-
-		check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_FORWARD));
-		check_err(cudaProduct(fTmp2, fExpTD1Dt, fTmp1, fNx*fNy));
-		check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_INVERSE));
-
-		check_err(cudaProduct(fTmp2, fExpVC2Dt, fTmp1, fNx*fNy));
-
-		check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_FORWARD));
-		check_err(cudaProduct(fTmp2, fExpTD2Dt, fTmp1, fNx*fNy));
-		check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_INVERSE));
-
-		check_err(cudaProduct(fTmp2, fExpVC2Dt, fTmp1, fNx*fNy));
-
-		check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_FORWARD));
-		check_err(cudaProduct(fTmp2, fExpTD1Dt, fTmp1, fNx*fNy));
-		check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_INVERSE));
-
-		check_err(cudaProduct(fTmp2, fExpVC1Dt, fTmp1, fNx*fNy));
-		check_err(cudaScale(fTmp1, fTmp2, 1. / (fNx*fNy) / (fNx*fNy) / (fNx*fNy), fNx * fNy));
-
 	}
+
 	check_err(cudaMemcpy(fPsi.data(), fTmp1, fNx * fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
 
 }

@@ -6,6 +6,7 @@
 
 struct SplittingMethod2DCUDA : EvolverImpl2D {
 
+	size_t fBatch;
 	cuDoubleComplex *fExpV0Dot5Dt;
 	cuDoubleComplex *fExpVC1Dt;
 	cuDoubleComplex *fExpVC2Dt;
@@ -33,6 +34,7 @@ struct SplittingMethod2DCUDA : EvolverImpl2D {
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar, std::map<std::string, std::string> const &opts) override;
 
+	void step() override;
 	void update_psi() override;
 	Real CalKinEn() const override;
 
