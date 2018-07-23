@@ -24,9 +24,14 @@ int main()
 	std::map<std::string, std::string> cuda;
 	cuda["fft_lib"] = "cuda";
 
+	std::map<std::string, std::string> cuda_10;
+	cuda_10["fft_lib"] = "cuda";
+	cuda_10["batch"] = "10";
+
 	Test tests[] = {
 #ifdef USE_CUDA
-		{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
+		{ SolverMethod::SplittingMethodO2 , "splitO2+cuda_batch10", cuda_10 },
+	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
 #endif
 	{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
 	{ SolverMethod::SplittingMethodO2 , "splitO2", std::map<std::string, std::string>() },
@@ -43,6 +48,7 @@ int main()
 		200,
 		400,
 		800,
+		1600,
 	};
 
 	printf("%-30s ", "");
@@ -66,6 +72,9 @@ int main()
 
 			int dim = dims[j];
 			int iter = 5000000 * 10 / (dim*dim);
+			if (tests[i].opts.count("batch") != 0) {
+				iter /= 10;
+			}
 
 			auto t0 = std::chrono::system_clock::now();
 			for (int it = 0; it < iter; ++it) {
@@ -74,7 +83,7 @@ int main()
 			auto t1 = std::chrono::system_clock::now();
 
 			auto d = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0);
-			printf("%13.2f ", (dim*dim*iter) / (1E-6*d.count())*1E-6);
+			printf("%13.2f ", (dim*dim*syst.Time()/0.01) / (1E-6*d.count())*1E-6);
 		}
 		printf("\n");
 

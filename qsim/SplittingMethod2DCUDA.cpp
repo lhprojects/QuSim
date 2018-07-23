@@ -35,6 +35,7 @@ void SplittingMethod2DCUDA::initSystem2D(std::function<Complex(Real, Real)> cons
 		vs, x0, x1, nx, y0, y1, ny,
 		b, solver, mass, hbar, opts);
 
+	fBatch = 1;
 	{
 		auto it = opts.find("batch");
 		if (it != opts.end()) {
