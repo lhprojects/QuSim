@@ -186,7 +186,7 @@ void SplittingMethod2DCUDAImpl<Scalar>::initSystem2D(std::function<Complex(Real,
 			tmp1.data()[i] = exp(f*fV.data()[i] * I*0.5);
 		} else {
 			tmp1.data()[i] = exp(f*fV.data()[i] * I*fC1);
-			tmp1.data()[i] = exp(f*fV.data()[i] * I*fC2);
+			tmp2.data()[i] = exp(f*fV.data()[i] * I*fC2);
 		}
 	}
 
