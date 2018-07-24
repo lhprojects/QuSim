@@ -1,14 +1,12 @@
-#ifdef USE_CUDA
 #define _CRT_SECURE_NO_WARNINGS
+#include "EvolverImpl.h"
+
+#ifdef USE_CUDA
 #include "SplittingMethod2DCUDA.h"
 #include "CudaUtility.h"
 #include <cuda_runtime.h>
 #include <cufft.h>
 #include <cublas.h>
-
-
-
-#include "EvolverImpl.h"
 #include <cufft.h>
 
 template<class Scalar>
