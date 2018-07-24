@@ -106,8 +106,7 @@
     </Link>
     <Lib />
     <Lib>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalDependencies>libfftw-3.3.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
@@ -135,7 +134,7 @@
     </Link>
     <Lib />
     <Lib>
-      <AdditionalDependencies>cudart.lib;cufft.lib;CudaUtility.lib</AdditionalDependencies>
+      <AdditionalDependencies>cudart.lib;cufft.lib;CudaUtility.lib;libfftw-3.3.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(CudaToolkitLibDir);$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
@@ -179,7 +178,7 @@
     </Link>
     <Lib />
     <Lib>
-      <AdditionalDependencies>cudart.lib;cufft.lib;CudaUtility.lib</AdditionalDependencies>
+      <AdditionalDependencies>cudart.lib;cufft.lib;CudaUtility.lib;libfftw-3.3.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(CudaToolkitLibDir);$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
