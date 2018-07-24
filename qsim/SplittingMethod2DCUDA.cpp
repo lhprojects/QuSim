@@ -6,7 +6,92 @@
 #include <cufft.h>
 #include <cublas.h>
 
-SplittingMethod2DCUDA::SplittingMethod2DCUDA()
+
+
+#include "EvolverImpl.h"
+#include <cufft.h>
+
+template<class Scalar>
+struct SplittingMethod2DCUDAImpl : EvolverImpl2D {
+
+	Scalar *fExpV0Dot5Dt;
+	Scalar *fExpVC1Dt;
+	Scalar *fExpVC2Dt;
+
+	Scalar *fExpTDt;
+	Scalar *fExpTD1Dt;
+	Scalar *fExpTD2Dt;
+
+	Scalar *fTmp1;
+	Scalar *fTmp2;
+
+
+	size_t fBatch;
+	cufftHandle plan;
+	Real fD1;
+	Real fD2;
+	Real fC1;
+	Real fC2;
+
+	SplittingMethod2DCUDAImpl();
+
+	void initSystem2D(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
+		Complex dt, bool force_normalization_each_step,
+		std::function<Complex(Real, Real)> const &vs, Real x0, Real x1, size_t nx,
+		Real y0, Real y1, size_t ny,
+		BoundaryCondition b, SolverMethod solver,
+		Real mass, Real hbar, std::map<std::string, std::string> const &opts) override;
+
+	void step() override;
+	void update_psi() override;
+	Real CalKinEn() const override;
+
+	Eigen::MatrixXcf tmpf;
+
+	~SplittingMethod2DCUDAImpl();
+
+};
+
+
+cufftResult fftExec(cufftHandle plan,
+	cufftComplex *idata,
+	cufftComplex *odata,
+	int direction)
+{
+	return cufftExecC2C(plan, idata, odata, direction);
+}
+
+
+cufftResult fftExec(cufftHandle plan,
+	cufftDoubleComplex *idata,
+	cufftDoubleComplex *odata,
+	int direction)
+{
+	return cufftExecZ2Z(plan, idata, odata, direction);
+}
+
+template<class Scalar>
+struct Trait {
+
+};
+
+template<>
+struct Trait<cuDoubleComplex> {
+	typedef Eigen::MatrixXcd Matrix;
+	typedef double Real;
+	static const bool Double = true;
+};
+
+template<>
+struct Trait<cuComplex> {
+	typedef Eigen::MatrixXcf Matrix;
+	typedef float Real;
+	static const bool Double = false;
+
+};
+
+template<class Scalar>
+SplittingMethod2DCUDAImpl<Scalar>::SplittingMethod2DCUDAImpl()
 {
 
 	fExpV0Dot5Dt = nullptr;
@@ -24,7 +109,9 @@ SplittingMethod2DCUDA::SplittingMethod2DCUDA()
 
 #define check_err(err) do { if(err!=cudaSuccess) throw std::runtime_error("cuda error: " #err); } while(0)
 
-void SplittingMethod2DCUDA::initSystem2D(std::function<Complex(Real, Real)> const & psi,
+
+template<class Scalar>
+void SplittingMethod2DCUDAImpl<Scalar>::initSystem2D(std::function<Complex(Real, Real)> const & psi,
 	bool force_normalization, Complex dt, bool force_normalization_each_step,
 	std::function<Complex(Real, Real)> const & vs,
 	Real x0, Real x1, size_t nx, Real y0, Real y1, size_t ny,
@@ -48,17 +135,17 @@ void SplittingMethod2DCUDA::initSystem2D(std::function<Complex(Real, Real)> cons
 		}
 	}
 
-	check_err(cudaMalloc((void**)&fTmp1, nx*ny * sizeof(cuDoubleComplex)));
-	check_err(cudaMalloc((void**)&fTmp2, nx*ny * sizeof(cuDoubleComplex)));
+	check_err(cudaMalloc((void**)&fTmp1, nx*ny * sizeof(Scalar)));
+	check_err(cudaMalloc((void**)&fTmp2, nx*ny * sizeof(Scalar)));
 
 	if (solver == SolverMethod::SplittingMethodO2) {
-		check_err(cudaMalloc((void**)&fExpV0Dot5Dt, nx*ny * sizeof(cuDoubleComplex)));
-		check_err(cudaMalloc((void**)&fExpTDt, nx*ny * sizeof(cuDoubleComplex)));
+		check_err(cudaMalloc((void**)&fExpV0Dot5Dt, nx*ny * sizeof(Scalar)));
+		check_err(cudaMalloc((void**)&fExpTDt, nx*ny * sizeof(Scalar)));
 	} else {
-		check_err(cudaMalloc((void**)&fExpVC1Dt, nx*ny * sizeof(cuDoubleComplex)));
-		check_err(cudaMalloc((void**)&fExpVC2Dt, nx*ny * sizeof(cuDoubleComplex)));
-		check_err(cudaMalloc((void**)&fExpTD1Dt, nx*ny * sizeof(cuDoubleComplex)));
-		check_err(cudaMalloc((void**)&fExpTD2Dt, nx*ny * sizeof(cuDoubleComplex)));
+		check_err(cudaMalloc((void**)&fExpVC1Dt, nx*ny * sizeof(Scalar)));
+		check_err(cudaMalloc((void**)&fExpVC2Dt, nx*ny * sizeof(Scalar)));
+		check_err(cudaMalloc((void**)&fExpTD1Dt, nx*ny * sizeof(Scalar)));
+		check_err(cudaMalloc((void**)&fExpTD2Dt, nx*ny * sizeof(Scalar)));
 
 		Real tpow1t = pow(2, 1 / 3.0);
 		fD1 = 1 / (2 - tpow1t);
@@ -68,8 +155,8 @@ void SplittingMethod2DCUDA::initSystem2D(std::function<Complex(Real, Real)> cons
 
 	}
 
-	Eigen::MatrixXcd tmp1(fNy, fNx);
-	Eigen::MatrixXcd tmp2(fNy, fNx);
+	typename Trait<Scalar>::Matrix tmp1(fNy, fNx);
+	typename Trait<Scalar>::Matrix tmp2(fNy, fNx);
 	for (size_t i = 0; i < fNx; ++i) {
 		for (size_t j = 0; j < fNy; ++j) {
 			size_t ii = i > fNx / 2 ? fNx - i : i;
@@ -89,10 +176,10 @@ void SplittingMethod2DCUDA::initSystem2D(std::function<Complex(Real, Real)> cons
 	}
 
 	if (solver == SolverMethod::SplittingMethodO2) {
-		check_err(cudaMemcpy(fExpTDt, tmp1.data(), fNx*fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
+		check_err(cudaMemcpy(fExpTDt, tmp1.data(), fNx*fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
 	} else {
-		check_err(cudaMemcpy(fExpTD1Dt, tmp1.data(), fNx*fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
-		check_err(cudaMemcpy(fExpTD2Dt, tmp2.data(), fNx*fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
+		check_err(cudaMemcpy(fExpTD1Dt, tmp1.data(), fNx*fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
+		check_err(cudaMemcpy(fExpTD2Dt, tmp2.data(), fNx*fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
 	}
 
 	Complex f = -1.0 / fHbar * fDt;
@@ -106,16 +193,19 @@ void SplittingMethod2DCUDA::initSystem2D(std::function<Complex(Real, Real)> cons
 	}
 
 	if (solver == SolverMethod::SplittingMethodO2) {
-		check_err(cudaMemcpy(fExpV0Dot5Dt, tmp1.data(), fNx*fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
+		check_err(cudaMemcpy(fExpV0Dot5Dt, tmp1.data(), fNx*fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
 	} else {
-		check_err(cudaMemcpy(fExpVC1Dt, tmp1.data(), fNx*fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
-		check_err(cudaMemcpy(fExpVC2Dt, tmp2.data(), fNx*fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
+		check_err(cudaMemcpy(fExpVC1Dt, tmp1.data(), fNx*fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
+		check_err(cudaMemcpy(fExpVC2Dt, tmp2.data(), fNx*fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
 	}
 
-	check_err(cufftPlan2d(&plan, (int)fNx, (int)fNy, CUFFT_Z2Z));
+	cufftType_t type = Trait<Scalar>::Double ? CUFFT_Z2Z : CUFFT_C2C;
+	check_err(cufftPlan2d(&plan, (int)fNx, (int)fNy, type));
 }
 
-void SplittingMethod2DCUDA::step()
+
+template<class Scalar>
+void SplittingMethod2DCUDAImpl<Scalar>::step()
 {
 	//Real y = Norm2();
 	fLastLastPsi = fLastPsi;
@@ -131,20 +221,29 @@ void SplittingMethod2DCUDA::step()
 
 }
 
-void SplittingMethod2DCUDA::update_psi()
+template<class Scalar>
+void SplittingMethod2DCUDAImpl<Scalar>::update_psi()
 {
 	if (fStep == 0) {
-		check_err(cudaMemcpy(fTmp1, fPsi.data(), fNx * fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
+
+		if (Trait<Scalar>::Double) {
+			check_err(cudaMemcpy(fTmp1, fPsi.data(), fNx * fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
+		} else {
+			tmpf.resize(fNy, fNx);
+			tmpf = fPsi.cast<std::complex<float> >();
+			check_err(cudaMemcpy(fTmp1, tmpf.data(), fNx * fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
+		}
 	}
+
 	for (size_t i = 0; i < fBatch; ++i) {
 		if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
 
 			check_err(cudaProduct(fTmp2, fExpV0Dot5Dt, fTmp1, fNx*fNy));
-			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_FORWARD));
+			check_err(fftExec(plan, fTmp2, fTmp1, CUFFT_FORWARD));
 			check_err(cudaProduct(fTmp2, fExpTDt, fTmp1, fNx*fNy));
-			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_INVERSE));
+			check_err(fftExec(plan, fTmp2, fTmp1, CUFFT_INVERSE));
 			check_err(cudaProduct(fTmp2, fExpV0Dot5Dt, fTmp1, fNx*fNy));
-			check_err(cudaScale(fTmp1, fTmp2, 1. / (fNx*fNy), fNx * fNy));
+			check_err(cudaScale(fTmp1, fTmp2, (typename Trait<Scalar>::Real)(1. / (fNx*fNy)), fNx * fNy));
 
 
 
@@ -152,38 +251,46 @@ void SplittingMethod2DCUDA::update_psi()
 
 			check_err(cudaProduct(fTmp2, fExpVC1Dt, fTmp1, fNx*fNy));
 
-			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_FORWARD));
+			check_err(fftExec(plan, fTmp2, fTmp1, CUFFT_FORWARD));
 			check_err(cudaProduct(fTmp2, fExpTD1Dt, fTmp1, fNx*fNy));
-			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_INVERSE));
+			check_err(fftExec(plan, fTmp2, fTmp1, CUFFT_INVERSE));
 
 			check_err(cudaProduct(fTmp2, fExpVC2Dt, fTmp1, fNx*fNy));
 
-			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_FORWARD));
+			check_err(fftExec(plan, fTmp2, fTmp1, CUFFT_FORWARD));
 			check_err(cudaProduct(fTmp2, fExpTD2Dt, fTmp1, fNx*fNy));
-			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_INVERSE));
+			check_err(fftExec(plan, fTmp2, fTmp1, CUFFT_INVERSE));
 
 			check_err(cudaProduct(fTmp2, fExpVC2Dt, fTmp1, fNx*fNy));
 
-			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_FORWARD));
+			check_err(fftExec(plan, fTmp2, fTmp1, CUFFT_FORWARD));
 			check_err(cudaProduct(fTmp2, fExpTD1Dt, fTmp1, fNx*fNy));
-			check_err(cufftExecZ2Z(plan, fTmp2, fTmp1, CUFFT_INVERSE));
+			check_err(fftExec(plan, fTmp2, fTmp1, CUFFT_INVERSE));
 
 			check_err(cudaProduct(fTmp2, fExpVC1Dt, fTmp1, fNx*fNy));
-			check_err(cudaScale(fTmp1, fTmp2, 1. / (fNx*fNy) / (fNx*fNy) / (fNx*fNy), fNx * fNy));
+			check_err(cudaScale(fTmp1, fTmp2, (typename Trait<Scalar>::Real)(1. / (fNx*fNy) / (fNx*fNy) / (fNx*fNy)), fNx * fNy));
 
 		}
 	}
 
-	check_err(cudaMemcpy(fPsi.data(), fTmp1, fNx * fNy * sizeof(cuDoubleComplex), cudaMemcpyKind::cudaMemcpyDefault));
+	if (Trait<Scalar>::Double) {
+		check_err(cudaMemcpy(fPsi.data(), fTmp1, fNx * fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
+	} else {
+		check_err(cudaMemcpy(tmpf.data(), fTmp1, fNx * fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
+		fPsi = tmpf.cast<std::complex<double> >();
+	}
+
 
 }
 
-Real SplittingMethod2DCUDA::CalKinEn() const
+template<class Scalar>
+Real SplittingMethod2DCUDAImpl<Scalar>::CalKinEn() const
 {
 	return 0;
 }
 
-SplittingMethod2DCUDA::~SplittingMethod2DCUDA()
+template<class Scalar>
+SplittingMethod2DCUDAImpl<Scalar>::~SplittingMethod2DCUDAImpl()
 {
 	if (fSolverMethod == SolverMethod::SplittingMethodO2) {
 		cudaFree(fExpV0Dot5Dt);
@@ -200,3 +307,19 @@ SplittingMethod2DCUDA::~SplittingMethod2DCUDA()
 }
 
 #endif
+
+
+
+EvolverImpl2D *CreateSplittingMethod2DCUDA(std::map<std::string, std::string> const &opts)
+{
+#ifdef USE_CUDA
+	//return new SplittingMethod2DCUDAImpl<cuComplex>();
+	if (opts.find("cuda_precision") != opts.end() && opts.find("cuda_precision")->second == "single") {
+		return new SplittingMethod2DCUDAImpl<cuComplex>();
+	} else {
+		return new SplittingMethod2DCUDAImpl<cuDoubleComplex>();
+	}
+#else
+	throw std::runtime_error("cuda not supported");
+#endif
+}

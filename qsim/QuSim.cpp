@@ -159,22 +159,14 @@ void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_n
 	if (solver == SolverMethod::SplittingMethodO2) {
 		auto it = opts.find("fft_lib");
 		if (it != opts.end() && it->second == "cuda") {
-#ifdef USE_CUDA
-			fImpl.reset(new SplittingMethod2DCUDA());
-#else
-			throw std::runtime_error("cuda not supported");
-#endif
+			fImpl.reset(CreateSplittingMethod2DCUDA(opts));
 		} else {
 			fImpl.reset(new SplittingMethod2D());
 		}
 	} else if (solver == SolverMethod::SplittingMethodO4) {
 		auto it = opts.find("fft_lib");
 		if (it != opts.end() && it->second == "cuda") {
-#ifdef USE_CUDA
-			fImpl.reset(new SplittingMethod2DCUDA());
-#else
-			throw std::runtime_error("cuda not supported");
-#endif
+			fImpl.reset(CreateSplittingMethod2DCUDA(opts));
 		} else {
 			fImpl.reset(new SplittingMethod2D());
 		}

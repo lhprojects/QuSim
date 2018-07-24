@@ -28,9 +28,15 @@ int main()
 	cuda_10["fft_lib"] = "cuda";
 	cuda_10["batch"] = "10";
 
+	std::map<std::string, std::string> cuda_10_single;
+	cuda_10_single["fft_lib"] = "cuda";
+	cuda_10_single["batch"] = "10";
+	cuda_10_single["cuda_precision"] = "single";
+
 	Test tests[] = {
 #ifdef USE_CUDA
-		{ SolverMethod::SplittingMethodO2 , "splitO2+cuda_batch10", cuda_10 },
+	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda_batch10_single", cuda_10_single },
+	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda_batch10", cuda_10 },
 	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
 #endif
 	{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
