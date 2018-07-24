@@ -589,6 +589,30 @@ void InitialASystem1D(Evolver1D &syst)
 
 }
 
+void GetDouble(HWND hx, double &db, char const *inf)
+{
+	std::vector<char> psiStr;
+	int len = GetWindowTextLength(hx);
+	psiStr.resize(len + 1);
+	GetWindowTextA(hx, psiStr.data(), len + 1);
+	int na = sscanf(psiStr.data(), "%lf", &db);
+	if (na < 1) {
+		throw std::runtime_error(std::string("can't parse '") + psiStr.data() + "' as floating point for " + inf);
+	}
+}
+
+void GetInt(HWND hx, int &i, char const *inf)
+{
+	std::vector<char> psiStr;
+	int len = GetWindowTextLength(hx);
+	psiStr.resize(len + 1);
+	GetWindowTextA(hx, psiStr.data(), len + 1);
+	int na = sscanf(psiStr.data(), "%d", &i);
+	if (na < 1) {
+		throw std::runtime_error(std::string("can't parse '") + psiStr.data() + "' as integer for " + inf);
+	}
+}
+
 void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 {
 
@@ -597,93 +621,68 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 	Pen      blackPen(Color(255, 0, 0, 0));
 	graphics.DrawLine(&blackPen, Point(0, h / 2), Point(w, h / 2));
 
-	Evolver1D syst;
 
 	bool show_psi = SendMessage(hShowPsi, BM_GETCHECK, 0, 0) == BST_CHECKED;
 	bool show_pot = SendMessage(hShowPotential, BM_GETCHECK, 0, 0) == BST_CHECKED;
 
-	std::string psi;
-	std::string pot;
 	double x0 = -1;
 	double x1 = 1;
 	int n = 100;
 	bool fn = false;
 
-	{
-		std::vector<char> psiStr;
-		int len = GetWindowTextLength(hInitalPsi);
-		psiStr.resize(len + 1);
-		GetWindowTextA(hX0, psiStr.data(), len + 1);
-		int na = sscanf(psiStr.data(), "%lf", &x0);
-		if (na < 1) {
-			show_psi = false;
-			show_pot = false;
-		}
-	}
-
-	{
-		std::vector<char> psiStr;
-		int len = GetWindowTextLength(hInitalPsi);
-		psiStr.resize(len + 1);
-		GetWindowTextA(hX1, psiStr.data(), len + 1);
-		int na = sscanf(psiStr.data(), "%lf", &x1);
-		if (na < 1) {
-			show_psi = false;
-			show_pot = false;
-		}
-	}
-
-	{
-		std::vector<char> psiStr;
-		int len = GetWindowTextLength(hBins);
-		psiStr.resize(len + 1);
-		GetWindowTextA(hBins, psiStr.data(), len + 1);
-		int na = sscanf(psiStr.data(), "%d", &n);
-		if (na < 1) {
-			show_psi = false;
-			show_pot = false;
-		}
-	}
-
-	if(show_psi) {
-		std::vector<char> psiStr;
-		int len = GetWindowTextLength(hInitalPsi);
-		psiStr.resize(len + 1);
-		GetWindowTextA(hInitalPsi, psiStr.data(),len+1);
-		psi.assign(psiStr.data(), len);
-		fn = SendMessage(hNormInitPsi, BM_GETCHECK, 0, 0) == BST_CHECKED;
-		if (psi.empty()) show_psi = false;
-	}
-	
-	if(!show_psi){
-		psi = "0";
-	}
-
-	if (show_pot) {
-		std::vector<char> psiStr;
-		int len = GetWindowTextLength(hPotential);
-		psiStr.resize(len + 1);
-		GetWindowTextA(hPotential, psiStr.data(), len + 1);
-		pot.assign(psiStr.data(), len);
-		if (pot.empty()) show_pot = false;
-	}
-	if(!show_pot) {
-		pot = "0";
-	}
-
 	try {
-		syst.init(FunctorWrapper(psi.c_str()), fn, 1, false, FunctorWrapper(pot.c_str()),
-			x0, x1, n, BoundaryCondition::Period, SolverMethod::SplittingMethodO2, 1, 1, std::map<std::string, std::string>());
-	} catch (...) {
-		MessageBox(hMainWin, L"err", L"err", MB_OK);
-		show_psi = false;
-		show_pot = false;
-	}
-	if (show_psi) {
-		DrawPsi(graphics, syst.GetPsi(), left, top, w, h);
-	}
-	if (show_pot) {
-		DrawPotential(graphics, syst.GetV(), left, top, w, h);
+		GetDouble(hX0, x0, "x0");
+		GetDouble(hX1, x1, "x1");
+		GetInt(hBins, n, "nbins");
+		if (n < 0) throw std::runtime_error("nbins < 0");
+		if (show_psi) {
+			PsiVector psiv(n);
+			std::vector<char> psiStr;
+			int len = GetWindowTextLength(hInitalPsi);
+			psiStr.resize(len + 1);
+			GetWindowTextA(hInitalPsi, psiStr.data(), len + 1);
+			fn = SendMessage(hNormInitPsi, BM_GETCHECK, 0, 0) == BST_CHECKED;
+			if (psiStr.empty()) show_psi = false;
+
+			if (show_psi) {
+				try {
+					Cal cal(psiStr.data());
+					for (int i = 0; i < n; ++i) {
+						double x = x0 + i * (x1 - x0) / n;
+						cal.SetVarVal("x", x);
+						psiv[i] = cal.Val();
+					}
+					DrawPsi(graphics, psiv, left, top, w, h);
+				} catch (std::exception &e) {
+					MessageBoxA(hMainWin, e.what(), "Error", MB_OK);
+				}
+			}
+		}
+
+		if (show_pot) {
+			std::vector<Real> vv(n);
+			std::vector<char> psiStr;
+			int len = GetWindowTextLength(hPotential);
+			psiStr.resize(len + 1);
+			GetWindowTextA(hPotential, psiStr.data(), len + 1);
+			if (psiStr.empty()) show_pot = false;
+			if (show_pot) {
+				try {
+					Cal cal(psiStr.data());
+					for (int i = 0; i < n; ++i) {
+						double x = x0 + i * (x1 - x0) / n;
+						cal.SetVarVal("x", x);
+						vv[i] = cal.Val().real();
+					}
+					DrawPotential(graphics, vv, left, top, w, h);
+				} catch (std::exception &e) {
+					MessageBoxA(hMainWin, e.what(), "Error", MB_OK);
+				}
+			}
+
+		}
+	} catch (std::exception &e) {
+		MessageBoxA(hMainWin, e.what(), "Error", MB_OK);
 	}
 
 }
