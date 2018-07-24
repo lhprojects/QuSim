@@ -225,7 +225,7 @@ CalExpr *parseFunc(char const *&s)
 		double a;
 		int n;
 		int c = sscanf(s, "%lf%n", &a, &n);
-		if (c <= 0) throw std::runtime_error("falied to parse double");
+		if (c <= 0) throw std::runtime_error(std::string("falied to parse double for: ") + s);
 		s += n;
 		skipEmpty(s);
 		return new CalExpr(CALE_CONST, a);
@@ -236,7 +236,7 @@ CalExpr *parseFunc(char const *&s)
 		skipEmpty(s);
 		auto e = parseQuestionExpr(s);
 		if (*s == ')') ++s;
-		else throw std::runtime_error("expect ')'");
+		else throw std::runtime_error(std::string("expect ')' before: ") + s);
 		skipEmpty(s);
 		return e;
 	}
@@ -295,7 +295,7 @@ CalExpr *parseFunc(char const *&s)
 				skipEmpty(s);
 				auto e1 = parseQuestionExpr(s);
 				if (*s == ')') ++s;
-				else throw std::runtime_error("expect ')'");
+				else throw std::runtime_error(std::string("expect ')' before: ") + s);
 				skipEmpty(s);
 
 				auto e = new CalExpr(type, { e1 });
@@ -308,18 +308,18 @@ CalExpr *parseFunc(char const *&s)
 				auto e1 = parseQuestionExpr(s);
 				skipEmpty(s);
 				if (*s == ',') ++s;
-				else throw std::runtime_error("expect ','");
+				else throw std::runtime_error(std::string("expect ',' before: ") + s);
 				skipEmpty(s);
 
 				auto e2 = parseQuestionExpr(s);
 				skipEmpty(s);
 				if (*s == ',') ++s;
-				else throw std::runtime_error("expect ','");
+				else throw std::runtime_error(std::string("expect ',' before: ") + s);
 				skipEmpty(s);
 
 				auto e3 = parseQuestionExpr(s);
 				if (*s == ')') ++s;
-				else throw std::runtime_error("expect ')'");
+				else throw std::runtime_error(std::string("expect ')' before: ") + s);
 				skipEmpty(s);
 
 				auto e = new CalExpr(type, { e1, e2, e3 });
@@ -334,7 +334,8 @@ CalExpr *parseFunc(char const *&s)
 
 	}
 
-	throw std::runtime_error("not valid expression!");
+	if(*s == '\0') 	throw std::runtime_error(std::string("unexpected: ") + "end of file");
+	else throw std::runtime_error(std::string("unexpected: ") + s);
 }
 
 CalExpr *parsePowExpr(char const *&s)
@@ -485,7 +486,7 @@ CalExpr *parseQuestionExpr(char const *&s)
 
 			auto e2 = parseQuestionExpr(s);
 
-			if (*s != ':') throw std::runtime_error("expect ':'");
+			if (*s != ':') throw std::runtime_error(std::string("expect ':' before: ") + s);
 			s += 1;
 			skipEmpty(s);
 
@@ -506,7 +507,7 @@ CalExpr *parseExpr(char const *s)
 	skipEmpty(s);
 	auto e = parseQuestionExpr(s);
 	if (*s != '\0') {
-		throw std::runtime_error("expect end of file");
+		throw std::runtime_error(std::string("expect end of file, but find: ") + s);
 	}
 	return e;
 }
@@ -528,7 +529,7 @@ CCom Cal::GetVarVal(std::string const & name)
 {
 	auto it = fVarVals.find(name);
 	if (it == fVarVals.end()) {
-		throw std::runtime_error("var not found!");
+		throw std::runtime_error(std::string("var not defined: ") + name);
 	}
 	return fVarVals[name];
 }
