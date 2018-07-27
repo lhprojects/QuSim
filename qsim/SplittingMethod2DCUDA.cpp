@@ -12,6 +12,7 @@
 template<class Scalar>
 struct SplittingMethod2DCUDAImpl : EvolverImpl2D {
 
+	Scalar *fExpVDtScaled;
 	Scalar *fExpV0Dot5Dt;
 	Scalar *fExpVC1Dt;
 	Scalar *fExpVC2Dt;
@@ -135,6 +136,7 @@ void SplittingMethod2DCUDAImpl<Scalar>::initSystem2D(std::function<Complex(Real,
 
 	check_err(cudaMalloc((void**)&fTmp1, nx*ny * sizeof(Scalar)));
 	check_err(cudaMalloc((void**)&fTmp2, nx*ny * sizeof(Scalar)));
+	check_err(cudaMalloc((void**)&fExpVDtScaled, nx*ny * sizeof(Scalar)));
 
 	if (solver == SolverMethod::SplittingMethodO2) {
 		check_err(cudaMalloc((void**)&fExpV0Dot5Dt, nx*ny * sizeof(Scalar)));
@@ -155,6 +157,7 @@ void SplittingMethod2DCUDAImpl<Scalar>::initSystem2D(std::function<Complex(Real,
 
 	typename Trait<Scalar>::Matrix tmp1(fNy, fNx);
 	typename Trait<Scalar>::Matrix tmp2(fNy, fNx);
+	typename Trait<Scalar>::Matrix tmp3(fNy, fNx);
 	for (size_t i = 0; i < fNx; ++i) {
 		for (size_t j = 0; j < fNy; ++j) {
 			size_t ii = i > fNx / 2 ? fNx - i : i;
@@ -184,12 +187,15 @@ void SplittingMethod2DCUDAImpl<Scalar>::initSystem2D(std::function<Complex(Real,
 	for (size_t i = 0; i < fNx*fNy; ++i) {
 		if (solver  == SolverMethod::SplittingMethodO2) {
 			tmp1.data()[i] = exp(f*fV.data()[i] * I*0.5);
+			tmp3.data()[i] = exp(f*fV.data()[i] * I) / (1.*fNx *fNy);
 		} else {
 			tmp1.data()[i] = exp(f*fV.data()[i] * I*fC1);
 			tmp2.data()[i] = exp(f*fV.data()[i] * I*fC2);
+			tmp3.data()[i] = exp(f*fV.data()[i] * I*fC1*2.0) / (1.*fNx *fNy);
 		}
 	}
 
+	check_err(cudaMemcpy(fExpVDtScaled, tmp3.data(), fNx*fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
 	if (solver == SolverMethod::SplittingMethodO2) {
 		check_err(cudaMemcpy(fExpV0Dot5Dt, tmp1.data(), fNx*fNy * sizeof(Scalar), cudaMemcpyKind::cudaMemcpyDefault));
 	} else {
@@ -234,15 +240,26 @@ void SplittingMethod2DCUDAImpl<Scalar>::update_psi()
 	}
 
 	for (size_t i = 0; i < fBatch; ++i) {
+		bool enable_head_tail_fold = true;
 		if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
 
-			check_err(cudaProduct(fTmp2, fExpV0Dot5Dt, fTmp1, fNx*fNy));
+			if (i == 0 || !enable_head_tail_fold) {
+				check_err(cudaProduct(fTmp2, fExpV0Dot5Dt, fTmp1, fNx*fNy));
+			} else {
+				std::swap(fTmp1, fTmp2);
+			}
+			
 			check_err(fftExec(plan, fTmp2, fTmp1, CUFFT_FORWARD));
 			check_err(cudaProduct(fTmp2, fExpTDt, fTmp1, fNx*fNy));
 			check_err(fftExec(plan, fTmp2, fTmp1, CUFFT_INVERSE));
-			check_err(cudaProduct(fTmp2, fExpV0Dot5Dt, fTmp1, fNx*fNy));
-			check_err(cudaScale(fTmp1, fTmp2, (typename Trait<Scalar>::Real)(1. / (fNx*fNy)), fNx * fNy));
 
+			if (i == fBatch - 1 || !enable_head_tail_fold) {
+				check_err(cudaProduct(fTmp2, fExpV0Dot5Dt, fTmp1, fNx*fNy));
+				check_err(cudaScale(fTmp1, fTmp2, (typename Trait<Scalar>::Real)(1. / (fNx*fNy)), fNx * fNy));
+			} else {
+				check_err(cudaProduct(fTmp2, fExpVDtScaled, fTmp1, fNx*fNy));
+				std::swap(fTmp1, fTmp2);
+			}
 
 
 		} else {
