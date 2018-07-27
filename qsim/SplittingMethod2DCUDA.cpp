@@ -92,7 +92,7 @@ struct Trait<cuComplex> {
 template<class Scalar>
 SplittingMethod2DCUDAImpl<Scalar>::SplittingMethod2DCUDAImpl()
 {
-
+	fExpVDtScaled = nullptr;
 	fExpV0Dot5Dt = nullptr;
 	fExpVC1Dt = nullptr;
 	fExpVC2Dt = nullptr;
@@ -322,6 +322,7 @@ SplittingMethod2DCUDAImpl<Scalar>::~SplittingMethod2DCUDAImpl()
 		cudaFree(fExpTD1Dt);
 		cudaFree(fExpTD2Dt);
 	}
+	cudaFree(fExpVDtScaled);
 	cudaFree(fTmp1);
 	cudaFree(fTmp2);
 
