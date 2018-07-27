@@ -106,7 +106,13 @@ SplittingMethod2DCUDAImpl<Scalar>::SplittingMethod2DCUDAImpl()
 
 }
 
-#define check_err(err) do { if(err!=cudaSuccess) throw std::runtime_error("cuda error: " #err); } while(0)
+std::string my_itoa(int i)
+{
+	char b[10];
+	sprintf(b, "%d", i);
+	return b;
+}
+#define check_err(err) do { if(err!=cudaSuccess) throw std::runtime_error("cuda error: " #err " : " + my_itoa((int)err)); } while(0)
 
 
 template<class Scalar>
