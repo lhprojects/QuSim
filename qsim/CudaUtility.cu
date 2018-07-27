@@ -56,7 +56,7 @@ cudaError cudaProduct(cuDoubleComplex * __restrict__ out, const cuDoubleComplex 
 	thrust::device_ptr<const cuDoubleComplex> d_f2 = thrust::device_pointer_cast(f2);
 	thrust::device_ptr<cuDoubleComplex> d_out = thrust::device_pointer_cast(out);
 
-	//thrust::transform(d_f1, d_f1_e, d_f2, d_out, my_multiplies());
+	thrust::transform(d_f1, d_f1_e, d_f2, d_out, my_multiplies());
 	return cudaSuccess;
 }
 
