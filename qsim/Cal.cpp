@@ -531,7 +531,7 @@ CCom Cal::GetVarVal(std::string const & name)
 	if (it == fVarVals.end()) {
 		throw std::runtime_error(std::string("var not defined: ") + name);
 	}
-	return fVarVals[name];
+	return it->second;
 }
 
 CCom Cal::Val()
