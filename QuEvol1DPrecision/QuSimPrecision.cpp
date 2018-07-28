@@ -134,11 +134,16 @@ void test_speed()
 	std::map<std::string, std::string> cuda;
 	cuda["fft_lib"] = "cuda";
 
+	std::map<std::string, std::string> cuda_single;
+	cuda_single["fft_lib"] = "cuda";
+	cuda_single["cuda_precision"] = "single";
+
 	Test tests[] = {
 	
 	{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
 #ifdef USE_CUDA
 	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
+	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda_single", cuda_single },
 #endif
 	{ SolverMethod::SplittingMethodO2 , "splitO2+kiss", std::map<std::string, std::string>() },
 	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },

@@ -3,7 +3,6 @@
 
 #include "../fftw-3.3.2/api/fftw3.h"
 //#include "../fftw-3.3.5-dll64/fftw3.h"
-#include "CUDAFourierTransform.h"
 
 struct KissFourierTransform : FourierTransform {
 	kissfft<double> impl;
@@ -53,12 +52,6 @@ FourierTransform * FourierTransform::Create(size_t n, bool inverse, FourierTrans
 		return new KissFourierTransform(n, inverse);
 	} else if (lib == FourierTransformLibrary::FFTW) {
 		return new FFTWFourierTransform(n, inverse);
-	} else if (lib == FourierTransformLibrary::CUDA) {
-#ifdef USE_CUDA
-		return CreateCUDAFourierTransform(n, inverse);
-#else
-		throw std::runtime_error("cuda not supported");
-#endif
 	} else {
 		throw std::runtime_error("not supported fft library");
 	}

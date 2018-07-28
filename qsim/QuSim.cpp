@@ -3,6 +3,7 @@
 #include "EvolverImpl.h"
 #include "SolverImpl.h"
 #include "SplittingMethod.h"
+#include "SplittingMethod1DCUDA.h"
 #include "EigenMethod.h"
 #include "GaussLegendreMethod.h"
 #include "SplittingMethod2D.h"
@@ -72,10 +73,13 @@ void Evolver1D::init(std::function<Complex(Real)> const &psi, bool force_normali
 	Real mass, Real hbar,
 	std::map<std::string, std::string> const &opts)
 {
-	if (solver == SolverMethod::SplittingMethodO2) {
-		fImpl.reset(new SplittingMethod());
-	} else if (solver == SolverMethod::SplittingMethodO4) {
-		fImpl.reset(new SplittingMethod());
+	if (solver == SolverMethod::SplittingMethodO2 || solver == SolverMethod::SplittingMethodO4) {
+		auto it = opts.find("fft_lib");
+		if (it != opts.end() && it->second == "cuda") {
+			fImpl.reset(CreateSplittingMethod1DCUDA(opts));
+		} else {
+			fImpl.reset(new SplittingMethod());
+		}
 	} else if(solver == SolverMethod::Eigen) {
 		fImpl.reset(new EigenMethod());
 	} else if (solver == SolverMethod::ImplicitMidpointMethod) {

@@ -583,9 +583,13 @@ void InitialASystem1D(Evolver1D &syst)
 		Cal cal(psiStr.data());
 		deltaT = cal.Val();
 	}
-
+	std::map<std::string, std::string> opts;
+#ifdef USE_CUDA
+	opts["fft_lib"] = "cuda";
+	opts["batch"] = "5";
+#endif
 	syst.init(FunctorWrapper(psi.c_str()), fn, deltaT, fnes, FunctorWrapper(pot.c_str()),
-		x0, x1, n, bc, sl, mass, hbar, std::map<std::string, std::string>());
+		x0, x1, n, bc, sl, mass, hbar, opts);
 
 }
 

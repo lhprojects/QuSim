@@ -280,12 +280,12 @@
     <ClCompile Include="..\qsim\GaussLegendreMethod.cpp" />
     <ClCompile Include="..\qsim\GaussLegendreMethod2D.cpp" />
     <ClCompile Include="..\qsim\SolverImpl.cpp" />
-    <ClCompile Include="..\qsim\CUDAFourierTransform.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod2D.cpp" />
     <ClCompile Include="..\qsim\QuSim.cpp" />
     <ClCompile Include="..\qsim\EvolverImpl.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod2DCUDA.cpp" />
+    <ClCompile Include="..\qsim\SplittingMethod1DCUDA.cpp" />
     <ClCompile Include="..\qsim\TestCal.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -295,7 +295,6 @@
     <ClInclude Include="..\qsim\FourierTransform.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod2D.h" />
-    <ClInclude Include="..\qsim\CUDAFourierTransform.h" />
     <ClInclude Include="..\qsim\kissfft.hh" />
     <ClInclude Include="..\qsim\Matrix2.h" />
     <ClInclude Include="..\qsim\SolverImpl.h" />
@@ -304,6 +303,8 @@
     <ClInclude Include="..\qsim\QuSim.h" />
     <ClInclude Include="..\qsim\EvolverImpl.h" />
     <ClInclude Include="..\qsim\SplittingMethod2DCUDA.h" />
+    <ClInclude Include="..\qsim\SplittingMethod1DCUDA.h" />
+    <ClInclude Include="..\qsim\SplittingMethodGeneralCUDA.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\fftw-3.3.2\fftw-3.3-libs\libfftw-3.3\libfftw-3.3.vcxproj">

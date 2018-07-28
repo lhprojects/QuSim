@@ -1,28 +1,29 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include "EvolverImpl.h"
+#include "SplittingMethod1DCUDA.h"
 
 #ifdef USE_CUDA
 #include "SplittingMethodGeneralCUDA.h"
 
 
 template<class Scalar>
-struct SplittingMethod2DCUDA : EvolverImpl2D {
+struct SplittingMethod1DCUDA : EvolverImpl1D {
 
 	SplittingMethodGeneralCUDAImpl<Scalar> fImpl;
 
 
-	void initSystem2D(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
+	virtual void initSystem1D(std::function<Complex(Real)> const & psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
-		std::function<Complex(Real, Real)> const &vs, Real x0, Real x1, size_t nx,
-		Real y0, Real y1, size_t ny,
+		std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t nx,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar, std::map<std::string, std::string> const &opts) override
+		Real mass, Real hbar, std::map<std::string, std::string> const &opts) 
 	{
-		EvolverImpl2D::initSystem2D(psi, force_normalization, dt, force_normalization_each_step,
-			vs, x0, x1, nx, y0, y1, ny,
-			b, solver, mass, hbar, opts);
+		EvolverImpl1D::initSystem1D(psi, force_normalization,
+			dt, force_normalization_each_step,
+			vs, x0, x1, nx, b, solver,
+			mass, hbar, opts);
+
 		fImpl.initSystem2D(this, fPsi.data(), force_normalization, dt, force_normalization_each_step,
-			fV.data(), x0, x1, nx, y0, y1, ny,
+			fV.data(), x0, x1, nx, 0, 1, 1,
 			b, solver, mass, hbar, opts);
 	}
 
@@ -36,7 +37,7 @@ struct SplittingMethod2DCUDA : EvolverImpl2D {
 		update_psi();
 
 		if (fFNES) {
-			fPsi *= 1.0 / sqrt(Norm2());
+			Scale(fPsi, 1.0 / sqrt(Norm2()));
 		}
 		fStep += fImpl.fBatch;
 	}
@@ -46,10 +47,6 @@ struct SplittingMethod2DCUDA : EvolverImpl2D {
 		fImpl.update_psi();
 	}
 
-	Real CalKinEn() const override
-	{
-		return fImpl.CalKinEn();
-	}
 
 };
 
@@ -57,14 +54,14 @@ struct SplittingMethod2DCUDA : EvolverImpl2D {
 
 
 
-EvolverImpl2D *CreateSplittingMethod2DCUDA(std::map<std::string, std::string> const &opts)
+EvolverImpl *CreateSplittingMethod1DCUDA(std::map<std::string, std::string> const &opts)
 {
 #ifdef USE_CUDA
 	//return new SplittingMethod2DCUDAImpl<cuComplex>();
 	if (opts.find("cuda_precision") != opts.end() && opts.find("cuda_precision")->second == "single") {
-		return new SplittingMethod2DCUDA<cuComplex>();
+		return new SplittingMethod1DCUDA<cuComplex>();
 	} else {
-		return new SplittingMethod2DCUDA<cuDoubleComplex>();
+		return new SplittingMethod1DCUDA<cuDoubleComplex>();
 	}
 #else
 	throw std::runtime_error("cuda not supported");

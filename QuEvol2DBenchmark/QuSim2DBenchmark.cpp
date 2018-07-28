@@ -50,11 +50,9 @@ int main()
 	};
 
 	int dims[] = {
-		100,
-		200,
-		400,
 		800,
 		1600,
+		3200,
 	};
 
 	printf("%-30s ", "");
@@ -73,7 +71,8 @@ int main()
 		int n = sizeof(dims) / sizeof(int);
 		for (int j = 0; j < n; ++j) {
 			Evolver2D syst;
-			syst.init(Functor2DWrapper("exp(I*x)*exp(-x*x)*exp(-y*y)"), true, 0.01, false, Functor2DWrapper("exp(-x*x)"),
+			syst.init([](Real x, Real y) { return exp(I*x)*exp(-x * x)*exp(-y * y); }, true, 0.01, false,
+				[](Real x, Real y) { return exp(-x * x); },
 				-10, 10, dims[j],-10, 10, dims[j], BoundaryCondition::Period, tests[i].met, 1, 1,
 				tests[i].opts);
 
