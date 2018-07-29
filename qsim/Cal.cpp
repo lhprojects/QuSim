@@ -58,6 +58,12 @@ struct CalExpr {
 	{
 	}
 
+	~CalExpr()
+	{
+		for (auto x : fSubExprs) {
+			delete x;
+		}
+	}
 	CalExprType fType;
 	std::vector<CalExpr*> fSubExprs;
 
@@ -515,9 +521,13 @@ CalExpr *parseExpr(char const *s)
 Cal::Cal(char const * x) : fStr(x)
 {
 	char const * s = fStr.c_str();
-	fExpr = parseExpr(s);
+	fExpr.reset(parseExpr(s));
 	SetVarVal("Pi", 3.14159265358979323846);
 	SetVarVal("I", CCom(0, 1));
+}
+
+Cal::~Cal()
+{
 }
 
 void Cal::SetVarVal(std::string const & name, CCom const & v)
