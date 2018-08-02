@@ -151,6 +151,7 @@ struct Solver1D : Solver {
 	Eigen::Matrix2cd GetTMat();
 	Real GetT();
 	Real GetR();
+	Real GetEnergy();
 	Complex InitPsi();
 	Complex InitPsiPrime();
 	Complex FinalPsi();

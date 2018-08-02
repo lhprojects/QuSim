@@ -307,6 +307,11 @@ Real Solver1D::GetR()
 	return ((SolverImpl1D*)fImpl.get())->fR;
 }
 
+Real Solver1D::GetEnergy()
+{
+	return ((SolverImpl1D*)fImpl.get())->fE;
+}
+
 Complex Solver1D::InitPsi()
 {
 	return ((SolverImpl1D*)fImpl.get())->fPsi[0];
