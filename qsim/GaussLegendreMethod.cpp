@@ -28,7 +28,6 @@ void GaussLegendreMethod::initSystem1D(std::function<Complex(Real)> const &psi, 
 
 	fh.resize(fN, fN); // = H Dt / hbar
 
-	bool split_time = fOpts.find("split_time_2") != fOpts.end() && fOpts.find("split_time_2")->second != "0";
 	bool space_O2 = false;
 	if (fOpts.find("space_O2") != fOpts.end()) {
 		space_O2 = fOpts.find("space_O2")->second != "0";
@@ -36,7 +35,7 @@ void GaussLegendreMethod::initSystem1D(std::function<Complex(Real)> const &psi, 
 		space_O2 = true;
 	}
 
-	Complex hdt = split_time ? fDt /2.0 :  fDt;
+	Complex hdt = fDt;
 
 	if (space_O2) {
 		for (int i = 0; i < fN; ++i) {
@@ -70,11 +69,6 @@ void GaussLegendreMethod::initSystem1D(std::function<Complex(Real)> const &psi, 
 	} else {
 		fn = id - 0.5 * fh * I;
 		fd = id + 0.5 * fh * I;
-	}
-
-	if (split_time) {
-		fn = fn * fn;
-		fd = fd * fd;
 	}
 
 	fLU.compute(fd);
