@@ -198,8 +198,7 @@ void EvolverImpl2D::initPsi()
 	if (fFN) {
 		fPsi *= 1.0 / sqrt(Norm2());
 	}
-	double x = Norm2();
-	//dump(fPsi, "psi.txt");
+	//double x = Norm2();
 
 }
 
@@ -215,7 +214,7 @@ void EvolverImpl2D::initPotential()
 		}
 	}
 	//dump_matrix_real(fV, "pot.txt");
-	Real x = Norm2();
+	//Real x = Norm2();
 
 }
 
