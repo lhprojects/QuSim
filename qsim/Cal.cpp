@@ -535,7 +535,7 @@ void Cal::SetVarVal(std::string const & name, CCom const & v)
 	fVarVals[name] = v;
 }
 
-CCom Cal::GetVarVal(std::string const & name)
+CCom &Cal::GetVarVal(std::string const & name)
 {
 	auto it = fVarVals.find(name);
 	if (it == fVarVals.end()) {

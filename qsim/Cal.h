@@ -13,7 +13,7 @@ struct Cal {
 	~Cal();
 
 	void SetVarVal(std::string const &name, CCom const &v);
-	CCom GetVarVal(std::string const &name);
+	CCom &GetVarVal(std::string const &name);
 	CCom Val();
 
 private:
