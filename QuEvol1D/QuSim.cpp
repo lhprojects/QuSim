@@ -651,11 +651,14 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 			if (show_psi) {
 				try {
 					Cal cal(psiStr.data());
+					double norm2 = 0;
 					for (int i = 0; i < n; ++i) {
 						double x = x0 + i * (x1 - x0) / n;
 						cal.SetVarVal("x", x);
 						psiv[i] = cal.Val();
+						norm2 += abs2(psiv[i])*(x1 - x0) / n;
 					}
+					if (fn) for(auto &x : psiv) x *= 1.0 / sqrt(norm2);
 					DrawPsi(graphics, psiv, left, top, w, h);
 				} catch (std::exception &e) {
 					MessageBoxA(hMainWin, e.what(), "Error", MB_OK);
