@@ -513,7 +513,7 @@ CalExpr *parseExpr(char const *s)
 	skipEmpty(s);
 	auto e = parseQuestionExpr(s);
 	if (*s != '\0') {
-		throw std::runtime_error(std::string("expect end of file, but find: ") + s);
+		throw std::runtime_error(std::string("expect end of input, but find: ") + s);
 	}
 	return e;
 }
