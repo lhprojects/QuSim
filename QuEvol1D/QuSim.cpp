@@ -651,10 +651,12 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 			if (show_psi) {
 				try {
 					Cal cal(psiStr.data());
+					cal.SetVarVal("x", 0);
+					cal.GenPseudoCode();
+					Complex *x = &cal.GetVarVal("x");
 					double norm2 = 0;
 					for (int i = 0; i < n; ++i) {
-						double x = x0 + i * (x1 - x0) / n;
-						cal.SetVarVal("x", x);
+						*x = x0 + i * (x1 - x0) / n;
 						psiv[i] = cal.Val();
 						norm2 += abs2(psiv[i])*(x1 - x0) / n;
 					}
@@ -676,9 +678,12 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 			if (show_pot) {
 				try {
 					Cal cal(psiStr.data());
+					cal.SetVarVal("x", 0);
+					cal.GenPseudoCode();
+					Complex *x = &cal.GetVarVal("x");
+
 					for (int i = 0; i < n; ++i) {
-						double x = x0 + i * (x1 - x0) / n;
-						cal.SetVarVal("x", x);
+						*x = x0 + i * (x1 - x0) / n;
 						vv[i] = cal.Val().real();
 					}
 					DrawPotential(graphics, vv, left, top, w, h);

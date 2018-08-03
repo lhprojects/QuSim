@@ -51,6 +51,7 @@ struct FunctorWrapper
 	Complex operator()(Real x);
 	~FunctorWrapper();
 private:
+	Complex *fX;
 	std::shared_ptr<Cal> fCal;
 };
 
@@ -59,6 +60,8 @@ struct Functor2DWrapper {
 	Complex operator()(Real x, Real y);
 	~Functor2DWrapper();
 private:
+	Complex *fX;
+	Complex *fY;
 	std::shared_ptr<Cal> fCal;
 };
 

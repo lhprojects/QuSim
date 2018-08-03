@@ -223,12 +223,15 @@ UInt Evolver2D::GetNy()
 
 FunctorWrapper::FunctorWrapper(char const *str) : fCal(std::make_shared<Cal>(str))
 {
+	fCal->SetVarVal("x", 0);
+	fX = &fCal->GetVarVal("x");
+	fCal->GenPseudoCode();
 }
 
 Complex FunctorWrapper::operator()(Real x)
 {
-	fCal->SetVarVal("x", x);
-	return fCal->Val();
+	*fX = x;
+	return fCal->RunPseudoCode();
 }
 
 FunctorWrapper::~FunctorWrapper()
@@ -237,13 +240,18 @@ FunctorWrapper::~FunctorWrapper()
 
 Functor2DWrapper::Functor2DWrapper(char const *str) : fCal(std::make_shared<Cal>(str))
 {
+	fCal->SetVarVal("x", 0);
+	fCal->SetVarVal("y", 0);
+	fX = &fCal->GetVarVal("x");
+	fY = &fCal->GetVarVal("y");
+	fCal->GenPseudoCode();
 }
 
 Complex Functor2DWrapper::operator()(Real x, Real y)
 {
-	fCal->SetVarVal("x", x);
-	fCal->SetVarVal("y", y);
-	return fCal->Val();
+	*fX = x;
+	*fY = y;
+	return fCal->RunPseudoCode();
 }
 
 Functor2DWrapper::~Functor2DWrapper()
