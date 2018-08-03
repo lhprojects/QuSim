@@ -47,14 +47,14 @@ enum CalExprType {
 
 struct CalExpr {
 
-	CalExpr(CalExprType type, std::vector<CalExpr*> const &x) : fSubExprs(x), fType(type)
+	CalExpr(CalExprType type, std::vector<CalExpr*> const &x) : fSubExprs(x), fType(type), fVarValue(nullptr)
 	{		
 	}
 
-	CalExpr(CalExprType type, double a) : fSubExprs({}), fType(type), fConstVal(a, 0)
+	CalExpr(CalExprType type, double a) : fSubExprs({}), fType(type), fConstVal(a, 0), fVarValue(nullptr)
 	{
 	}
-	CalExpr(CalExprType type, char const *a) : fSubExprs({}), fType(type), fVarName(a)
+	CalExpr(CalExprType type, char const *a) : fSubExprs({}), fType(type), fVarName(a), fVarValue(nullptr)
 	{
 	}
 
@@ -70,6 +70,7 @@ struct CalExpr {
 	CCom fConstVal;
 
 	std::string fVarName;
+	CCom const *fVarValue;
 	CCom Val(Cal *cal)
 	{
 
@@ -175,7 +176,8 @@ struct CalExpr {
 		}
 		case CALE_VARIABLE:
 		{
-			return cal->GetVarVal(fVarName);
+			if (!fVarValue) fVarValue = &cal->GetVarVal(fVarName);
+			return *fVarValue;
 			break;
 		}
 		default:
