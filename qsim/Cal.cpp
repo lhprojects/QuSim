@@ -7,6 +7,10 @@
 
 enum CalExprType {
 	CALE_UNK,
+
+	CALE_CONST,
+	CALE_VARIABLE,
+
 	CALE_QUEST,
 	CALE_OROR,
 	CALE_ANDAND,
@@ -41,8 +45,22 @@ enum CalExprType {
 	CALE_POW,
 	CALE_GAUS,
 
-	CALE_CONST,
-	CALE_VARIABLE,
+};
+
+struct StackUsage {
+	int usage;
+	int maxu;
+	StackUsage()
+	{
+		usage = 0;
+		maxu = 0;
+	}
+	StackUsage &operator+=(int n)
+	{
+		usage += n;
+		if (usage >= maxu) maxu = usage;
+		return *this;
+	}
 };
 
 struct CalExpr {
@@ -71,120 +89,9 @@ struct CalExpr {
 
 	std::string fVarName;
 	CCom const *fVarValue;
-	CCom Val(Cal *cal)
-	{
 
-		switch (fType) {
-		case CALE_QUEST:
-			if (fSubExprs.at(0)->Val(cal) != 0.0) {
-				return fSubExprs.at(1)->Val(cal);
-			} else {
-				return fSubExprs.at(2)->Val(cal);
-			}
-			break;
-		case CALE_ANDAND:
-			return ((fSubExprs.at(0)->Val(cal) != 0.0) && (fSubExprs.at(1)->Val(cal) != 0.0));
-			break;
-		case CALE_OROR:
-			return ((fSubExprs.at(0)->Val(cal) != 0.0) || (fSubExprs.at(1)->Val(cal) != 0.0));
-			break;
-		case CALE_GT:
-			return fSubExprs.at(0)->Val(cal).real() > fSubExprs.at(1)->Val(cal).real();
-			break;
-		case CALE_GE:
-			return fSubExprs.at(0)->Val(cal).real() >= fSubExprs.at(1)->Val(cal).real();
-			break;
-		case CALE_LT:
-			return fSubExprs.at(0)->Val(cal).real() < fSubExprs.at(1)->Val(cal).real();
-			break;
-		case CALE_LE:
-			return fSubExprs.at(0)->Val(cal).real() <= fSubExprs.at(1)->Val(cal).real();
-			break;
-		case CALE_EQ:
-			return fSubExprs.at(0)->Val(cal).real() == fSubExprs.at(1)->Val(cal).real();
-			break;
-		case CALE_ADD:
-			return fSubExprs.at(0)->Val(cal) + fSubExprs.at(1)->Val(cal);
-			break;
-		case CALE_SUB:
-			return fSubExprs.at(0)->Val(cal) - fSubExprs.at(1)->Val(cal);
-			break;
-		case CALE_MUL:
-			return fSubExprs.at(0)->Val(cal) * fSubExprs.at(1)->Val(cal);
-			break;
-		case CALE_DIV:
-			return fSubExprs.at(0)->Val(cal) / fSubExprs.at(1)->Val(cal);
-			break;
-		case CALE_POW:
-			return pow(fSubExprs.at(0)->Val(cal), fSubExprs.at(1)->Val(cal));
-			break;
-		case CALE_EXP:
-			return exp(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_TANH:
-			return tanh(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_LOG:
-			return log(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_ATANH:
-			return atanh(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_SIN:
-			return sin(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_COS:
-			return cos(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_TAN:
-			return tan(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_ASIN:
-			return asin(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_ACOS:
-			return acos(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_ATAN:
-			return atan(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_SIGN:
-			return fSubExprs.at(0)->Val(cal).real() > 0;
-			break;
-		case CALE_ABS:
-			return abs(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_NEG:
-			return (-fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_SQRT:
-			return sqrt(fSubExprs.at(0)->Val(cal));
-			break;
-		case CALE_GAUS:
-		{
-			CCom x = fSubExprs.at(0)->Val(cal);
-			CCom mu = fSubExprs.at(1)->Val(cal);
-			CCom sigma = fSubExprs.at(2)->Val(cal);
-			CCom t = (x - mu) / sigma;
-			return 1.0 / (sqrt(2 * 3.14159265358979323846) * sigma) *exp(-0.5*t*t);
-			break;
-		}
-		case CALE_CONST:
-		{
-			return fConstVal;
-			break;
-		}
-		case CALE_VARIABLE:
-		{
-			if (!fVarValue) fVarValue = &cal->GetVarVal(fVarName);
-			return *fVarValue;
-			break;
-		}
-		default:
-			throw std::runtime_error("not implemented!");
-		}
+	void Gen(Cal *cal, StackUsage &nstack);
 
-	}
 };
 
 bool isEmpy(char c)
@@ -546,7 +453,231 @@ CCom &Cal::GetVarVal(std::string const & name)
 	return it->second;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void CalExpr::Gen(Cal *cal, StackUsage &nstack)
+{
+	for (size_t i = 0; i < fSubExprs.size(); ++i) {
+		fSubExprs.at(i)->Gen(cal, nstack);
+	}
+
+	cal->fPseudoCode.push_back(fType);
+	switch (fType) {
+	case CALE_QUEST:
+		nstack += -2;
+		break;
+	case CALE_ANDAND:
+	case CALE_OROR:
+	case CALE_GT:
+	case CALE_GE:
+	case CALE_LT:
+	case CALE_LE:
+	case CALE_EQ:
+	case CALE_ADD:
+	case CALE_SUB:
+	case CALE_MUL:
+	case CALE_DIV:
+	case CALE_POW:
+		nstack += -1;
+		break;
+	case CALE_EXP:
+	case CALE_TANH:
+	case CALE_LOG:
+	case CALE_ATANH:
+	case CALE_SIN:
+	case CALE_COS:
+	case CALE_TAN:
+	case CALE_ASIN:
+	case CALE_ACOS:
+	case CALE_ATAN:
+	case CALE_SIGN:
+	case CALE_ABS:
+	case CALE_NEG:
+	case CALE_SQRT:
+		break;
+	case CALE_GAUS:
+	{
+		nstack += -2;
+		break;
+	}
+	case CALE_CONST:
+	{
+		cal->fConstants.push_back(fConstVal);
+		nstack += 1;
+		break;
+	}
+	case CALE_VARIABLE:
+	{
+		if (!fVarValue) fVarValue = &cal->GetVarVal(fVarName);
+		cal->fVariables.push_back(fVarValue);
+		nstack += 1;
+		break;
+	}
+	default:
+		throw std::runtime_error("not implemented!");
+	}
+
+}
+
 CCom Cal::Val()
 {
-	return fExpr->Val(this);
+	if (fPseudoCode.size() == 0) GenPseudoCode();
+	return RunPseudoCode();
+}
+
+void Cal::GenPseudoCode()
+{
+	StackUsage su;
+	fExpr->Gen(this, su);
+	fPseudoCode.push_back(0);
+	fStack.resize(su.maxu);
+}
+
+CCom Cal::RunPseudoCode()
+{
+	int *ip = fPseudoCode.data();
+	CCom *stack = fStack.data() - 1;
+	CCom *constant = fConstants.data();
+	CCom const **variables = fVariables.data();
+
+	for (; *ip; ++ip) {
+		CalExprType code = (CalExprType)*ip;
+
+		switch (code) {
+		case CALE_CONST:
+		{
+			*(++stack) = *(constant++);
+			break;
+		}
+		case CALE_VARIABLE:
+		{
+			*(++stack) = **(variables++);
+			break;
+		}
+
+		case CALE_QUEST:
+			stack -= 2;
+			stack[0] = stack[0] != 0.0 ? stack[1] : stack[2];
+			break;
+		case CALE_ANDAND:
+			stack -= 1;
+			stack[0] = (stack[0] != 0.0 && stack[1] != 0.0) ? 1 : 0;
+			break;
+		case CALE_OROR:
+			--stack;
+			stack[0] = (stack[0] != 0.0 || stack[1] != 0.0) ? 1 : 0;
+			break;
+		case CALE_GT:
+			--stack;
+			stack[0] = stack[0].real() > stack[1].real();
+			break;
+		case CALE_GE:
+			--stack;
+			stack[0] = stack[0].real() >= stack[1].real();
+			break;
+		case CALE_LT:
+			--stack;
+			stack[0] = stack[0].real() < stack[1].real();
+			break;
+		case CALE_LE:
+			--stack;
+			stack[0] = stack[0].real() <= stack[1].real();
+			break;
+		case CALE_EQ:
+			--stack;
+			stack[0] = stack[0] == stack[1];
+			break;
+		case CALE_ADD:
+			--stack;
+			stack[0] = stack[0] + stack[1];
+			break;
+		case CALE_SUB:
+			--stack;
+			stack[0] = stack[0] - stack[1];
+			break;
+		case CALE_MUL:
+			--stack;
+			stack[0] = stack[0] * stack[1];
+			break;
+		case CALE_DIV:
+			--stack;
+			stack[0] = stack[0] / stack[1];
+			break;
+		case CALE_POW:
+			stack -= 1;
+			stack[0] = pow(stack[0], stack[1]);
+			break;
+		case CALE_EXP:
+			stack[0] = exp(stack[0]);
+			break;
+		case CALE_TANH:
+			stack[0] = tanh(stack[0]);
+			break;
+		case CALE_LOG:
+			stack[0] = log(stack[0]);
+			break;
+		case CALE_ATANH:
+			stack[0] = atan(stack[0]);
+			break;
+		case CALE_SIN:
+			stack[0] = sin(stack[0]);
+			break;
+		case CALE_COS:
+			stack[0] = cos(stack[0]);
+			break;
+		case CALE_TAN:
+			stack[0] = tan(stack[0]);
+			break;
+		case CALE_ASIN:
+			stack[0] = asin(stack[0]);
+			break;
+		case CALE_ACOS:
+			stack[0] = acos(stack[0]);
+			break;
+		case CALE_ATAN:
+			stack[0] = atan(stack[0]);
+			break;
+		case CALE_SIGN:
+			stack[0] = stack[0].real() > 0 ? 1 : -1;
+			break;
+		case CALE_ABS:
+			stack[0] = abs(stack[0]);
+			break;
+		case CALE_NEG:
+			stack[0] = -stack[0];
+			break;
+		case CALE_SQRT:
+			stack[0] = sqrt(stack[0]);
+			break;
+		case CALE_GAUS:
+		{
+			stack -= 2;
+			CCom x = stack[0];
+			CCom mu = stack[1];
+			CCom sigma = stack[2];
+			CCom t = (x - mu) / sigma;
+			stack[0] = 1.0 / (sqrt(2 * 3.14159265358979323846) * sigma) *exp(-0.5*t*t);
+			break;
+		}
+		default:
+			throw std::runtime_error("not implemented!");
+		}
+
+	}
+	return *stack;
 }
