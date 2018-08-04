@@ -120,7 +120,7 @@ void SolverImpl1D::Calculate()
 	Real const BB = -a12 * fDx;
 	Real const CC = -a21 * fDx;
 	Real const FF = 1. / 16 * fDx*fDx - CC * BB;
-
+	Real const OneFourthDxDx = 0.25 * fDx*fDx;
 	Matrix mat;
 	mat(0, 0) = fTMat(0, 0);
 	mat(0, 1) = fTMat(0, 1);
@@ -134,11 +134,12 @@ void SolverImpl1D::Calculate()
 			//amax = std::max(a, amax);
 			//amin = std::min(a, amin);
 
-			Real c1 = 1 + 0.25 * a * fDx*fDx;
-			Real c2 = 1 - 0.25 * a * fDx*fDx;
+			Real c1 = 1 + OneFourthDxDx * a;
+			Real c2 = 1 - OneFourthDxDx * a;
 			
-			tr(0, 0) = c1 / c2;
-			tr(0, 1) = fDx / (c2);
+			Real inv_c2 = 1 / c2;
+			tr(0, 0) = c1 * inv_c2;
+			tr(0, 1) = fDx * inv_c2;
 			tr(1, 0) = a * tr(0, 1);
 			tr(1, 1) = tr(0, 0);
 
@@ -146,20 +147,21 @@ void SolverImpl1D::Calculate()
 		} else if (fMethod == SolverMethod::ExplicitRungeKuttaO4Classical) {
 			Real a1 = e - vk * fV[3 * i];
 			Real a2 = e - vk * fV[3 * i + 1];
-			Real a3 = a2;
+			//Real a3 = a2;
 			Real a4 = e - vk * fV[3 * i + 2];
 			//amax = std::max(a, amax);
 			//amin = std::min(a, amin);
 
-			Matrix A1;
-			A1(0, 0) = A1(1, 1) = 0; A1(0, 1) = 1; A1(1, 0) = a1;
-			Matrix A2;
-			A2(0, 0) = A2(1, 1) = 0; A2(0, 1) = 1; A2(1, 0) = a2;
-			Matrix const &A3 = A2;
-			Matrix A4;
-			A4(0, 0) = A4(1, 1) = 0; A4(0, 1) = 1; A4(1, 0) = a4;
+			AntiDiagonalMatrix2<Real> A1;
+			A1(0, 1) = 1; A1(1, 0) = a1;
+			AntiDiagonalMatrix2<Real> A2;
+			A2(0, 1) = 1; A2(1, 0) = a2;
 
-			Matrix const &K1 = A1;
+			AntiDiagonalMatrix2<Real> const &A3 = A2;
+			AntiDiagonalMatrix2<Real> A4;
+			A4(0, 1) = 1; A4(1, 0) = a4;
+
+			AntiDiagonalMatrix2<Real> const &K1 = A1;
 			Matrix K2 = A2 * (Matrix::Identity() + 1. / 2 * fDx*K1);
 			Matrix K3 = A3 * (Matrix::Identity() + 1. / 2 * fDx*K2);
 			Matrix K4 = A4 * (Matrix::Identity() + fDx*K3);
@@ -175,35 +177,17 @@ void SolverImpl1D::Calculate()
 			Real a2 = e - vk * fV[2 * i + 1];
 
 
-			if (0) {
-				Matrix A1;
-				A1(0, 0) = A1(1, 1) = 0; A1(0, 1) = 1; A1(1, 0) = a1;
-				Matrix A2;
-				A2(0, 0) = A2(1, 1) = 0; A2(0, 1) = 1; A2(1, 0) = a2;
+			AntiDiagonalMatrix2<Real> A1;
+			A1(0, 1) = 1; A1(1, 0) = a1;
+			AntiDiagonalMatrix2<Real> A2;
+			A2(0, 1) = 1; A2(1, 0) = a2;
 
-				Matrix AA = A1.inverse() - 1. / 4 * fDx * Matrix::Identity();
-				Matrix DD = A2.inverse() - 1. / 4 * fDx * Matrix::Identity();
-
-				Matrix kk1 = (DD * AA - CC * BB * Matrix::Identity()).inverse() * (DD - Matrix::Identity() * BB);
-				Matrix kk2 = (BB * CC * Matrix::Identity() - AA * DD).inverse() * (CC * Matrix::Identity() - AA);
-
-				tr = Matrix::Identity() + fDx * 0.5*(kk1 + kk2);
-
-			} else { // same implementation, but faster
-
-				Matrix A1;
-				A1(0, 0) = A1(1, 1) = 0; A1(0, 1) = 1; A1(1, 0) = a1;
-				Matrix A2;
-				A2(0, 0) = A2(1, 1) = 0; A2(0, 1) = 1; A2(1, 0) = a2;
-
-				Matrix tmp = 0.25*fDx*(A1 + A2);
-				Matrix kk1 = A1 * (Matrix::Identity() - tmp + FF * A2 * A1).inverse() * (Matrix::Identity() - (1. / 4 * fDx + BB)*A2);
-				Matrix kk2 = A2 * (Matrix::Identity() - tmp + FF * A1 * A2).inverse() * (Matrix::Identity() - (1. / 4 * fDx + CC)*A1);
+			AntiDiagonalMatrix2<Real> tmp = 0.25*fDx*(A1 + A2);
+			Matrix kk1 = A1 * (Matrix::Identity() - tmp + FF * A2 * A1).inverse() * (Matrix::Identity() - (1. / 4 * fDx + BB)*A2);
+			Matrix kk2 = A2 * (Matrix::Identity() - tmp + FF * A1 * A2).inverse() * (Matrix::Identity() - (1. / 4 * fDx + CC)*A1);
 
 
-				tr = Matrix::Identity() + fDx * 0.5*(kk1 + kk2);
-
-			}
+			tr = Matrix::Identity() + fDx * 0.5*(kk1 + kk2);
 
 		}
 		

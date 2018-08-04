@@ -84,6 +84,147 @@ struct Mat2 {
 };
 
 template<class Scalar>
+struct AntiDiagonalMatrix2
+{
+	AntiDiagonalMatrix2()
+	{
+	}
+
+	AntiDiagonalMatrix2(Scalar v12, Scalar v21)
+	{
+		m12 = v12;
+		m21 = v21;
+	}
+
+	Scalar &operator()(size_t i, size_t j)
+	{
+		assert((i == 1 && j == 0) || (i == 0 && j == 1));
+		if (i == 0 && j == 1) return m12;
+		else return m21;
+		
+	}
+
+	Scalar const &operator()(size_t i, size_t j) const
+	{
+		assert((i == 1 && j == 0) || (i == 0 && j == 1));
+		if (i == 0 && j == 1) return m12;
+		else return m21;
+	}
+
+	inline AntiDiagonalMatrix2<Scalar> inverse() const
+	{
+		Scalar inv_m_det = Scalar(1)/(m12 * m21);
+		return AntiDiagonalMatrix2<Scalar>(m12*inv_m_det, m21*inv_m_det);
+	}
+	Scalar m12;
+	Scalar m21;
+};
+
+template<class Scalar>
+struct DiagonalMatrix2 {
+	DiagonalMatrix2()
+	{
+	}
+
+	DiagonalMatrix2(Scalar v11, Scalar v22)
+	{
+		m11 = v11;
+		m22 = v22;
+	}
+
+	Scalar &operator()(size_t i, size_t j)
+	{
+		assert((i == 0 && j == 0) || (i == 1 && j == 1));
+		if (i == 0 && j == 0) return m11;
+		else return m22;
+
+	}
+
+	Scalar const &operator()(size_t i, size_t j) const
+	{
+		assert((i == 0 && j == 0) || (i == 1 && j == 1));
+		if (i == 0 && j == 0) return m11;
+		else return m22;
+	}
+
+	inline DiagonalMatrix2<Scalar> inverse() const
+	{
+		Scalar inv_det = Scalar(1) /(m11 * m22);
+		return AntiDiagonalMatrix2<Scalar>(m22*inv_det, m11*inv_det);
+	}
+
+	Scalar m11;
+	Scalar m22;
+};
+
+template<class Scalar>
+inline AntiDiagonalMatrix2<Scalar> operator+(AntiDiagonalMatrix2<Scalar> const &l,
+	AntiDiagonalMatrix2<Scalar> const &r)
+{
+	return AntiDiagonalMatrix2<Scalar>(l.m12 + r.m12, l.m21 + r.m21);
+}
+
+template<class Scalar>
+inline Mat2<Scalar> operator+(Mat2Identity<Scalar> const &l,
+	AntiDiagonalMatrix2<Scalar> const &r)
+{
+	return Mat2<Scalar>(Scalar(1), r.m12, r.m21, Scalar(1));
+}
+
+template<class Scalar>
+inline Mat2<Scalar> operator-(Mat2Identity<Scalar> const &l,
+	AntiDiagonalMatrix2<Scalar> const &r)
+{
+	return Mat2<Scalar>(Scalar(1), -r.m12, -r.m21, Scalar(1));
+}
+
+template<class Scalar>
+inline Mat2<Scalar> operator+(AntiDiagonalMatrix2<Scalar> const &l,
+	Mat2<Scalar> const &r)
+{
+	return Mat2<Scalar>(r.m11, l.m12 + r.m12, l.m21 + r.m21, r.m22);
+}
+
+template<class Scalar>
+inline Mat2<Scalar> operator+(Mat2<Scalar> const &l,
+	AntiDiagonalMatrix2<Scalar> const &r)
+{
+	return Mat2<Scalar>(l.m11, l.m12 + r.m12, l.m21 + r.m21, l.m22);
+}
+
+template<class Scalar>
+inline Mat2<Scalar> operator+(Mat2<Scalar> const &l,
+	DiagonalMatrix2<Scalar> const &r)
+{
+	return Mat2<Scalar>(l.m11 + r.m11, l.m12, l.m21, l.m22 + r.m22);
+}
+
+template<class Scalar>
+inline AntiDiagonalMatrix2<Scalar> operator*(Scalar l,
+	AntiDiagonalMatrix2<Scalar> const &r)
+{
+	return AntiDiagonalMatrix2<Scalar>(l * r.m12, l * r.m21);
+}
+
+template<class Scalar>
+inline DiagonalMatrix2<Scalar> operator*(AntiDiagonalMatrix2<Scalar> const &l,
+	AntiDiagonalMatrix2<Scalar> const &r)
+{
+	return DiagonalMatrix2<Scalar>(l.m12 * r.m21, l.m21 * r.m12);
+}
+
+template<class Scalar>
+inline Mat2<Scalar> operator*(AntiDiagonalMatrix2<Scalar> const &l,
+	Mat2<Scalar> const &r)
+{
+	return Mat2<Scalar>(l.m12 * r.m21,
+		l.m12 * r.m22,
+		l.m21 * r.m11,
+		l.m21 * r.m12);
+}
+
+
+template<class Scalar>
 inline Mat2<Scalar> operator*(Mat2<Scalar> const &l, Mat2<Scalar> const &r)
 {
 	return Mat2<Scalar>(l.m11*r.m11 + l.m12 * r.m21,
