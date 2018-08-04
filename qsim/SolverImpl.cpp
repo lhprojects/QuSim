@@ -75,15 +75,17 @@ void SolverImpl1D::initSystem1D(std::function<Complex(Real)> const & v,
 	fHbar = hbar;
 	fE = en;
 
-	T11 = 1;
-	T12 = 0;
-	T21 = 0;
-	T22 = 1;
+	fTMat(0, 0) = 1;
+	fTMat(0, 1) = 0;
+	fTMat(1, 0) = 0;
+	fTMat(1, 1) = 1;
 
 	fV0 = fVFunc(x0).real();
 	fV1 = fVFunc(x1).real();
 }
 
+//typedef Eigen::Matrix2d Matrix;
+typedef Mat2<Real> Matrix;
 void SolverImpl1D::Calculate()
 {
 
@@ -113,20 +115,20 @@ void SolverImpl1D::Calculate()
 	//Real amax = -10000;
 	//Real amin = +10000;
 
-	//typedef Eigen::Matrix2d Matrix;
-	typedef Mat2<Real> Matrix;
 	Real const a12 = 1. / 4 - sqrt(3) / 6;
 	Real const a21 = 1. / 4 + sqrt(3) / 6;
 	Real const BB = -a12 * fDx;
 	Real const CC = -a21 * fDx;
 	Real const FF = 1. / 16 * fDx*fDx - CC * BB;
 
+	Matrix mat;
+	mat(0, 0) = fTMat(0, 0);
+	mat(0, 1) = fTMat(0, 1);
+	mat(1, 0) = fTMat(1, 0);
+	mat(1, 1) = fTMat(1, 1);
 	for (size_t i = 0; i < fNBins; ++i) {
 
-		Real f_11;
-		Real f_12;
-		Real f_21;
-		Real f_22;
+		Matrix tr;
 		if (fMethod == SolverMethod::ImplicitMidpointMethod) {
 			Real a = e - vk * fV[i];
 			//amax = std::max(a, amax);
@@ -135,10 +137,10 @@ void SolverImpl1D::Calculate()
 			Real c1 = 1 + 0.25 * a * fDx*fDx;
 			Real c2 = 1 - 0.25 * a * fDx*fDx;
 			
-			f_11 = c1 / c2;
-			f_12 = fDx / (c2);
-			f_21 = a * f_12;
-			f_22 = f_11;
+			tr(0, 0) = c1 / c2;
+			tr(0, 1) = fDx / (c2);
+			tr(1, 0) = a * tr(0, 1);
+			tr(1, 1) = tr(0, 0);
 
 
 		} else if (fMethod == SolverMethod::ExplicitRungeKuttaO4Classical) {
@@ -162,14 +164,10 @@ void SolverImpl1D::Calculate()
 			Matrix K3 = A3 * (Matrix::Identity() + 1. / 2 * fDx*K2);
 			Matrix K4 = A4 * (Matrix::Identity() + fDx*K3);
 
-			Matrix ARK4 = Matrix::Identity() + 1. / 6 * fDx * (
+			tr = Matrix::Identity() + 1. / 6 * fDx * (
 				K1 + 2. * K2 + 2. * K3 + K4
 				);
 
-			f_11 = ARK4(0, 0);
-			f_12 = ARK4(0, 1);
-			f_21 = ARK4(1, 0);
-			f_22 = ARK4(1, 1);
 
 
 		} else if(fMethod == SolverMethod::GaussLegendreO4){
@@ -189,12 +187,8 @@ void SolverImpl1D::Calculate()
 				Matrix kk1 = (DD * AA - CC * BB * Matrix::Identity()).inverse() * (DD - Matrix::Identity() * BB);
 				Matrix kk2 = (BB * CC * Matrix::Identity() - AA * DD).inverse() * (CC * Matrix::Identity() - AA);
 
-				Matrix glo4 = Matrix::Identity() + fDx * 0.5*(kk1 + kk2);
+				tr = Matrix::Identity() + fDx * 0.5*(kk1 + kk2);
 
-				f_11 = glo4(0, 0);
-				f_12 = glo4(0, 1);
-				f_21 = glo4(1, 0);
-				f_22 = glo4(1, 1);
 			} else { // same implementation, but faster
 
 				Matrix A1;
@@ -207,59 +201,34 @@ void SolverImpl1D::Calculate()
 				Matrix kk2 = A2 * (Matrix::Identity() - tmp + FF * A1 * A2).inverse() * (Matrix::Identity() - (1. / 4 * fDx + CC)*A1);
 
 
-				Matrix glo4 = Matrix::Identity() + fDx * 0.5*(kk1 + kk2);
+				tr = Matrix::Identity() + fDx * 0.5*(kk1 + kk2);
 
-				f_11 = glo4(0, 0);
-				f_12 = glo4(0, 1);
-				f_21 = glo4(1, 0);
-				f_22 = glo4(1, 1);
 			}
 
 		}
 		
-		if (0) {
-			Eigen::Matrix2cd U;
-			Eigen::Matrix2cd O;
-			U(0, 0) = f_11;
-			U(0, 1) = f_12;
-			U(1, 0) = f_21;
-			U(1, 1) = f_22;
-			O(0, 0) = O(1, 1) = 0;
-			O(0, 1) = 1;
-			O(1, 0) = -1;
-			
-			Eigen::Matrix2cd err = U.transpose() * O * U - O;
-			if (err.norm() > 1E-10) {
-				err(0, 0);
-			}
-		}
-
-		Real t11 = T11;
-		Real t12 = T12;
-		Real t21 = T21;
-		Real t22 = T22;
-		
-		T11 = f_11 * t11 + f_12 * t21;
-		T12 = f_11 * t12 + f_12 * t22;
-		T21 = f_21 * t11 + f_22 * t21;
-		T22 = f_21 * t12 + f_22 * t22;
+		mat = tr * mat;
 
 		Complex psi_ = psi;
 		Complex psiPrime_  = psiPrime;
-		psi = psi_ * f_11 + psiPrime_ * f_12;
-		psiPrime = psi_ * f_21 + psiPrime_ * f_22;
+		psi = psi_ * tr(0, 0) + psiPrime_ * tr(0, 1);
+		psiPrime = psi_ * tr(1, 0) + psiPrime_ * tr(1, 1);
 
 		fPsi[i + 1] = psi;
 		fPsiPrime[i + 1] = psiPrime;
 	}
 	fFinalJ = (std::conj(psi)*psiPrime - psi * std::conj(psiPrime)).imag();
 
-	fTMat(0, 0) = T11;
-	fTMat(0, 1) = T12;
-	fTMat(1, 0) = T21;
-	fTMat(1, 1) = T22;
-
+	fTMat(0, 0) = mat(0, 0);
+	fTMat(0, 1) = mat(0, 1);
+	fTMat(1, 0) = mat(1, 0);
+	fTMat(1, 1) = mat(1, 1);
 	do {
+		Real T11 = fTMat(0, 0);
+		Real T12 = fTMat(0, 1);
+		Real T21 = fTMat(1, 0);
+		Real T22 = fTMat(1, 1);
+
 		fT = 0;
 		fR = 0;
 		Real kin1 = fE - fV0;

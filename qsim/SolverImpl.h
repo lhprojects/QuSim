@@ -6,7 +6,7 @@
 struct SolverImpl {
 
 	SolverImpl();
-	virtual ~SolverImpl() { }
+	virtual ~SolverImpl() {}
 
 	void initSystem(
 		Real en,
@@ -58,10 +58,6 @@ struct SolverImpl1D : SolverImpl {
 
 	Real fT;
 	Real fR;
-	Eigen::Matrix2cd fTMat;
-	Real T11;
-	Real T12;
-	Real T21;
-	Real T22;
+	Eigen::Matrix2d fTMat;
 
 };
