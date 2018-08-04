@@ -89,12 +89,6 @@ typedef Mat2<Real> Matrix;
 void SolverImpl1D::Calculate()
 {
 
-	Complex psi = fPsi[0];
-	Complex psiPrime = fPsiPrime[0];
-	Real e = -2 * fMass / (fHbar*fHbar) * fE;
-	Real vk = -2 * fMass / (fHbar*fHbar);
-
-	fInitJ = (std::conj(psi)*psiPrime - psi * std::conj(psiPrime)).imag();
 	//          |  psi       |
 	//  Psi =   |            |
 	//          |  psi^prime |
@@ -112,39 +106,53 @@ void SolverImpl1D::Calculate()
 	//      Psi(x + dx) =  -------------------------- Psi(x)
 	//                       1 - 1/2 A(x + 1/2dx) dx
 
-	//Real amax = -10000;
-	//Real amin = +10000;
+	Complex psi = fPsi[0];
+	Complex psiPrime = fPsiPrime[0];
+	Real e = -2 * fMass / (fHbar*fHbar) * fE;
+	Real vk = -2 * fMass / (fHbar*fHbar);
 
-	Real const a12 = 1. / 4 - sqrt(3) / 6;
-	Real const a21 = 1. / 4 + sqrt(3) / 6;
-	Real const BB = -a12 * fDx;
-	Real const CC = -a21 * fDx;
-	Real const FF = 1. / 16 * fDx*fDx - CC * BB;
-	Real const OneFourthDxDx = 0.25 * fDx*fDx;
+	fInitJ = (std::conj(psi)*psiPrime - psi * std::conj(psiPrime)).imag();
+
 	Matrix mat;
 	mat(0, 0) = fTMat(0, 0);
 	mat(0, 1) = fTMat(0, 1);
 	mat(1, 0) = fTMat(1, 0);
 	mat(1, 1) = fTMat(1, 1);
-	for (size_t i = 0; i < fNBins; ++i) {
 
-		Matrix tr;
-		if (fMethod == SolverMethod::ImplicitMidpointMethod) {
+#define Tail()											\
+	mat = tr * mat;										\
+														\
+	Complex psi_ = psi;									\
+	Complex psiPrime_ = psiPrime;						\
+	psi = psi_ * tr(0, 0) + psiPrime_ * tr(0, 1);		\
+	psiPrime = psi_ * tr(1, 0) + psiPrime_ * tr(1, 1);	\
+														\
+	fPsi[i + 1] = psi;									\
+	fPsiPrime[i + 1] = psiPrime;
+
+	if (fMethod == SolverMethod::ImplicitMidpointMethod) {
+		Real const OneFourthDxDx = 0.25 * fDx*fDx;
+		for (size_t i = 0; i < fNBins; ++i) {
+			Matrix tr;
 			Real a = e - vk * fV[i];
 			//amax = std::max(a, amax);
 			//amin = std::min(a, amin);
 
 			Real c1 = 1 + OneFourthDxDx * a;
 			Real c2 = 1 - OneFourthDxDx * a;
-			
+
 			Real inv_c2 = 1 / c2;
 			tr(0, 0) = c1 * inv_c2;
 			tr(0, 1) = fDx * inv_c2;
 			tr(1, 0) = a * tr(0, 1);
 			tr(1, 1) = tr(0, 0);
+			
+			Tail();
+		}
 
-
-		} else if (fMethod == SolverMethod::ExplicitRungeKuttaO4Classical) {
+	} else if (fMethod == SolverMethod::ExplicitRungeKuttaO4Classical) {
+		for (size_t i = 0; i < fNBins; ++i) {
+			Matrix tr;
 			Real a1 = e - vk * fV[3 * i];
 			Real a2 = e - vk * fV[3 * i + 1];
 			//Real a3 = a2;
@@ -164,15 +172,25 @@ void SolverImpl1D::Calculate()
 			AntiDiagonalMatrix2<Real> const &K1 = A1;
 			Matrix K2 = A2 * (Matrix::Identity() + 1. / 2 * fDx*K1);
 			Matrix K3 = A3 * (Matrix::Identity() + 1. / 2 * fDx*K2);
-			Matrix K4 = A4 * (Matrix::Identity() + fDx*K3);
+			Matrix K4 = A4 * (Matrix::Identity() + fDx * K3);
 
 			tr = Matrix::Identity() + 1. / 6 * fDx * (
 				K1 + 2. * K2 + 2. * K3 + K4
 				);
 
+			Tail();
+		}
 
+	} else if (fMethod == SolverMethod::GaussLegendreO4) {
 
-		} else if(fMethod == SolverMethod::GaussLegendreO4){
+		Real const a12 = 1. / 4 - sqrt(3) / 6;
+		Real const a21 = 1. / 4 + sqrt(3) / 6;
+		Real const BB = -a12 * fDx;
+		Real const CC = -a21 * fDx;
+		Real const FF = 1. / 16 * fDx*fDx - CC * BB;
+
+		for (size_t i = 0; i < fNBins; ++i) {
+			Matrix tr;
 			Real a1 = e - vk * fV[2 * i];
 			Real a2 = e - vk * fV[2 * i + 1];
 
@@ -189,18 +207,11 @@ void SolverImpl1D::Calculate()
 
 			tr = Matrix::Identity() + fDx * 0.5*(kk1 + kk2);
 
+			Tail();
 		}
-		
-		mat = tr * mat;
-
-		Complex psi_ = psi;
-		Complex psiPrime_  = psiPrime;
-		psi = psi_ * tr(0, 0) + psiPrime_ * tr(0, 1);
-		psiPrime = psi_ * tr(1, 0) + psiPrime_ * tr(1, 1);
-
-		fPsi[i + 1] = psi;
-		fPsiPrime[i + 1] = psiPrime;
 	}
+		
+
 	fFinalJ = (std::conj(psi)*psiPrime - psi * std::conj(psiPrime)).imag();
 
 	fTMat(0, 0) = mat(0, 0);
