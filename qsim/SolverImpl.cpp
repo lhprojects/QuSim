@@ -61,6 +61,32 @@ void SolverImpl1D::initSystem1D(std::function<Complex(Real)> const & v,
 			fV[2 * i] = fVFunc(x1).real();
 			fV[2 * i + 1] = fVFunc(x2).real();
 		}
+	} else if (met == SolverMethod::ExplicitRungeKuttaO6Luther1967) {
+		fV.resize(7 * fNBins);
+		Real f1 = 0;
+		Real f2 = 1;
+		Real f3 = 1. / 2;
+		Real f4 = 2. / 3;
+		Real f5 = (7 - sqrt(21)) / 14;
+		Real f6 = (7 + sqrt(21)) / 14;
+		Real f7 = 1;
+
+		for (size_t i = 0; i < fNBins; ++i) {
+			Real x1 = x0 + (i + f1)*fDx;
+			Real x2 = x0 + (i + f2)*fDx;
+			Real x3 = x0 + (i + f3)*fDx;
+			Real x4 = x0 + (i + f4)*fDx;
+			Real x5 = x0 + (i + f5)*fDx;
+			Real x6 = x0 + (i + f6)*fDx;
+			Real x7 = x0 + (i + f7)*fDx;
+			fV[7 * i] = fVFunc(x1).real();
+			fV[7 * i + 1] = fVFunc(x2).real();
+			fV[7 * i + 2] = fVFunc(x3).real();
+			fV[7 * i + 3] = fVFunc(x4).real();
+			fV[7 * i + 4] = fVFunc(x5).real();
+			fV[7 * i + 5] = fVFunc(x6).real();
+			fV[7 * i + 6] = fVFunc(x7).real();
+		}
 	} else {
 		throw std::runtime_error("Unsupported method");
 	}
@@ -209,6 +235,90 @@ void SolverImpl1D::Calculate()
 
 			Tail();
 		}
+	} else if (fMethod == SolverMethod::ExplicitRungeKuttaO6Luther1967) {
+
+		Real const c31 = 3. / 8;
+		Real const c32 = 1. / 8;
+
+		Real const c41 = 8. / 27.;
+		Real const c42 = 2. / 27;
+		Real const c43 = 8. / 27;
+
+		Real const c51 = 3*(3 * sqrt(21) - 7)/392;
+		Real const c52 = -8*(7 - sqrt(21)) / 392;
+		Real const c53 = 48*(7 - sqrt(21)) / 392;
+		Real const c54 = -3*(21 - sqrt(21)) / 392;
+		//Real const one1 = c51 + c52 + c53 + c54;
+
+		Real const c61 = -5 * (231 + 51 * sqrt(21)) / 1960;
+		Real const c62 = -40 * (7 + sqrt(21)) / 1960;
+		Real const c63 = -320 * sqrt(21) / 1960;
+		Real const c64 = 3 * (21 + 121 * sqrt(21)) / 1960;
+		Real const c65 = 392 * (6 + sqrt(21)) / 1960;
+		//Real const one2 = c61 + c62 + c63 + c64 + c65;
+
+		Real const c71 = 15 * (22 + 7 * sqrt(21)) / 180;
+		Real const c72 = 120. / 180;
+		Real const c73 = 40*(7*sqrt(21) - 5) / 180;
+		Real const c74 = -63*(3*sqrt(21) - 2) / 180;
+		Real const c75 = -14*(49 + 9*sqrt(21)) / 180;
+		Real const c76 = 70*(7 - sqrt(21)) / 180;
+		//Real const one3 = c71 + c72 + c73 + c74 + c75 + c76;
+
+		Real const f1 = 0;
+		Real const f2 = 1;
+		Real const f3 = 1. / 2;
+		Real const f4 = 2. / 3;
+		Real const f5 = (7 - sqrt(21)) / 14;
+		Real const f6 = (7 + sqrt(21)) / 14;
+		Real const f7 = 1;
+
+		Real const b1 =  9. / 180;
+		Real const b3 = 64. / 180;
+		Real const b5 = 49. / 180;
+		Real const b6 = 49. / 180;
+		Real const b7 =  9. / 180;;
+
+
+		for (size_t i = 0; i < fNBins; ++i) {
+			Matrix tr;
+			Real a1 = e - vk * fV[7 * i];
+			Real a2 = e - vk * fV[7 * i + 1];
+			Real a3 = e - vk * fV[7 * i + 2];
+			Real a4 = e - vk * fV[7 * i + 3];
+			Real a5 = e - vk * fV[7 * i + 4];
+			Real a6 = e - vk * fV[7 * i + 5];
+			Real a7 = e - vk * fV[7 * i + 6];
+
+			AntiDiagonalMatrix2<Real> A1;
+			AntiDiagonalMatrix2<Real> A2;
+			AntiDiagonalMatrix2<Real> A3;
+			AntiDiagonalMatrix2<Real> A4;
+			AntiDiagonalMatrix2<Real> A5;
+			AntiDiagonalMatrix2<Real> A6;
+			AntiDiagonalMatrix2<Real> A7;
+			A1(0, 1) = 1; A1(1, 0) = a1;
+			A2(0, 1) = 1; A2(1, 0) = a2;
+			A3(0, 1) = 1; A3(1, 0) = a3;
+			A4(0, 1) = 1; A4(1, 0) = a4;
+			A5(0, 1) = 1; A5(1, 0) = a5;
+			A6(0, 1) = 1; A6(1, 0) = a6;
+			A7(0, 1) = 1; A7(1, 0) = a7;
+
+
+			AntiDiagonalMatrix2<Real> K1 = fDx * A1;
+			Matrix K2 = fDx * A2 * (Matrix::Identity() + K1);
+			Matrix K3 = fDx * A3 * (Matrix::Identity() + c31 * K1 + c32 * K2);
+			Matrix K4 = fDx * A4 * (Matrix::Identity() + c41 * K1 + c42 * K2 + c43 * K3);
+			Matrix K5 = fDx * A5 * (Matrix::Identity() + c51 * K1 + c52 * K2 + c53 * K3 + c54 * K4);
+			Matrix K6 = fDx * A6 * (Matrix::Identity() + c61 * K1 + c62 * K2 + c63 * K3 + c64 * K4 + c65 * K5) ;
+			Matrix K7 = fDx * A7 * (Matrix::Identity() + c71 * K1 + c72 * K2 + c73 * K3 + c74 * K4 + c75 * K5 + c76 * K6);
+
+			tr = Matrix::Identity() + b1 * K1 + b3 * K3 + b5 * K5 + b6 * K6 + b7 * K7;
+
+			Tail();
+		}
+
 	}
 		
 

@@ -83,9 +83,6 @@
     <ClInclude Include="..\qsim\EvolverImpl.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\qsim\Matrix2.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\qsim\GaussLegendreMethod2D.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -102,6 +99,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\qsim\SolverImpl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\Matrix2.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

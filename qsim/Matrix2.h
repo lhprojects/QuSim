@@ -193,6 +193,13 @@ inline Mat2<Scalar> operator+(Mat2<Scalar> const &l,
 }
 
 template<class Scalar>
+inline Mat2<Scalar> operator-(Mat2<Scalar> const &l,
+	AntiDiagonalMatrix2<Scalar> const &r)
+{
+	return Mat2<Scalar>(l.m11, l.m12 - r.m12, l.m21 - r.m21, l.m22);
+}
+
+template<class Scalar>
 inline Mat2<Scalar> operator+(Mat2<Scalar> const &l,
 	DiagonalMatrix2<Scalar> const &r)
 {

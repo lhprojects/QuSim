@@ -33,12 +33,14 @@ enum class SolverMethod {
 	SplittingMethodO4,
 	Eigen,
 
-	// One Step Method
 	// Runge¨CKutta family
 	ImplicitMidpointMethod, // which is same as GaussLegendreO2
-	ExplicitRungeKuttaO4Classical,
 	GaussLegendreO4,
 	GaussLegendreO6,
+
+	ExplicitRungeKuttaO4Classical,
+	ExplicitRungeKuttaO6Luther1967,
+
 };
 
 struct Cal;
