@@ -15,6 +15,7 @@ int main()
 		{ SolverMethod::ImplicitMidpointMethod , "midpoint", std::map<std::string, std::string>() },
 	{ SolverMethod::GaussLegendreO4 , "gaussO4", std::map<std::string, std::string>() },
 	{ SolverMethod::ExplicitRungeKuttaO4Classical , "RK4", std::map<std::string, std::string>() },
+	{ SolverMethod::ExplicitRungeKuttaO6Luther1967 , "RK6", std::map<std::string, std::string>() },
 	};
 
 	int dims[] = {
