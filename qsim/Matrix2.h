@@ -38,6 +38,8 @@ struct Mat2IdentityK {
 template<class Scalar>
 struct Mat2 {
 
+	size_t rows() const { return 2; }
+	size_t cols() const { return 2; }
 	Mat2() {}
 	Mat2(Scalar a11, Scalar a12, Scalar a21, Scalar a22) : m11(a11), m12(a12), m21(a21), m22(a22)
 	{
