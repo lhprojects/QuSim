@@ -291,6 +291,7 @@
   <ItemGroup>
     <ClInclude Include="..\qsim\AdptiveSimpsonQuadrature.h" />
     <ClInclude Include="..\qsim\Cal.h" />
+    <ClInclude Include="..\qsim\Dump.h" />
     <ClInclude Include="..\qsim\EigenMethod.h" />
     <ClInclude Include="..\qsim\FourierTransform.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod.h" />
