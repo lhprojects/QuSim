@@ -10,12 +10,18 @@ struct Test {
 
 int main()
 {
+	std::map<std::string, std::string> smal_round_err;
+	smal_round_err["small_round_error"] = "0";
 
 	Test tests[] = {
 		{ SolverMethod::ImplicitMidpointMethod , "midpoint", std::map<std::string, std::string>() },
-	{ SolverMethod::GaussLegendreO4 , "gaussO4", std::map<std::string, std::string>() },
-	{ SolverMethod::ExplicitRungeKuttaO4Classical , "RK4", std::map<std::string, std::string>() },
-	{ SolverMethod::ExplicitRungeKuttaO6Luther1967 , "RK6", std::map<std::string, std::string>() },
+	{ SolverMethod::ImplicitMidpointMethod , "midpoint-", smal_round_err },
+	{ SolverMethod::ExplicitRungeKuttaO4Classical , "rk4", std::map<std::string, std::string>() },
+	{ SolverMethod::ExplicitRungeKuttaO4Classical , "rk4-", smal_round_err },
+	{ SolverMethod::GaussLegendreO4 , "glo4", std::map<std::string, std::string>() },
+	{ SolverMethod::GaussLegendreO4 , "glo4-", smal_round_err },
+	{ SolverMethod::ExplicitRungeKuttaO6Luther1967 , "rko6", std::map<std::string, std::string>() },
+	{ SolverMethod::ExplicitRungeKuttaO6Luther1967 , "rko6-", smal_round_err },
 	};
 
 	int dims[] = {
@@ -42,16 +48,16 @@ int main()
 			int dim = dims[j];
 
 			Solver1D syst;
-			syst.init(FunctorWrapper("exp(-x*x)"), -10, 10, dim, 0.5, 1, I, tests[i].met, 1, 1);
+			syst.init(FunctorWrapper("exp(-x*x)"), -10, 10, dim, 0.5, 1, I, tests[i].met, 1, 1, tests[i].opts);
 
 
 			auto t0 = std::chrono::system_clock::now();
-			for(int i = 0; i < 10; ++i)
+			for(int i = 0; i < 50; ++i)
 				syst.Compute();
 			auto t1 = std::chrono::system_clock::now();
 
 			auto d = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0) / 10;
-			printf("%6.2f ", dim / (1E-6*d.count())*1E-6);
+			printf("%6.1f ", 50.0*dim / d.count());
 		}
 		printf("\n");
 

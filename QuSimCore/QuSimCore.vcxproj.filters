@@ -107,5 +107,8 @@
     <ClInclude Include="..\qsim\Dump.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\qsim\SolverMainLoop.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -279,10 +279,11 @@ void Solver1D::init(std::function<Complex(Real)> const & v,
 	Real en,
 	Complex initPsi,
 	Complex initPsiPrime, SolverMethod met,
-	Real mass, Real hbar)
+	Real mass, Real hbar,
+	std::map<std::string, std::string> const &opts)
 {
 	fImpl.reset(new SolverImpl1D());
-	((SolverImpl1D*)fImpl.get())->initSystem1D(v, x0, x1, n, en, initPsi, initPsiPrime, met, mass, hbar);
+	((SolverImpl1D*)fImpl.get())->initSystem1D(v, x0, x1, n, en, initPsi, initPsiPrime, met, mass, hbar, opts);
 }
 
 PsiVector const & Solver1D::GetPsi()

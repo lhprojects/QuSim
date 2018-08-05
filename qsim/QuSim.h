@@ -147,7 +147,8 @@ struct Solver1D : Solver {
 		Complex initPsiPrime,
 		SolverMethod met,
 		Real mass,
-		Real hbar);
+		Real hbar,
+		std::map<std::string, std::string> const &opts);
 
 	PsiVector const &GetPsi();
 	std::vector<Real> const &GetV();

@@ -299,6 +299,7 @@
     <ClInclude Include="..\qsim\kissfft.hh" />
     <ClInclude Include="..\qsim\Matrix2.h" />
     <ClInclude Include="..\qsim\SolverImpl.h" />
+    <ClInclude Include="..\qsim\SolverMainLoop.h" />
     <ClInclude Include="..\qsim\SplittingMethod.h" />
     <ClInclude Include="..\qsim\SplittingMethod2D.h" />
     <ClInclude Include="..\qsim\QuSim.h" />

@@ -11,10 +11,12 @@ struct SolverImpl {
 	void initSystem(
 		Real en,
 		Real mass,
-		Real hbar);
+		Real hbar,
+		std::map<std::string, std::string> const &opts);
 
 	virtual void Calculate() = 0;
 
+	std::map<std::string, std::string> fOpts;
 	Real const fE;
 	Real const fMass;
 	Real const fHbar;
@@ -35,8 +37,11 @@ struct SolverImpl1D : SolverImpl {
 		Complex initPsiPrime,
 		SolverMethod met,
 		Real mass,
-		Real hbar);
+		Real hbar,
+		std::map<std::string, std::string> const &opts);
 
+	void MainLoop();
+	void MainLoopSamllRoundError();
 	void Calculate() override;
 
 	std::function<Complex(Real)> fVFunc;
@@ -50,6 +55,7 @@ struct SolverImpl1D : SolverImpl {
 	PsiVector fPsi;
 	PsiVector fPsiPrime;
 	SolverMethod fMethod;
+	bool fSmallRoundError;
 	std::vector<Real> fV;
 	Real fMass;
 	Real fHbar;
