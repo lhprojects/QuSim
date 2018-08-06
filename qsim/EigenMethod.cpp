@@ -30,7 +30,7 @@ void EigenMethod::initSystem1D(std::function<Complex(Real)> const &psi, bool for
 			fH(0, 0) = -2 * f;
 			fH(0, 1) = f;
 			fH(0, 0) += fV[0];
-			for (int i = 1; i < (int)fN - 1; ++i) {
+			for (ptrdiff_t i = 1; i < (ptrdiff_t)fN - 1; ++i) {
 				fH(i, i - 1) = f;
 				fH(i, i + 1) = f;
 				fH(i, i + 0) = -2 * f;
@@ -41,12 +41,12 @@ void EigenMethod::initSystem1D(std::function<Complex(Real)> const &psi, bool for
 			fH(fN - 1, 0) = f;
 			fH(fN - 1, fN - 1) += fV[fN - 1];
 		} else {
-			for (int i = 0; i < (int)fN; ++i) {
+			for (ptrdiff_t i = 0; i < (ptrdiff_t)fN; ++i) {
 				fH(i, i - 2 < 0 ? fN + i - 2: i - 2) = -1./12 * f;
 				fH(i, i - 1 < 0 ? fN + i - 1 : i - 1) = 4./3 * f;
 				fH(i, i + 0) = -5./2 * f;
-				fH(i, i + 1 > fN - 1 ? i + 1 - fN : i + 1) = 4./3 * f;
-				fH(i, i + 2 > fN - 1 ? i + 2 - fN : i + 2) = -1./12 * f;
+				fH(i, i + 1 > (ptrdiff_t)fN - 1 ? i + 1 - fN : i + 1) = 4./3 * f;
+				fH(i, i + 2 > (ptrdiff_t)fN - 1 ? i + 2 - fN : i + 2) = -1./12 * f;
 				fH(i, i + 0) += fV[i];
 			}
 		}
@@ -59,14 +59,14 @@ void EigenMethod::initSystem1D(std::function<Complex(Real)> const &psi, bool for
 		//dump_real(eigenvalues, "eigen.txt");
 
 
-		for (int i = 0; i < eigenvalues.size(); ++i) {
+		for (ptrdiff_t i = 0; i < (ptrdiff_t)eigenvalues.size(); ++i) {
 			expDt[i] = exp(-I * eigenvalues[i] * fDt / fHbar);
 		}
 		//dump_comp(expDt, "expDt.txt");
 
 		psi0.resize(fN);
 
-		for (int i = 0; i < eigenvalues.size(); ++i) {
+		for (ptrdiff_t i = 0; i < (ptrdiff_t)eigenvalues.size(); ++i) {
 			psi0(i) = fPsi[i];
 		}
 
@@ -85,13 +85,13 @@ void EigenMethod::initSystem1D(std::function<Complex(Real)> const &psi, bool for
 
 void EigenMethod::update_psi()
 {
-	for (int i = 0; i < psi.size(); ++i) {
+	for (ptrdiff_t i = 0; i < (ptrdiff_t)psi.size(); ++i) {
 		psi_eigenspace[i] *= expDt(i);
 	}
 	psi = fSolver.eigenvectors() * psi_eigenspace;
 	//dump_comp(psi_eigenspace, "psi_eigenspace.txt");
 	//dump_comp(psi, "psi.txt");
-	for (int i = 0; i < psi.size(); ++i) {
+	for (ptrdiff_t i = 0; i < (ptrdiff_t)psi.size(); ++i) {
 		fPsi[i] = psi(i);
 	}
 	//dump_comp(fPsi, "fPsi.txt");

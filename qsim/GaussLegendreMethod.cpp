@@ -38,20 +38,20 @@ void GaussLegendreMethod::initSystem1D(std::function<Complex(Real)> const &psi, 
 	Complex hdt = fDt;
 
 	if (space_O2) {
-		for (int i = 0; i < fN; ++i) {
+		for (ptrdiff_t i = 0; i < (ptrdiff_t)fN; ++i) {
 			fh.insert(i, i) = (fV[i] + hbar * hbar / (2 * fMass) * 2 / (fDx*fDx))*hdt / hbar;
-			fh.insert(i, i + 1 >= fN ? 0 : i + 1) = (hbar * hbar / (2 * fMass) * (-1) / (fDx*fDx))*hdt / hbar;
+			fh.insert(i, i + 1 >= (ptrdiff_t)fN ? 0 : i + 1) = (hbar * hbar / (2 * fMass) * (-1) / (fDx*fDx))*hdt / hbar;
 			fh.insert(i, i - 1 < 0 ? fN - 1 : i - 1) = (hbar * hbar / (2 * fMass) * (-1) / (fDx*fDx))*hdt / hbar;
 		}
 	} else {
 		Complex f = -(hbar * hbar / (2 * fMass) * 1 / (fDx*fDx))*hdt / hbar;
-		for (int i = 0; i < fN; ++i) {
+		for (ptrdiff_t i = 0; i < (ptrdiff_t)fN; ++i) {
 
 			fh.insert(i, i - 2 < 0 ? fN + i - 2 : i - 2) = -1. / 12 * f;
 			fh.insert(i, i - 1 < 0 ? fN + i - 1 : i - 1) = 4. / 3 * f;
 			fh.insert(i, i + 0) = fV[i] * hdt / hbar - 5. / 2 * f;
-			fh.insert(i, i + 1 > fN - 1 ? i + 1 - fN : i + 1) = 4. / 3 * f;
-			fh.insert(i, i + 2 > fN - 1 ? i + 2 - fN : i + 2) = -1. / 12 * f;
+			fh.insert(i, i + 1 > (ptrdiff_t)fN - 1 ? i + 1 - fN : i + 1) = 4. / 3 * f;
+			fh.insert(i, i + 2 > (ptrdiff_t)fN - 1 ? i + 2 - fN : i + 2) = -1. / 12 * f;
 
 		}
 	}
@@ -79,14 +79,14 @@ void GaussLegendreMethod::initSystem1D(std::function<Complex(Real)> const &psi, 
 void GaussLegendreMethod::update_psi()
 {
 
-	for (int i = 0; i < fN; ++i) {
+	for (ptrdiff_t i = 0; i < (ptrdiff_t)fN; ++i) {
 		ffnPsi[i] = fPsi[i];
 	}
 
 	ffnPsi = fn * ffnPsi;
 	ffnPsi = fLU.solve(ffnPsi);
 
-	for (int i = 0; i < fN; ++i) {
+	for (ptrdiff_t i = 0; i < (ptrdiff_t)fN; ++i) {
 		fPsi[i] = ffnPsi[i];
 	}
 
