@@ -19,7 +19,7 @@ struct EvolverImpl
 	SolverMethod fSolverMethod;
 
 	bool fFN;
-	Int fStep;
+	UInt fStep;
 
 	std::map<std::string, std::string> const fOpts;
 

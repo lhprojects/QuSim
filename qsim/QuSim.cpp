@@ -118,7 +118,7 @@ Real Evolver1D::Xavg()
 	return ((EvolverImpl1D*)fImpl.get())->Xavg();
 }
 
-UInt Evolver1D::GetN()
+size_t Evolver1D::GetN()
 {
 	return ((EvolverImpl1D*)fImpl.get())->fN;
 }
@@ -202,12 +202,12 @@ Eigen::MatrixXd const & Evolver2D::GetV()
 	return ((EvolverImpl2D*)fImpl.get())->fV;
 }
 
-UInt Evolver2D::GetNx()
+size_t Evolver2D::GetNx()
 {
 	return ((EvolverImpl2D*)fImpl.get())->fNx;
 }
 
-UInt Evolver2D::GetNy()
+size_t Evolver2D::GetNy()
 {
 	return ((EvolverImpl2D*)fImpl.get())->fNy;
 }
@@ -296,7 +296,7 @@ std::vector<Real> const & Solver1D::GetV()
 	return ((SolverImpl1D*)fImpl.get())->fV;
 }
 
-UInt Solver1D::GetNPoints()
+size_t Solver1D::GetNPoints()
 {
 	return ((SolverImpl1D*)fImpl.get())->fNPoints;
 }

@@ -95,7 +95,7 @@ struct Evolver1D : Evolver {
 	PsiVector const &GetPsi();
 	std::vector<Real> const &GetV();
 	Real Xavg();
-	UInt GetN();
+	size_t GetN();
 	Real NormLeft();
 	Real NormRight();
 
@@ -118,8 +118,8 @@ struct Evolver2D : Evolver
 
 	Eigen::MatrixXcd const &GetPsi();
 	Eigen::MatrixXd const &GetV();
-	UInt GetNx();
-	UInt GetNy();
+	size_t GetNx();
+	size_t GetNy();
 
 
 };
@@ -153,7 +153,7 @@ struct Solver1D : Solver {
 	PsiVector const &GetPsi();
 	std::vector<Real> const &GetV();
 
-	UInt GetNPoints();
+	size_t GetNPoints();
 	Eigen::Matrix2cd GetTMat();
 	Real GetT();
 	Real GetR();
