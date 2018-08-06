@@ -289,7 +289,6 @@
     <ClCompile Include="..\qsim\TestCal.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\qsim\AdptiveSimpsonQuadrature.h" />
     <ClInclude Include="..\qsim\Cal.h" />
     <ClInclude Include="..\qsim\Dump.h" />
     <ClInclude Include="..\qsim\EigenMethod.h" />
