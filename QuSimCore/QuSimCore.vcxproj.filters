@@ -74,9 +74,6 @@
     <ClInclude Include="..\qsim\Cal.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\qsim\AdptiveSimpsonQuadrature.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\qsim\QuSim.h">
       <Filter>头文件</Filter>
     </ClInclude>
