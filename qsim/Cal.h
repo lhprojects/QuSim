@@ -25,8 +25,8 @@ struct CalExpr;
 //       result = cal.Val()        // and re-evaluate
 //   }
 //
-//   // SetVarVal itself is expensive, However reseting value by the reference from GetVarVal is cheap
-//   // The first call of Val may be expensive after SetVarVal or constructor
+//   // `SetVarVal` and `GetVarVal` itself is expensive, However reseting value by the reference from GetVarVal is cheap
+//   // The first call of `Val` after `SetVarVal` or `constructor` may be expensive
 //   // you must call SetVarVal before you call GetVarVal
 struct Cal {
 
