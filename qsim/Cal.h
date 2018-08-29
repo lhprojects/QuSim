@@ -8,15 +8,46 @@
 typedef std::complex<double> CCom;
 
 struct CalExpr;
+
+// Usage:
+// 
+// 
+//   Cal cal("1+x");               // step 1: set expresion
+//   cal.SetVarVal("x", 1);        // step 2: set variables
+//   CCom result = cal.Val();      // step 3: evalute value
+//
+//   cal.SetVarVal("x", 2);        // you can reset variable value
+//   result = cal.Val();           // then re-evaluate
+//
+//   CCom &x = cal.GetVarVal("x"); // you can take address of variable
+//   for(int i = 0; i < 10; ++i) { 
+//       x = 1.0*i;                // then reset variable value
+//       result = cal.Val()        // and re-evaluate
+//   }
+//
+//   // SetVarVal itself is expensive, However reseting value by the reference from GetVarVal is cheap
+//   // The first call of Val may be expensive after SetVarVal or constructor
+//   // you must call SetVarVal before you call GetVarVal
 struct Cal {
 
+	// Codes are stil not avaliable
 	Cal(char const *x);
+
+	// Alloc and set variable
+	// This operation will make codes not avaliable
+	void SetVarVal(std::string const &name, CCom const &v);
+	// Get variable (address), you must alloc and set variable before you get variable
+	CCom &GetVarVal(std::string const &name);
+	// Generate (if codes not avaliable) and run codes
+	CCom Val();
+
 	~Cal();
 
-	void SetVarVal(std::string const &name, CCom const &v);
-	CCom &GetVarVal(std::string const &name);
-	CCom Val();
+
+	// Generate codes
+	// Codes will be avaliable
 	void GenPseudoCode();
+	// Run codes, Codes must be avaliable
 	CCom RunPseudoCode();
 private:
 	friend struct CalExpr;

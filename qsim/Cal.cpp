@@ -441,6 +441,10 @@ Cal::~Cal()
 
 void Cal::SetVarVal(std::string const & name, CCom const & v)
 {
+	if (fVarVals.find(name) == fVarVals.end()) {
+		// not alloc ever ?
+		fPseudoCode.clear();
+	}
 	fVarVals[name] = v;
 }
 
@@ -542,6 +546,11 @@ CCom Cal::Val()
 
 void Cal::GenPseudoCode()
 {
+	fPseudoCode.clear();
+	fStack.clear();
+	fConstants.clear();
+	fVariables.clear();
+
 	StackUsage su;
 	fExpr->Gen(this, su);
 	fPseudoCode.push_back(0);
