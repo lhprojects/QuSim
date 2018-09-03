@@ -43,9 +43,11 @@ enum class SolverMethod {
 
 };
 
+
 struct Cal;
 struct EvolverImpl;
 struct SolverImpl;
+struct QuPerturbationImpl;
 
 struct FunctorWrapper
 {
@@ -162,6 +164,46 @@ struct Solver1D : Solver {
 	Complex InitPsiPrime();
 	Complex FinalPsi();
 	Complex FinalPsiPrime();
+
+};
+
+struct QuPerturbation {
+	~QuPerturbation();
+protected:
+	QuPerturbation();
+	std::shared_ptr<QuPerturbationImpl> fImpl;
+
+};
+
+struct QuPerturbation1D : QuPerturbation {
+
+	QuPerturbation1D();
+	void init(
+		std::function<Complex(Real)> const & v,
+		Real x0,
+		Real x1,
+		size_t n,
+		Real en,
+		Real epsilon,
+		Real direction,
+		SolverMethod met,
+		Real mass,
+		Real hbar,
+		std::map<std::string, std::string> const &opts);
+
+	PsiVector const &GetPsi();
+	std::vector<Real> const &GetV();
+
+	size_t GetNPoints();
+	void Compute();
+	Real GetT();
+	Real GetR();
+	Real GetEnergy();
+	Real GetMomentumGap();
+	Real GetEpsilonMomentumWidth();
+	Real GetEnergyGap();
+	Real GetEpsilon();
+	Real GetEpsilonBoundaryError();
 
 };
 

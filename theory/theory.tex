@@ -313,9 +313,30 @@ This methods is unconditional stable
 
 \subsection{Gauss-Legendre methods}
 
-Gauss-Legendre methods are implicit Runge-Kutta methods. The Gauss-legendre method of order two is also called implicit midpoint method.
-We don't decribe the details of Gauss-Legendre Methods. We only conclude some key points here.
+Gauss-Legendre methods are implicit Runge-Kutta methods.
 
+ The Gauss-legendre method of order two is also called implicit midpoint method.
+We don't decribe the details of Gauss-Legendre Methods. We only conclude some key points here.
+$$
+k_1 = - I h(t_1) (1 + c_{11} k_1\Delta t + c_{12} k_2\Delta t)
+$$
+$$
+k_2 = - I h(t_2) (1 + c_{21} k_1\Delta t + c_{22} k_2\Delta t)
+$$
+$$
+\psi(t+\Delta t) = (1+k_1\Delta t + k_2\Delta t) \psi(t)
+$$
+$k1$ is sovled as
+$$
+k_1 = A_1(1-c_{22} A_2\Delta t-c_{11}A_1\Delta t+(c_{22}c_{11}-c_{12}c_{21}) A_1A_2(\Delta t)^2)^{-1}(1+(-c_{22}+c_{12})A_2\Delta t)
+$$
+$$
+k_2 = A_2(1-c_{22}A_2\Delta t -c_{11}A_1\Delta t+(c_{22}c_{11}-c_{12}c_{21}) A_2A_1(\Delta t)^2)^{-1}(1+(-c_{11}+c_{21})A_1\Delta t)
+$$
+where $A_i=-Ih(t_i)$.
+
+
+When $h$ is time independent the evolution is simplified as:
 $$
 \psi(t + \Delta t) = (1 + 1/2 I \Delta t h)^{-1} (1 - 1/2 I \Delta t h) \psi(t)
 $$

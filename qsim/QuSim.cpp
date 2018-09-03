@@ -9,6 +9,7 @@
 #include "SplittingMethod2D.h"
 #include "SplittingMethod2DCUDA.h"
 #include "GaussLegendreMethod2D.h"
+#include "Perturbation1DImpl.h"
 #include "Cal.h"
 
 using std::abs;
@@ -341,3 +342,83 @@ Complex Solver1D::FinalPsiPrime()
 	return ((SolverImpl1D*)fImpl.get())->fPsiPrime[((SolverImpl1D*)fImpl.get())->fNPoints - 1];
 }
 
+QuPerturbation::QuPerturbation()
+{
+}
+
+QuPerturbation::~QuPerturbation()
+{
+}
+
+QuPerturbation1D::QuPerturbation1D()
+{
+}
+
+void QuPerturbation1D::init(std::function<Complex(Real)> const & v, Real x0, Real x1, size_t n, Real en, Real epsilon,
+	Real direction, SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+{
+	fImpl.reset(new QuPerturbation1DImpl());
+	((QuPerturbation1DImpl*)fImpl.get())->InitQuPerturbation1D(v, x0, x1, n, en, epsilon, direction, met, mass, hbar, opts);
+}
+
+PsiVector const & QuPerturbation1D::GetPsi()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fPsi;
+}
+
+std::vector<Real> const & QuPerturbation1D::GetV()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fV;
+}
+
+size_t QuPerturbation1D::GetNPoints()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fNx;
+}
+
+Real QuPerturbation1D::GetT()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fT;
+}
+
+void QuPerturbation1D::Compute()
+{
+	static_cast<QuPerturbation1DImpl*>(fImpl.get())->Compute();
+}
+
+Real QuPerturbation1D::GetR()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fR;
+}
+
+
+Real QuPerturbation1D::GetEnergy()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fE;
+}
+
+Real QuPerturbation1D::GetMomentumGap()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->GetMomentumGap();
+}
+
+Real QuPerturbation1D::GetEpsilonMomentumWidth()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->GetEpsilonMomentumWidth();
+}
+
+Real QuPerturbation1D::GetEnergyGap()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->GetEnergyGap();
+}
+
+
+Real QuPerturbation1D::GetEpsilon()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fEpsilon;
+}
+
+Real QuPerturbation1D::GetEpsilonBoundaryError()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->GetEpsilonBoundaryError();
+}

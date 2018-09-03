@@ -39,6 +39,7 @@ int main()
 	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda_batch10", cuda_10 },
 	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
 #endif
+#if 1
 	{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
 	{ SolverMethod::SplittingMethodO2 , "splitO2", std::map<std::string, std::string>() },
 	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },
@@ -47,6 +48,7 @@ int main()
 	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", std::map<std::string, std::string>() },
 	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO2", space_O2 },
 	{ SolverMethod::GaussLegendreO6 , "gaussO6+spaceO4", std::map<std::string, std::string>() },
+#endif
 	};
 
 	int dims[] = {
