@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "Perturbation1DImpl.h"
 
 void QuPerturbation1DImpl::InitQuPerturbation1D(std::function<Complex(Real)> const & v,
@@ -18,16 +19,38 @@ void QuPerturbation1DImpl::InitQuPerturbation1D(std::function<Complex(Real)> con
 
 	initPotential();
 
+	fPsiX.resize(fNx);
+	fPsiK.resize(fNx);
 	fPsi0X.resize(fNx);
-	fPsi1X.resize(fNx);
-	fPsi2X.resize(fNx);
-
-	fPsi0K.resize(fNx);
-	fPsi1K.resize(fNx);
-	fPsi2K.resize(fNx);
 	ftmp1.resize(fNx);
 	ftmp2.resize(fNx);
 
+	if (fMet == SolverMethod::BornSerise) {
+
+		{
+			int the_order = 1;
+			auto it = fOpts.find("order");
+			if (it != fOpts.end()) {
+				auto &order = it->second;
+				if (sscanf(order.c_str(), "%d", &the_order) < 1) {
+					throw std::runtime_error("not valid order");
+				}
+			}
+			const_cast<int&>(fOrder) = the_order;
+		}
+
+		{
+			int the_split = 1;
+			auto it = fOpts.find("split_n");
+			if (it != fOpts.end()) {
+				auto &split = it->second;
+				if (sscanf(split.c_str(), "%d", &the_split) < 1) {
+					throw std::runtime_error("not valid split");
+				}
+			}
+			const_cast<int&>(fSplit) = the_split;
+		}
+	}
 }
 
 void QuPerturbation1DImpl::initPotential()
@@ -43,16 +66,20 @@ void QuPerturbation1DImpl::initPotential()
 }
 
 
+
 void QuPerturbation1DImpl::Compute()
 {
 
-	if (true) {
+	if (fMet == SolverMethod::BornSerise) {
 		for (size_t i = 0; i < fNx; ++i) {
 			fPsi0X[i] = exp(fK0 * GetX(i) * I);
 		}
 
-		fFFT->Transform(fPsi0X.data(), fPsi0K.data());
-
+		auto add = [this](PsiVector const &a, PsiVector &b) {
+			for (size_t i = 0; i < fNx; ++i) {
+				b[i] += a[i];
+			}
+		};
 		auto VProd = [this](PsiVector const &psix, PsiVector &retx) {
 			for (size_t i = 0; i < fNx; ++i) {
 				retx[i] = fV[i] * psix[i];
@@ -80,24 +107,31 @@ void QuPerturbation1DImpl::Compute()
 			}
 		};
 
-		VProd(fPsi0X, ftmp1);
-		X2K(ftmp1, ftmp2);
-		G0Prod(ftmp2, fPsi1K);
-		K2X(fPsi1K, fPsi1X);
+		if (fSplit == 1) {
+			for (int i = 0; i < fOrder; ++i) {
+				if (i == 0) {
+					VProd(fPsi0X, ftmp1);
+				} else {
+					add(fPsi0X, fPsiX);
+					VProd(fPsiX, ftmp1);
+				}
+				X2K(ftmp1, ftmp2);
+				G0Prod(ftmp2, fPsiK);
+				K2X(fPsiK, fPsiX);
+			}
 
-		VProd(fPsi1X, ftmp1);
-		X2K(ftmp1, ftmp2);
-		G0Prod(ftmp2, fPsi2K);
-		K2X(fPsi2K, fPsi2X);
+		}
 
+
+		// post calculation
 		Real r = 0;
 		Real t = 0;
 		for (size_t i = fNx / 2; i < fNx; ++i) {
-			r += abs2(fPsi1K[i]);
+			r += abs2(fPsiK[i]);
 		}
 
 		for (size_t i = 0; i < fNx / 2; ++i) {
-			t += abs2(fPsi1K[i]);
+			t += abs2(fPsiK[i]);
 		}
 
 		fR = r * fEpsilon / fE * fDx / fNx;

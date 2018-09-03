@@ -41,6 +41,8 @@ enum class SolverMethod {
 	ExplicitRungeKuttaO4Classical,
 	ExplicitRungeKuttaO6Luther1967,
 
+	// Perburbation Method
+	BornSerise,
 };
 
 
@@ -199,6 +201,11 @@ struct QuPerturbation1D : QuPerturbation {
 	Real GetT();
 	Real GetR();
 	Real GetEnergy();
+	Real GetMomentum();
+
+	Real GetMaxEnergy();
+	Real GetMaxMomentum();
+
 	Real GetMomentumGap();
 	Real GetEpsilonMomentumWidth();
 	Real GetEnergyGap();

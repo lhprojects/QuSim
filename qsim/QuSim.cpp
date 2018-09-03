@@ -397,6 +397,21 @@ Real QuPerturbation1D::GetEnergy()
 	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fE;
 }
 
+Real QuPerturbation1D::GetMomentum()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->GetMomentum();
+}
+
+Real QuPerturbation1D::GetMaxEnergy()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->GetMaxEnergy();
+}
+
+Real QuPerturbation1D::GetMaxMomentum()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->GetMaxMomentum();
+}
+
 Real QuPerturbation1D::GetMomentumGap()
 {
 	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->GetMomentumGap();

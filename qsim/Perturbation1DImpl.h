@@ -5,7 +5,7 @@
 
 struct QuPerturbation1DImpl : QuPerturbationImpl {
 
-	QuPerturbation1DImpl() : fDx(), fX0(), fEpsilon(), fNx(), fK0() { }
+	QuPerturbation1DImpl() : fDx(), fX0(), fEpsilon(), fNx(), fK0(), fOrder(), fSplit() { }
 	virtual void InitQuPerturbation1D(
 		std::function<Complex(Real)> const & v,
 		Real x0,
@@ -22,6 +22,21 @@ struct QuPerturbation1DImpl : QuPerturbationImpl {
 	virtual void Compute();
 	Real GetX(ptrdiff_t i) const { return fX0 + fDx * i; }
 	void initPotential();
+
+	Real GetMaxEnergy()
+	{
+		return 0.5 * pow(2 * Pi / fDx * fHbar, 2) / fMass;
+	}
+
+	Real GetMaxMomentum()
+	{
+		return 2 * Pi / fDx * fHbar;
+	}
+
+	Real GetMomentum()
+	{
+		return 2 * Pi / fDx * fHbar;
+	}
 
 	Real GetMomentumGap()
 	{
@@ -45,6 +60,8 @@ struct QuPerturbation1DImpl : QuPerturbationImpl {
 	std::shared_ptr<FourierTransform> fInvFFT;
 
 
+	int const fOrder;
+	int const fSplit;
 	Real const fEpsilon;
 	size_t const fNx;
 	std::function<Complex(Real)> const fVFunc;
@@ -53,11 +70,8 @@ struct QuPerturbation1DImpl : QuPerturbationImpl {
 	Real const fK0;
 
 	PsiVector fPsi0X;
-	PsiVector fPsi1X;
-	PsiVector fPsi2X;
-	PsiVector fPsi0K;
-	PsiVector fPsi1K;
-	PsiVector fPsi2K;
+	PsiVector fPsiX;
+	PsiVector fPsiK;
 
 	PsiVector ftmp1;
 	PsiVector ftmp2;
