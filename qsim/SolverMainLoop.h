@@ -51,7 +51,6 @@ void SolverImpl1D:: LOOP_FUNC_NAME ()
 
 
 	if (fMethod == SolverMethod::ImplicitMidpointMethod) {
-		Real const OneFourthDxDx = 0.25 * fDx*fDx;
 		for (size_t i = 0; i < fNBins; ++i) {
 			Matrix tr;
 			Real a = e - vk * fV[i];
