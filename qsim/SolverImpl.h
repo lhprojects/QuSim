@@ -2,28 +2,9 @@
 
 #include "QuSim.h"
 #include "eigen/Eigen/Dense"
+#include "IVPSolverImpl.h"
 
-struct SolverImpl {
-
-	SolverImpl();
-	virtual ~SolverImpl() {}
-
-	void initSystem(
-		Real en,
-		Real mass,
-		Real hbar,
-		std::map<std::string, std::string> const &opts);
-
-	virtual void Calculate() = 0;
-
-	std::map<std::string, std::string> fOpts;
-	Real const fE;
-	Real const fMass;
-	Real const fHbar;
-
-};
-
-struct SolverImpl1D : SolverImpl {
+struct SolverImpl1D : IVPSolverImpl {
 
 	SolverImpl1D();
 
@@ -42,23 +23,19 @@ struct SolverImpl1D : SolverImpl {
 
 	void MainLoop();
 	void MainLoopSamllRoundError();
-	void Calculate() override;
+	void Compute() override;
 
 	std::function<Complex(Real)> fVFunc;
 	size_t fNPoints;
 	size_t fNBins;
 	Real fDx;
 	Real fX0;
-	Real fE;
 	Real fInitJ;
 	Real fFinalJ;
 	PsiVector fPsi;
 	PsiVector fPsiPrime;
-	SolverMethod fMethod;
 	bool fSmallRoundError;
 	std::vector<Real> fV;
-	Real fMass;
-	Real fHbar;
 	Real fV0;
 	Real fV1;
 

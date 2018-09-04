@@ -1,7 +1,6 @@
 
 #include "QuSim.h"
 #include "EvolverImpl.h"
-#include "SolverImpl.h"
 #include "SplittingMethod.h"
 #include "SplittingMethod1DCUDA.h"
 #include "EigenMethod.h"
@@ -9,6 +8,10 @@
 #include "SplittingMethod2D.h"
 #include "SplittingMethod2DCUDA.h"
 #include "GaussLegendreMethod2D.h"
+
+#include "IVPSolverImpl.h"
+#include "SolverImpl.h"
+
 #include "Perturbation1DImpl.h"
 #include "Cal.h"
 
@@ -262,7 +265,7 @@ Functor2DWrapper::~Functor2DWrapper()
 
 void Solver::Compute()
 {
-	return fImpl->Calculate();
+	return fImpl->Compute();
 }
 
 Solver::Solver()

@@ -279,6 +279,7 @@
     <ClCompile Include="..\qsim\FourierTransform.cpp" />
     <ClCompile Include="..\qsim\GaussLegendreMethod.cpp" />
     <ClCompile Include="..\qsim\GaussLegendreMethod2D.cpp" />
+    <ClCompile Include="..\qsim\IVPSolverImpl.cpp" />
     <ClCompile Include="..\qsim\Perturbation1DImpl.cpp" />
     <ClCompile Include="..\qsim\SolverImpl.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod.cpp" />
@@ -296,6 +297,7 @@
     <ClInclude Include="..\qsim\FourierTransform.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod2D.h" />
+    <ClInclude Include="..\qsim\IVPSolverImpl.h" />
     <ClInclude Include="..\qsim\kissfft.hh" />
     <ClInclude Include="..\qsim\Matrix2.h" />
     <ClInclude Include="..\qsim\PerturbationImpl.h" />

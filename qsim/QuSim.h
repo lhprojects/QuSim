@@ -48,7 +48,7 @@ enum class SolverMethod {
 
 struct Cal;
 struct EvolverImpl;
-struct SolverImpl;
+struct IVPSolverImpl;
 struct QuPerturbationImpl;
 
 struct FunctorWrapper
@@ -134,7 +134,7 @@ struct Solver {
 	~Solver();
 protected:
 	Solver();
-	std::shared_ptr<SolverImpl> fImpl;
+	std::shared_ptr<IVPSolverImpl> fImpl;
 };
 
 

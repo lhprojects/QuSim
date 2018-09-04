@@ -1,22 +1,6 @@
 #include "SolverImpl.h"
 #include "Matrix2.h"
 
-SolverImpl::SolverImpl() : fMass(0), fHbar(0), fE(0)
-{
-}
-
-void SolverImpl::initSystem(
-	Real en,
-	Real mass,
-	Real hbar,
-	std::map<std::string, std::string> const &opts)
-{
-	const_cast<Real&>(fE) = en;
-	const_cast<Real&>(fMass) = mass;
-	const_cast<Real&>(fHbar) = hbar;
-	const_cast<std::map<std::string, std::string>&>(fOpts) = opts;
-}
-
 
 SolverImpl1D::SolverImpl1D()
 {
@@ -29,13 +13,12 @@ void SolverImpl1D::initSystem1D(std::function<Complex(Real)> const & v,
 	Real mass, Real hbar,
 	std::map<std::string, std::string> const &opts)
 {
-	initSystem(en, mass, hbar, opts);
+	initSystem(en, mass, hbar, met, opts);
 
 	fSmallRoundError = true;
 	if (opts.find("small_round_error") != opts.end() && opts.find("small_round_error")->second == "0") {
 		fSmallRoundError = false;
 	}
-	fMethod = met;
 	fNPoints = n;
 	fNBins = n - 1;
 	fX0 = x0;
@@ -104,10 +87,6 @@ void SolverImpl1D::initSystem1D(std::function<Complex(Real)> const & v,
 	fPsi[0] = initPsi;
 	fPsiPrime[0] = initPsiPrime;
 
-	fMass = mass;
-	fHbar = hbar;
-	fE = en;
-
 	fTMat(0, 0) = 1;
 	fTMat(0, 1) = 0;
 	fTMat(1, 0) = 0;
@@ -129,7 +108,7 @@ typedef Mat2<Real> Matrix;
 #define SMALL_ROUND_ERROR
 #include "SolverMainLoop.h"
 
-void SolverImpl1D::Calculate()
+void SolverImpl1D::Compute()
 {
 
 	//          |  psi       |
