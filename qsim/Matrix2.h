@@ -70,7 +70,7 @@ struct Mat2 {
 
 	inline Mat2<Scalar> inverse() const
 	{
-		double det = Scalar(1) / (m11*m22 - m12 * m21);
+		Scalar det = Scalar(1) / (m11*m22 - m12 * m21);
 		return Mat2<Scalar>(m22*det, -m12 * det, -m21 * det, m11*det);
 	}
 
