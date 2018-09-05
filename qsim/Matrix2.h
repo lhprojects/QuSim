@@ -6,7 +6,7 @@
 template<class Scalar>
 struct ColVec2 {
 
-	ColVec2(double a, double b) : x(a), y(b) {}
+	ColVec2(Scalar a, Scalar b) : x(a), y(b) {}
 	Scalar &operator()(size_t i)
 	{
 		assert(i < 2);
@@ -30,7 +30,7 @@ struct Mat2Identity {
 
 template<class Scalar>
 struct Mat2IdentityK {
-	Mat2IdentityK(double k_) : k(k_) {}
+	Mat2IdentityK(Scalar k_) : k(k_) {}
 	Scalar k;
 };
 
