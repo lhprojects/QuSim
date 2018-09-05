@@ -24,6 +24,7 @@ struct SolverImpl1D : IVPSolverImpl {
 	void MainLoop();
 	void MainLoopSamllRoundError();
 	void Compute() override;
+	void CalculateFinalJFromPsi();
 
 	std::function<Complex(Real)> fVFunc;
 	size_t fNPoints;

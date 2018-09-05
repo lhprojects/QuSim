@@ -11,6 +11,7 @@
 
 #include "IVPSolverImpl.h"
 #include "SolverImpl.h"
+#include "ComplexPotentialIVPSolver1DImpl.h"
 
 #include "Perturbation1DImpl.h"
 #include "Cal.h"
@@ -286,7 +287,7 @@ void Solver1D::init(std::function<Complex(Real)> const & v,
 	Real mass, Real hbar,
 	std::map<std::string, std::string> const &opts)
 {
-	fImpl.reset(new SolverImpl1D());
+	fImpl.reset(new ComplexPotentialIVPSolver1DImpl());
 	((SolverImpl1D*)fImpl.get())->initSystem1D(v, x0, x1, n, en, initPsi, initPsiPrime, met, mass, hbar, opts);
 }
 

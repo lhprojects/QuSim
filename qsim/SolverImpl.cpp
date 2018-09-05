@@ -94,6 +94,9 @@ void SolverImpl1D::initSystem1D(std::function<Complex(Real)> const & v,
 
 	fV0 = fVFunc(x0).real();
 	fV1 = fVFunc(x1).real();
+
+	fInitJ = (std::conj(fPsi[0])*fPsiPrime[0] - fPsi[0] * std::conj(fPsiPrime[0])).imag();
+
 }
 
 //typedef Eigen::Matrix2d Matrix;
@@ -128,14 +131,13 @@ void SolverImpl1D::Compute()
 	//      Psi(x + dx) =  -------------------------- Psi(x)
 	//                       1 - 1/2 A(x + 1/2dx) dx
 
-	fInitJ = (std::conj(fPsi[0])*fPsiPrime[0] - fPsi[0] * std::conj(fPsiPrime[0])).imag();
 
 	if (fSmallRoundError)
 		MainLoopSamllRoundError();
 	else
 		MainLoop();
 
-	fFinalJ = (std::conj(fPsi[fNPoints-1])*fPsiPrime[fNPoints - 1] - fPsi[fNPoints - 1] * std::conj(fPsiPrime[fNPoints - 1])).imag();
+	CalculateFinalJFromPsi();
 
 	do {
 		Real T11 = fTMat(0, 0);
@@ -168,4 +170,9 @@ void SolverImpl1D::Compute()
 		fR = abs2(r);
 	} while (false);
 
+}
+
+void SolverImpl1D::CalculateFinalJFromPsi()
+{
+	fFinalJ = (std::conj(fPsi[fNPoints - 1])*fPsiPrime[fNPoints - 1] - fPsi[fNPoints - 1] * std::conj(fPsiPrime[fNPoints - 1])).imag();
 }

@@ -60,6 +60,9 @@
     <ClCompile Include="..\qsim\IVPSolverImpl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\ComplexPotentialIVPSolver1DImpl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\SplittingMethod2D.h">
@@ -120,6 +123,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\qsim\IVPSolverImpl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\ComplexPotentialIVPSolver1DImpl.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

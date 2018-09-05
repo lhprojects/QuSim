@@ -23,9 +23,10 @@ t=O3General[x/n,t];
 If[i==n-1, Return[t]]
 ];
 
+N[ExpandAll[O1Dn[x, 3]]]
 
 
-Fnl=1+I
+Fnl=1.+0.1 I
 WhatFuck[f_, x_, n_] := Re[f[x Fnl,n]]
 WhatFuck2[f_, x_] := Re[f[x Fnl]]
 rng=5;
@@ -51,4 +52,7 @@ WhatFuck[O1Dn, x, 16],
 WhatFuck[O1Dn, x, 1024]
 },
  {x,-rng,rng},PlotRange->{-10,10}, PlotLegends->"Expressions"]
+
+
+
 

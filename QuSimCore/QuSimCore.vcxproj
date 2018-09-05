@@ -275,6 +275,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\qsim\Cal.cpp" />
+    <ClCompile Include="..\qsim\ComplexPotentialIVPSolver1DImpl.cpp" />
     <ClCompile Include="..\qsim\EigenMethod.cpp" />
     <ClCompile Include="..\qsim\FourierTransform.cpp" />
     <ClCompile Include="..\qsim\GaussLegendreMethod.cpp" />
@@ -292,6 +293,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\Cal.h" />
+    <ClInclude Include="..\qsim\ComplexPotentialIVPSolver1DImpl.h" />
     <ClInclude Include="..\qsim\Dump.h" />
     <ClInclude Include="..\qsim\EigenMethod.h" />
     <ClInclude Include="..\qsim\FourierTransform.h" />

@@ -24,7 +24,7 @@ int main()
 	printf("R %lf\n", per.GetR());
 
 
-	printf("%10s | %10s %10s %10s %10s | %10s\n", "V0", "RO1", "RO2", "RO10", "RO1N3", "Exact");
+	printf("%10s | %10s %10s %10s %10s | %10s\n", "V0", "RO1", "RO2", "RO10", "RO3N4", "Exact");
 	for (int i = 0; i < 50; ++i) {
 		
 		Real v0 = 0.01 + 0.05*i;
@@ -56,7 +56,7 @@ int main()
 		QuPerturbation1D per4;
 		std::map<std::string, std::string> o4;
 		o4["order"] = "3";
-		o4["split_n"] = "4";
+		o4["split_n"] = "3";
 		per4.init(vfunc, -5000, 5000, 200000, 0.5, 0.002,
 			1, SolverMethod::BornSerise, 1, 1, o4);
 		per4.Compute();
