@@ -1,10 +1,16 @@
 #include "../qsim/QuSim.h"
 
-int main()
+
+void test1()
 {
 
+	Solver1D solver;
+	solver.init(FunctorWrapper("0.0001*exp(-x*x)"), -10, 10, 20000, 0.5, 1, I,
+		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, std::map<std::string, std::string>());
+	solver.Compute();
+
 	QuPerturbation1D per;
-	per.init(FunctorWrapper("0.0001*exp(-x*x)"), -5000, 5000, 200000, 0.5, 0.001,
+	per.init(FunctorWrapper("exp(-x*x)"), -5000, 5000, 200000, 0.5, 0.001,
 		1, SolverMethod::BornSerise, 1, 1, std::map<std::string, std::string>());
 
 	printf("Max MOmentum %lf\n", per.GetMaxMomentum());
@@ -21,14 +27,17 @@ int main()
 	printf("Epsilon Boundary Error %lf\n", per.GetEpsilonBoundaryError());
 
 	per.Compute();
-	printf("R %lf\n", per.GetR());
+	printf("R %g (Exact %g)\n", per.GetR(), solver.GetR()/(0.0001*0.0001));
 
+}
 
+void test2()
+{
 	printf("%10s | %10s %10s %10s %10s | %10s\n", "V0", "RO1", "RO2", "RO10", "RO3N4", "Exact");
 	for (int i = 0; i < 50; ++i) {
-		
+
 		Real v0 = 0.01 + 0.05*i;
-		auto vfunc = [&](Real x) { return v0*exp(-x * x); };
+		auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
 		Solver1D solver;
 		solver.init(vfunc, -10, 10, 20000, 0.5, 1, I,
 			SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, std::map<std::string, std::string>());
@@ -61,9 +70,15 @@ int main()
 			1, SolverMethod::BornSerise, 1, 1, o4);
 		per4.Compute();
 
-		printf("%10lf | %10lf %10lf %10f %10lf | %10lf\n", 
+		printf("%10lf | %10lf %10lf %10f %10lf | %10lf\n",
 			v0, per1.GetR(), per2.GetR(), per3.GetR(), per4.GetR(), solver.GetR());
 	}
+
+}
+int main()
+{
+	test1();
+	test2();
 
 }
 
