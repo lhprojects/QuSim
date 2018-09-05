@@ -32,6 +32,7 @@ enum CalExprType {
 	CALE_TAN,
 	CALE_EXP,
 	CALE_TANH,
+	CALE_SINH,
 
 	CALE_ASIN,
 	CALE_ACOS,
@@ -185,6 +186,8 @@ CalExpr *parseFunc(char const *&s)
 				type = CALE_EXP;
 			} else if (name == "tanh") {
 				type = CALE_TANH;
+			} else if (name == "sinh") {
+				type = CALE_SINH;
 			} else if (name == "log") {
 				type = CALE_LOG;
 			} else if (name == "atanh") {
@@ -201,7 +204,7 @@ CalExpr *parseFunc(char const *&s)
 
 			if (type == CALE_SIN || type == CALE_COS || type == CALE_TAN ||
 				type == CALE_ASIN || type == CALE_ACOS || type == CALE_ATAN ||
-				type == CALE_EXP || type == CALE_TANH ||
+				type == CALE_EXP || type == CALE_TANH || type == CALE_SINH ||
 				type == CALE_LOG || type == CALE_ATANH ||
 				type == CALE_ABS || type == CALE_SQRT) {
 				++s;
@@ -501,6 +504,7 @@ void CalExpr::Gen(Cal *cal, StackUsage &nstack)
 		break;
 	case CALE_EXP:
 	case CALE_TANH:
+	case CALE_SINH:
 	case CALE_LOG:
 	case CALE_ATANH:
 	case CALE_SIN:
@@ -636,6 +640,9 @@ CCom Cal::RunPseudoCode()
 			break;
 		case CALE_TANH:
 			stack[0] = tanh(stack[0]);
+			break;
+		case CALE_SINH:
+			stack[0] = sinh(stack[0]);
 			break;
 		case CALE_LOG:
 			stack[0] = log(stack[0]);
