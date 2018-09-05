@@ -19,7 +19,7 @@ struct ColVec2 {
 		if (i == 0) return x;
 		else return y;
 	}
-private:
+
 	Scalar x;
 	Scalar y;
 };
