@@ -59,12 +59,12 @@ void ScatteringProblemSolverInverseMatrix1D::InitScatteringSolver1D(std::functio
 	std::vector<Eigen::Triplet<Complex> > elems;
 	for (ptrdiff_t i = 0; i < (ptrdiff_t)fNx; ++i) {
 
-		Real lambda = 2 * Pi*sqrt(2 * fE*fMass) / fHbar;
+		Real lambda = 2 * Pi / sqrt(2 * fE*fMass) * fHbar;
 		Real x = GetX(i);
 
 		Real xx;
-		if (i < (ptrdiff_t)fNx / 2) xx = (x - fX0) / (3 * lambda);
-		else  xx = (x - (fX0 + fDx * fNx)) / (3 * lambda);
+		if (i < (ptrdiff_t)fNx / 2) xx = (x - fX0) / (4 * lambda);
+		else  xx = (x - (fX0 + fDx * fNx)) / (4 * lambda);
 		Complex asb = -I * 1.5*fE* exp(-xx * xx);
 
 		Real t = fHbar * fHbar / (2 * fMass) * 1 / (fDx*fDx);
