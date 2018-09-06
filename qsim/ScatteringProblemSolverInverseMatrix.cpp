@@ -17,6 +17,38 @@ void ScatteringProblemSolverInverseMatrix1D::InitScatteringSolver1D(std::functio
 		const_cast<int&>(fOrder) = order;
 	}
 
+	{
+		int solver = cLU;
+		auto it = opts.find("matrix_solver");
+		if (it != opts.end()) {
+			if (it->second == "LU") {
+				solver = cLU;
+			} else if (it->second == "BiCGSTAB") {
+				solver = cBiCGSTAB;
+			} else {
+				throw std::runtime_error("can't parse solver");
+			}
+		}
+		const_cast<int&>(fMatrixSolver) = solver;
+	}
+
+	{
+		Preconditioner prc = Preconditioner::DiagonalPreconditioner;
+		auto it = opts.find("preconditioner");
+		if (it != opts.end()) {
+			if (it->second == "DiagonalPreconditioner") {
+				prc = Preconditioner::DiagonalPreconditioner;
+			} else if (it->second == "IdentityPreconditioner") {
+				prc = Preconditioner::IdentityPreconditioner;
+			} else if (it->second == "IncompleteLUT") {
+				prc = Preconditioner::IncompleteLUT;
+			} else {
+				throw std::runtime_error("can't parse preconditioner");
+			}
+		}
+		const_cast<Preconditioner&>(fPreconditioner) = prc;
+	}
+
 	auto fold = [&](ptrdiff_t i) -> ptrdiff_t {
 		if (i < 0) i += fNx;
 		else if (i >= (ptrdiff_t)fNx) i -= fNx;
@@ -31,8 +63,8 @@ void ScatteringProblemSolverInverseMatrix1D::InitScatteringSolver1D(std::functio
 		Real x = GetX(i);
 
 		Real xx;
-		if (i < (ptrdiff_t)fNx / 2) xx = (x - fX0) / (2.5 * lambda);
-		else  xx = (x - (fX0 + fDx * fNx)) / (2.5 * lambda);
+		if (i < (ptrdiff_t)fNx / 2) xx = (x - fX0) / (3 * lambda);
+		else  xx = (x - (fX0 + fDx * fNx)) / (3 * lambda);
 		Complex asb = -I * 1.5*fE* exp(-xx * xx);
 
 		Real t = fHbar * fHbar / (2 * fMass) * 1 / (fDx*fDx);
@@ -72,18 +104,43 @@ void ScatteringProblemSolverInverseMatrix1D::InitScatteringSolver1D(std::functio
 
 void ScatteringProblemSolverInverseMatrix1D::Compute()
 {
-	fSparseLU.compute(fEMinusH);
+	if (fMatrixSolver == cLU) {
+		fSparseLU.compute(fEMinusH);
+	} else if (fMatrixSolver == cBiCGSTAB) {
+		if (fPreconditioner == Preconditioner::DiagonalPreconditioner) {
+			fBiCGSTAB_diag.compute(fEMinusH);
+		} else if (fPreconditioner == Preconditioner::IncompleteLUT) {
+			fBiCGSTAB_ilu.compute(fEMinusH);
+		} else if (fPreconditioner == Preconditioner::IdentityPreconditioner) {
+			fBiCGSTAB_ident.compute(fEMinusH);
+		}
+	}
 	
 	Eigen::VectorXcd v;
-	v.resize(fNx);
-	
+	v.resize(fNx);	
 	for (size_t i = 0; i < fNx; ++i) v(i) = fPsi0X[i];
 
 	for (size_t i = 0; i < fNx; ++i) {
 		v(i) *= fV[i];
 	}
 
-	Eigen::VectorXcd v1 = fSparseLU.solve(v);
+	Eigen::VectorXcd v1;
+	
+	if (fMatrixSolver == cLU) {
+		v1 = fSparseLU.solve(v);
+	} else if (fMatrixSolver == cBiCGSTAB) {
+		if (fPreconditioner == Preconditioner::DiagonalPreconditioner) {
+			fBiCGSTAB_diag.setMaxIterations(10000);
+			v1 = fBiCGSTAB_diag.solve(v);
+		} else if (fPreconditioner == Preconditioner::IncompleteLUT) {
+			fBiCGSTAB_ilu.setMaxIterations(10000);
+			v1 = fBiCGSTAB_ilu.solve(v);
+		} else if (fPreconditioner == Preconditioner::IdentityPreconditioner) {
+			fBiCGSTAB_ilu.setMaxIterations(10000);
+			v1 = fBiCGSTAB_ident.solve(v);
+		}
+	}
+
 	for (size_t i = 0; i < fNx; ++i) fPsiX[i] = v1(i);
 
 	fR = abs2(fPsiX[fNx/2 - fNx/8]);

@@ -16,8 +16,8 @@ void test0()
 
 	for (int i = 0; i < 10; ++i) {
 
-		double x0 = -100;
-		double x1 = 100;
+		double x0 = -150;
+		double x1 = 150;
 		size_t n = 500 + 500 * i;
 
 		std::map<std::string, std::string> space_o2;
@@ -42,11 +42,72 @@ void test0()
 			SolverMethod::MatrixInverse, 1, 1, space_o6);
 		inv3.Compute();
 
-		auto geti = [](double x) -> size_t {  return (size_t)((x - -100) / 200 * 4000); };
+		auto geti = [&](double x) -> size_t {  return (size_t)((x - x0) / (x1 - x0) * n); };
 		printf("%10.2E %10.2E %10.2E\n",
-			inv1.GetR() - solver.GetR(),
-			abs(inv2.GetR() - solver.GetR()),
-			abs(inv3.GetR() - solver.GetR()));
+			abs2(inv1.GetPsi()[geti(-10)]) - solver.GetR(),
+			abs2(inv2.GetPsi()[geti(-10)]) - solver.GetR(),
+			abs2(inv3.GetPsi()[geti(-10)]) - solver.GetR());
+	}
+}
+
+void test10()
+{
+
+	printf("Test inverse matrix method\n");
+	double R = 1 - 0.1355284179587569045304922;
+
+	for (int i = 0; i < 10; ++i) {
+
+		double x0 = -150;
+		double x1 = 150;
+		size_t n = 500 + 500 * i;
+
+		std::map<std::string, std::string> opt1;
+		opt1["space_order"] = "6";
+		opt1["matrix_solver"] = "LU";
+
+		std::map<std::string, std::string> opt2;
+		opt2["space_order"] = "6";
+		opt2["matrix_solver"] = "BiCGSTAB";
+		opt2["preconditioner"] = "DiagonalPreconditioner";
+
+		std::map<std::string, std::string> opt3;
+		opt3["space_order"] = "6";
+		opt3["matrix_solver"] = "BiCGSTAB";
+		opt3["preconditioner"] = "IdentityPreconditioner";
+
+		std::map<std::string, std::string> opt4;
+		opt4["space_order"] = "6";
+		opt4["matrix_solver"] = "BiCGSTAB";
+		opt4["preconditioner"] = "IncompleteLUT";
+
+		QuScatteringInverseMatrix1D inv1;
+		inv1.init(FunctorWrapper("1*exp(-x*x)"), x0, x1, n, 0.5, 1,
+			SolverMethod::MatrixInverse, 1, 1, opt1);
+		inv1.Compute();
+
+		QuScatteringInverseMatrix1D inv2;
+		inv2.init(FunctorWrapper("1*exp(-x*x)"), x0, x1, n, 0.5, 1,
+			SolverMethod::MatrixInverse, 1, 1, opt2);
+		inv2.Compute();
+
+		QuScatteringInverseMatrix1D inv3;
+		inv3.init(FunctorWrapper("1*exp(-x*x)"), x0, x1, n, 0.5, 1,
+			SolverMethod::MatrixInverse, 1, 1, opt3);
+		inv3.Compute();
+
+		QuScatteringInverseMatrix1D inv4;
+		inv4.init(FunctorWrapper("1*exp(-x*x)"), x0, x1, n, 0.5, 1,
+			SolverMethod::MatrixInverse, 1, 1, opt4);
+		inv4.Compute();
+
+
+		auto geti = [&](double x) -> size_t {  return (size_t)((x - x0) / (x1 - x0) * n); };
+		printf("%10.2E %10.2E %10.2E %10.2E\n",
+			abs2(inv1.GetPsi()[geti(-10)]) - R,
+			abs2(inv2.GetPsi()[geti(-10)]) - R,
+			abs2(inv3.GetPsi()[geti(-10)]) - R,
+			abs2(inv4.GetPsi()[geti(-10)]) - R);
 	}
 }
 
@@ -180,6 +241,7 @@ void test3()
 int main()
 {
 	test0();
+	test10();
 	test1();
 	test2();
 	test3();
