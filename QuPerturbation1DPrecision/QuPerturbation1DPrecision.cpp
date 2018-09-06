@@ -4,20 +4,50 @@
 void test0()
 {
 
-	printf("test inverse matrix method\n");
+	printf("Test inverse matrix method\n");
 	Solver1D solver;
-	solver.init(FunctorWrapper("1*exp(-x*x)"), -10, 10, 10000, 0.5, 1, I,
+	std::map<std::string, std::string> small;
+	small["small_round_error"] = "1";
+	solver.init(FunctorWrapper("1*exp(-x*x)"), -10, 10, 20000, 0.5, 1, I,
 		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, std::map<std::string, std::string>());
 	solver.Compute();
+	double R = 1 - 0.1355284179587569045304922;
+	printf("%.2E\n", solver.GetR() - R);
 
-	QuScatteringInverseMatrix1D inv;
-	inv.init(FunctorWrapper("1*exp(-x*x)"), -100, 100, 4000, 0.5, 1,
-		SolverMethod::BornSerise, 1, 1, std::map<std::string, std::string>());
-	inv.Compute();
-	auto geti = [](double x) -> size_t {  return (size_t)((x - -100) / 200 * 4000); };
-	printf("R %.17g (Exact %.17g)\n", abs2(inv.GetPsi()[geti(-10.)]), solver.GetR());
-	printf("T %.17g (Exact %.17g)\n", inv.GetT(), solver.GetT());
+	for (int i = 0; i < 10; ++i) {
 
+		double x0 = -100;
+		double x1 = 100;
+		size_t n = 500 + 500 * i;
+
+		std::map<std::string, std::string> space_o2;
+		space_o2["space_order"] = "2";
+		std::map<std::string, std::string> space_o4;
+		space_o4["space_order"] = "4";
+		std::map<std::string, std::string> space_o6;
+		space_o6["space_order"] = "6";
+
+		QuScatteringInverseMatrix1D inv1;
+		inv1.init(FunctorWrapper("1*exp(-x*x)"), x0, x1, n, 0.5, 1,
+			SolverMethod::MatrixInverse, 1, 1, space_o2);
+		inv1.Compute();
+
+		QuScatteringInverseMatrix1D inv2;
+		inv2.init(FunctorWrapper("1*exp(-x*x)"), x0, x1, n, 0.5, 1,
+			SolverMethod::MatrixInverse, 1, 1, space_o4);
+		inv2.Compute();
+
+		QuScatteringInverseMatrix1D inv3;
+		inv3.init(FunctorWrapper("1*exp(-x*x)"), x0, x1, n, 0.5, 1,
+			SolverMethod::MatrixInverse, 1, 1, space_o6);
+		inv3.Compute();
+
+		auto geti = [](double x) -> size_t {  return (size_t)((x - -100) / 200 * 4000); };
+		printf("%10.2E %10.2E %10.2E\n",
+			inv1.GetR() - solver.GetR(),
+			abs(inv2.GetR() - solver.GetR()),
+			abs(inv3.GetR() - solver.GetR()));
+	}
 }
 
 

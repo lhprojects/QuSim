@@ -6,6 +6,7 @@
 
 struct ScatteringProblemSolverInverseMatrix1D : ScatteringSolver1DImpl {
 
+	ScatteringProblemSolverInverseMatrix1D() : fOrder() { }
 	void InitScatteringSolver1D(
 		std::function<Complex(Real)> const & v,
 		Real x0,
@@ -19,7 +20,7 @@ struct ScatteringProblemSolverInverseMatrix1D : ScatteringSolver1DImpl {
 		std::map<std::string, std::string> const &opts) override;
 
 	void Compute() override;
-
+	int const fOrder;
 	Eigen::SparseMatrix<Complex> fEMinusH;
 	Eigen::SparseLU< Eigen::SparseMatrix<Complex> > fSparseLU;
 
