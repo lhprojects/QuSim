@@ -62,10 +62,34 @@ void ScatteringProblemSolverInverseMatrix1D::InitScatteringSolver1D(std::functio
 		Real lambda = 2 * Pi / sqrt(2 * fE*fMass) * fHbar;
 		Real x = GetX(i);
 
-		Real xx;
-		if (i < (ptrdiff_t)fNx / 2) xx = (x - fX0) / (4 * lambda);
-		else  xx = (x - (fX0 + fDx * fNx)) / (4 * lambda);
-		Complex asb = -I * 1.5*fE* exp(-xx * xx);
+		Complex asb = 0;
+
+		if (true) {
+
+			if (4 * lambda * 4 * 2 > fNx *fDx) {
+				throw std::runtime_error("too small size of to fill absorbtion layer");
+			}
+			Real xx;
+			if (i < (ptrdiff_t)fNx / 2) xx = (x - fX0) / (4 * lambda);
+			else  xx = ((fX0 + fDx * fNx) - x) / (4 * lambda);
+			asb = -I * 1.5 *fE* exp(-xx*xx);
+		} else {
+			Real xx = 0;
+			Real L = 100 / fK0;
+			if (2 * L > fNx *fDx) {
+				throw std::runtime_error("too small size of to fill absorbtion layer");
+			}
+			if (x - fX0 < L) xx = fX0 + L - x;
+			else if (x > fX0 + fNx * fDx - L) xx = x - (fX0 + fNx * fDx - L);
+
+			if (xx > 0) {
+				Real alpha = fK0 / 3;
+				Real alx = alpha * xx;
+				asb = -0.5*fMass*fHbar*fHbar*alpha * alpha*(6 - alx + 2.*I*fK0*xx)*pow(alx, 6 - 1);
+				asb /= 1 + alx * (1 + alx / 2 * (1 + alx / 3 * (1 + alx / 4 * (1 + alx / 5 * (1 + alx / 6)))));
+				asb /= (6 * 5 * 4 * 3 * 2 * 1);
+			}
+		}
 
 		Real t = fHbar * fHbar / (2 * fMass) * 1 / (fDx*fDx);
 		Complex dig = fE - (fV[i] + asb);
