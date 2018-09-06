@@ -14,6 +14,7 @@
 #include "ComplexPotentialIVPSolver1DImpl.h"
 
 #include "Perturbation1DImpl.h"
+#include "ScatteringProblemSolverInverseMatrix.h"
 #include "Cal.h"
 
 using std::abs;
@@ -346,13 +347,86 @@ Complex Solver1D::FinalPsiPrime()
 	return ((SolverImpl1D*)fImpl.get())->fPsiPrime[((SolverImpl1D*)fImpl.get())->fNPoints - 1];
 }
 
-QuPerturbation::QuPerturbation()
+
+
+
+
+QuScatteringProblemSolver::QuScatteringProblemSolver()
 {
 }
 
-QuPerturbation::~QuPerturbation()
+QuScatteringProblemSolver::~QuScatteringProblemSolver()
 {
 }
+
+void QuScatteringProblemSolver::Compute()
+{
+	static_cast<ScatteringSolverImpl*>(fImpl.get())->Compute();
+}
+
+
+
+
+
+
+PsiVector const & QuScatteringProblemSolver1D::GetPsi()
+{
+	return static_cast<ScatteringSolver1DImpl*>(fImpl.get())->fPsiX;
+}
+
+std::vector<Real> const & QuScatteringProblemSolver1D::GetV()
+{
+	return static_cast<ScatteringSolver1DImpl*>(fImpl.get())->fV;
+}
+
+size_t QuScatteringProblemSolver1D::GetNPoints()
+{
+	return static_cast<ScatteringSolver1DImpl*>(fImpl.get())->fNx;
+}
+
+Real QuScatteringProblemSolver1D::GetT()
+{
+	return static_cast<ScatteringSolver1DImpl*>(fImpl.get())->fT;
+}
+
+
+Real QuScatteringProblemSolver1D::GetR()
+{
+	return static_cast<ScatteringSolver1DImpl*>(fImpl.get())->fR;
+}
+
+
+Real QuScatteringProblemSolver1D::GetEnergy()
+{
+	return static_cast<ScatteringSolver1DImpl*>(fImpl.get())->fE;
+}
+
+Real QuScatteringProblemSolver1D::GetMomentum()
+{
+	return static_cast<ScatteringSolver1DImpl*>(fImpl.get())->GetMomentum();
+}
+
+
+
+
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+/*                    QuScatteringInverseMatrix1D                          */
+void QuScatteringInverseMatrix1D::init(std::function<Complex(Real)> const & v, Real x0, Real x1, size_t n, Real en, 
+	Real direction, SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+{
+
+	fImpl.reset(new ScatteringProblemSolverInverseMatrix1D());
+	static_cast<ScatteringProblemSolverInverseMatrix1D*>(fImpl.get())->InitScatteringSolver1D(v, x0, x1, n, en, direction, met, mass, hbar, opts);
+
+}
+/*                    QuScatteringInverseMatrix1D                          */
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+/*                    QuPerturbation1D                          */
 
 QuPerturbation1D::QuPerturbation1D()
 {
@@ -362,49 +436,9 @@ void QuPerturbation1D::init(std::function<Complex(Real)> const & v, Real x0, Rea
 	Real direction, SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
 {
 	fImpl.reset(new QuPerturbation1DImpl());
-	((QuPerturbation1DImpl*)fImpl.get())->InitQuPerturbation1D(v, x0, x1, n, en, epsilon, direction, met, mass, hbar, opts);
+	static_cast<QuPerturbation1DImpl*>(fImpl.get())->InitPerturbation1D(v, x0, x1, n, en, epsilon, direction, met, mass, hbar, opts);
 }
 
-PsiVector const & QuPerturbation1D::GetPsi()
-{
-	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fPsi;
-}
-
-std::vector<Real> const & QuPerturbation1D::GetV()
-{
-	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fV;
-}
-
-size_t QuPerturbation1D::GetNPoints()
-{
-	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fNx;
-}
-
-Real QuPerturbation1D::GetT()
-{
-	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fT;
-}
-
-void QuPerturbation1D::Compute()
-{
-	static_cast<QuPerturbation1DImpl*>(fImpl.get())->Compute();
-}
-
-Real QuPerturbation1D::GetR()
-{
-	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fR;
-}
-
-
-Real QuPerturbation1D::GetEnergy()
-{
-	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->fE;
-}
-
-Real QuPerturbation1D::GetMomentum()
-{
-	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->GetMomentum();
-}
 
 Real QuPerturbation1D::GetMaxEnergy()
 {
@@ -441,3 +475,5 @@ Real QuPerturbation1D::GetEpsilonBoundaryError()
 {
 	return static_cast<QuPerturbation1DImpl*>(fImpl.get())->GetEpsilonBoundaryError();
 }
+/*                    QuPerturbation1D                          */
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

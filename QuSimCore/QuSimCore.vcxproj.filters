@@ -63,6 +63,12 @@
     <ClCompile Include="..\qsim\ComplexPotentialIVPSolver1DImpl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\ScatteringSolverImpl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\SplittingMethod2D.h">
@@ -116,9 +122,6 @@
     <ClInclude Include="..\qsim\SolverMainLoop.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\qsim\PerturbationImpl.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\qsim\Perturbation1DImpl.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -126,6 +129,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\qsim\ComplexPotentialIVPSolver1DImpl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\ScatteringSolverImpl.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -43,13 +43,14 @@ enum class SolverMethod {
 
 	// Perburbation Method
 	BornSerise,
+	MatrixInverse
 };
 
 
 struct Cal;
 struct EvolverImpl;
 struct IVPSolverImpl;
-struct QuPerturbationImpl;
+struct ScatteringSolverImpl;
 
 struct FunctorWrapper
 {
@@ -169,15 +170,46 @@ struct Solver1D : Solver {
 
 };
 
-struct QuPerturbation {
-	~QuPerturbation();
+struct QuScatteringProblemSolver {
+	virtual ~QuScatteringProblemSolver();
+	void Compute();
 protected:
-	QuPerturbation();
-	std::shared_ptr<QuPerturbationImpl> fImpl;
+	QuScatteringProblemSolver();
+	std::shared_ptr<ScatteringSolverImpl> fImpl;
 
 };
 
-struct QuPerturbation1D : QuPerturbation {
+struct QuScatteringProblemSolver1D : QuScatteringProblemSolver {
+
+	PsiVector const &GetPsi();
+	std::vector<Real> const &GetV();
+
+	size_t GetNPoints();
+	Real GetT();
+	Real GetR();
+	Real GetEnergy();
+	Real GetMomentum();
+
+};
+
+struct QuScatteringInverseMatrix1D : QuScatteringProblemSolver1D {
+
+	void init(
+		std::function<Complex(Real)> const & v,
+		Real x0,
+		Real x1,
+		size_t n,
+		Real en,
+		Real direction,
+		SolverMethod met,
+		Real mass,
+		Real hbar,
+		std::map<std::string, std::string> const &opts);
+
+};
+
+
+struct QuPerturbation1D : QuScatteringProblemSolver1D {
 
 	QuPerturbation1D();
 	void init(
@@ -192,16 +224,6 @@ struct QuPerturbation1D : QuPerturbation {
 		Real mass,
 		Real hbar,
 		std::map<std::string, std::string> const &opts);
-
-	PsiVector const &GetPsi();
-	std::vector<Real> const &GetV();
-
-	size_t GetNPoints();
-	void Compute();
-	Real GetT();
-	Real GetR();
-	Real GetEnergy();
-	Real GetMomentum();
 
 	Real GetMaxEnergy();
 	Real GetMaxMomentum();

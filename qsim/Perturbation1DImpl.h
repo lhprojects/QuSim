@@ -1,12 +1,13 @@
 #pragma once
 
-#include "PerturbationImpl.h"
+#include "ScatteringSolverImpl.h"
 #include "FourierTransform.h"
 
-struct QuPerturbation1DImpl : QuPerturbationImpl {
+struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 
-	QuPerturbation1DImpl() : fDx(), fX0(), fEpsilon(), fNx(), fK0(), fOrder(), fSplit() { }
-	virtual void InitQuPerturbation1D(
+	QuPerturbation1DImpl() : fEpsilon(), fOrder(), fSplit(), fPreconditional(), fAbsorbtion() { }
+
+	virtual void InitPerturbation1D(
 		std::function<Complex(Real)> const & v,
 		Real x0,
 		Real x1,
@@ -19,9 +20,7 @@ struct QuPerturbation1DImpl : QuPerturbationImpl {
 		Real hbar,
 		std::map<std::string, std::string> const &opts);
 
-	virtual void Compute();
-	Real GetX(ptrdiff_t i) const { return fX0 + fDx * i; }
-	void initPotential();
+	void Compute() override;
 
 	Real GetMaxEnergy()
 	{
@@ -29,11 +28,6 @@ struct QuPerturbation1DImpl : QuPerturbationImpl {
 	}
 
 	Real GetMaxMomentum()
-	{
-		return 2 * Pi / fDx * fHbar;
-	}
-
-	Real GetMomentum()
 	{
 		return 2 * Pi / fDx * fHbar;
 	}
@@ -56,29 +50,22 @@ struct QuPerturbation1DImpl : QuPerturbationImpl {
 	{
 		return exp(-(fNx*fDx)*sqrt(2*fMass*fE)*fEpsilon/fE);
 	}
+
+
 	std::shared_ptr<FourierTransform> fFFT;
 	std::shared_ptr<FourierTransform> fInvFFT;
 
-
 	int const fOrder;
 	int const fSplit;
-	Real const fEpsilon;
-	size_t const fNx;
-	std::function<Complex(Real)> const fVFunc;
-	Real const fX0;
-	Real const fDx;
-	Real const fK0;
+	bool const fPreconditional;
+	bool const fAbsorbtion;
 
-	PsiVector fPsi0X;
+	Real const fEpsilon;
+
 	PsiVector fPsiX;
 	PsiVector fPsiK;
 
 	PsiVector ftmp1;
 	PsiVector ftmp2;
-
-	PsiVector fPsi;
-	std::vector<Real> fV;
-	Real fT;
-	Real fR;
 
 };
