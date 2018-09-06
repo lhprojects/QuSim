@@ -35,17 +35,25 @@ void ScatteringProblemSolverInverseMatrix1D::Compute()
 			Eigen::Triplet<Complex> tr1((int)i, (int)fold(i - 1), t);
 			elems.push_back(tr1);
 
-			Eigen::Triplet<Complex> tr0((int)i, (int)i, fE - 2 * t - (fV[i] + asb));
+			Eigen::Triplet<Complex> tr0((int)i, (int)i, -2*t + dig);
 			elems.push_back(tr0);
 
 			Eigen::Triplet<Complex> tr2((int)i, (int)fold(i + 1), t);
 			elems.push_back(tr2);
-		} else {
+		} else if(false) {
 			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i - 2), -1. / 12 * t));
 			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i - 1), 16. / 12 * t));
 			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i + 0), -30. / 12 * t + dig));
 			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i + 1), 16. / 12 * t));
 			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i + 2), -1. / 12 * t));
+		} else {
+			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i - 3), 2. / 180 * t));
+			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i - 2), -27. / 180 * t));
+			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i - 1), 270. / 180 * t));
+			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i + 0), -490. / 180 * t + dig));
+			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i + 1), 270. / 180 * t));
+			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i + 2), -27. / 180 * t));
+			elems.push_back(Eigen::Triplet<Complex>((int)i, (int)fold(i + 3), 2. / 180 * t));
 		}
 
 	}
