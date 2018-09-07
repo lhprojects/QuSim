@@ -288,7 +288,10 @@ void Solver1D::init(std::function<Complex(Real)> const & v,
 	Real mass, Real hbar,
 	std::map<std::string, std::string> const &opts)
 {
-	fImpl.reset(new ComplexPotentialIVPSolver1DImpl());
+	if (opts.find("complex_potential") != opts.end() && opts.find("complex_potential")->second != "0")
+		fImpl.reset(new ComplexPotentialIVPSolver1DImpl());
+	else
+		fImpl.reset(new SolverImpl1D());
 	((SolverImpl1D*)fImpl.get())->initSystem1D(v, x0, x1, n, en, initPsi, initPsiPrime, met, mass, hbar, opts);
 }
 
