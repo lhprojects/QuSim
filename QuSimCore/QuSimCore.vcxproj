@@ -316,6 +316,7 @@
     <ClInclude Include="..\qsim\SplittingMethod2DCUDA.h" />
     <ClInclude Include="..\qsim\SplittingMethod1DCUDA.h" />
     <ClInclude Include="..\qsim\SplittingMethodGeneralCUDA.h" />
+    <ClInclude Include="..\qsim\View.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\fftw-3.3.2\fftw-3.3-libs\libfftw-3.3\libfftw-3.3.vcxproj">

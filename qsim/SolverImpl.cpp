@@ -87,6 +87,7 @@ void SolverImpl1D::initSystem1D(std::function<Complex(Real)> const & v,
 	fPsi[0] = initPsi;
 	fPsiPrime[0] = initPsiPrime;
 
+	fTMat.resize(2, 2);
 	fTMat(0, 0) = 1;
 	fTMat(0, 1) = 0;
 	fTMat(1, 0) = 0;

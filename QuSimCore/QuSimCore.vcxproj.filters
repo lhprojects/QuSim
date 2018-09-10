@@ -137,5 +137,8 @@
     <ClInclude Include="..\qsim\ScatteringSolverImpl.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\qsim\View.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

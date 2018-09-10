@@ -42,6 +42,6 @@ struct SolverImpl1D : IVPSolverImpl {
 
 	Real fT;
 	Real fR;
-	Eigen::Matrix2d fTMat;
+	Eigen::MatrixXd fTMat;
 
 };

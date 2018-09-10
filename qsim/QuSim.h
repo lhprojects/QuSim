@@ -6,7 +6,51 @@
 #include <map>
 #include <memory>
 #include <functional>
-#include "eigen/Eigen/Dense"
+#include <assert.h>
+
+template<class T>
+struct VectorView {
+
+	VectorView(T const *d, size_t s) : fData(d), fSize(s) { }
+	VectorView(std::vector<T> const &v) : fData(v.data()), fSize(v.size()) { }
+
+	T const *begin() const { return fData; }
+	T const *end() const { return fData + fSize; }
+	T const *cbegin() const { return fData; }
+	T const *cend() const { return fData + fSize; }
+	size_t size() const { return fSize; }
+	T const & operator[](size_t i) const { return fData[i]; }
+	T const & operator()(size_t i) const { return fData[i]; }
+private:
+	T const * const fData;
+	size_t const fSize;
+};
+
+template<class T>
+struct MatrixView {
+
+	MatrixView(T const *d, size_t rows, size_t cols) : fData(d), fRows(rows), fCols(cols) { }
+
+	T const *begin() const { return fData; }
+	T const *end() const { return fData + fRows * fCols; }
+	T const *cbegin() const { return fData; }
+	T const *cend() const { return fData + fRows * fCols; }
+	size_t size() const { return fRows * fCols; }
+	size_t cols() const { return fCols; }
+	size_t rows() const { return fRows; }
+	T const *data() const { return fData; }
+	T const & operator[](size_t i) const { assert(i < size()); return fData[i]; }
+	T const & operator()(size_t i) const { assert(i < size()); return fData[i]; }
+	T const & operator()(size_t i, size_t j) const {
+		assert(i < fRows );
+		assert(j < fCols);
+		return fData[i + j*fCols];
+	}
+private:
+	T const * const fData;
+	size_t const fRows;
+	size_t const fCols;
+};
 
 using Real = double;
 using Complex = std::complex<Real>;
@@ -121,8 +165,8 @@ struct Evolver2D : Evolver
 		Real mass, Real hbar,
 		std::map<std::string, std::string> const &opts);
 
-	Eigen::MatrixXcd const &GetPsi();
-	Eigen::MatrixXd const &GetV();
+	MatrixView<Complex> GetPsi();
+	MatrixView<Real> GetV();
 	size_t GetNx();
 	size_t GetNy();
 
@@ -159,7 +203,7 @@ struct Solver1D : Solver {
 	std::vector<Real> const &GetV();
 
 	size_t GetNPoints();
-	Eigen::Matrix2cd GetTMat();
+	MatrixView<Real> GetTMat();
 	Real GetT();
 	Real GetR();
 	Real GetEnergy();

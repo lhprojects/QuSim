@@ -16,6 +16,7 @@
 #include "Perturbation1DImpl.h"
 #include "ScatteringProblemSolverInverseMatrix.h"
 #include "Cal.h"
+#include "View.h"
 
 using std::abs;
 
@@ -197,15 +198,15 @@ void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_n
 
 }
 
-Eigen::MatrixXcd const & Evolver2D::GetPsi()
+MatrixView<Complex> Evolver2D::GetPsi()
 {
 	//double x = Norm2();
-	return ((EvolverImpl2D*)fImpl.get())->fPsi;
+	return View(((EvolverImpl2D*)fImpl.get())->fPsi);
 }
 
-Eigen::MatrixXd const & Evolver2D::GetV()
+MatrixView<Real> Evolver2D::GetV()
 {
-	return ((EvolverImpl2D*)fImpl.get())->fV;
+	return View(((EvolverImpl2D*)fImpl.get())->fV);
 }
 
 size_t Evolver2D::GetNx()
@@ -310,9 +311,9 @@ size_t Solver1D::GetNPoints()
 	return ((SolverImpl1D*)fImpl.get())->fNPoints;
 }
 
-Eigen::Matrix2cd Solver1D::GetTMat()
+MatrixView<Real> Solver1D::GetTMat()
 {
-	return ((SolverImpl1D*)fImpl.get())->fTMat;
+	return View(((SolverImpl1D*)fImpl.get())->fTMat);
 }
 
 Real Solver1D::GetT()
