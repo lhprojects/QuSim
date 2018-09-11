@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <complex>
-#include <cmath>
 #include <map>
 #include <memory>
 #include <functional>
