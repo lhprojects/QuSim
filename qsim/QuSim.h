@@ -3,7 +3,6 @@
 #include <vector>
 #include <complex>
 #include <map>
-#include <memory>
 #include <functional>
 #include <assert.h>
 
@@ -108,34 +107,42 @@ struct ScatteringSolverImpl;
 struct EXPORT_STRUCT FunctorWrapper
 {
 	FunctorWrapper(char const *);
+	FunctorWrapper(FunctorWrapper const &r);
+	FunctorWrapper &operator=(FunctorWrapper const &r);
 	Complex operator()(Real x);
 	~FunctorWrapper();
 private:
 	Complex *fX;
-	std::shared_ptr<Cal> fCal;
+	Cal *fCal;
+	int *fRef;
 };
 
 struct EXPORT_STRUCT Functor2DWrapper {
 	Functor2DWrapper(char const *);
+	Functor2DWrapper(Functor2DWrapper const &r);
+	Functor2DWrapper &operator=(Functor2DWrapper const &r);
 	Complex operator()(Real x, Real y);
 	~Functor2DWrapper();
 private:
 	Complex *fX;
 	Complex *fY;
-	std::shared_ptr<Cal> fCal;
+	Cal *fCal;
+	int *fRef;
 };
 
 struct EXPORT_STRUCT Calculator {
 	Calculator(char const *expr);
+	Calculator(Calculator const &) = delete;
+	Calculator &operator=(Calculator const &) = delete;
+	~Calculator();
 	Complex &SetVaraible(char const *, Complex v);
 	Complex &GetVaraible(char const *);
 	Complex Evaluate();
 private:
-	std::shared_ptr<Cal> fImpl;
+	Cal *fImpl;
 };
 
 struct EXPORT_STRUCT Evolver {
-
 	void step();
 	Real Norm2();
 	Real Time();
@@ -143,10 +150,12 @@ struct EXPORT_STRUCT Evolver {
 	Real KinEn();
 	Real EnPartialT();
 
+	Evolver(Evolver const &) = delete;
+	Evolver const &operator=(Evolver const &) = delete;
 	~Evolver();
 protected:
 	Evolver();
-	std::shared_ptr<EvolverImpl> fImpl;
+	EvolverImpl *fImpl;
 };
 
 struct EXPORT_STRUCT Evolver1D : Evolver {
@@ -172,8 +181,6 @@ struct EXPORT_STRUCT Evolver1D : Evolver {
 
 struct EXPORT_STRUCT Evolver2D : Evolver
 {
-	Evolver2D();
-
 	void init(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		std::function<Complex(Real, Real)> const &v, Real x0, Real x1, size_t nx,
@@ -194,9 +201,12 @@ struct EXPORT_STRUCT Solver {
 
 	void Compute();
 	~Solver();
+	Solver(Solver const &) = delete;
+	Solver const &operator=(Solver const &) = delete;
+
 protected:
 	Solver();
-	std::shared_ptr<IVPSolverImpl> fImpl;
+	IVPSolverImpl *fImpl;
 };
 
 
@@ -234,9 +244,13 @@ struct EXPORT_STRUCT Solver1D : Solver {
 struct EXPORT_STRUCT QuScatteringProblemSolver {
 	~QuScatteringProblemSolver();
 	void Compute();
+
+	QuScatteringProblemSolver(QuScatteringProblemSolver const &) = delete;
+	QuScatteringProblemSolver const &operator=(QuScatteringProblemSolver const &) = delete;
+
 protected:
 	QuScatteringProblemSolver();
-	std::shared_ptr<ScatteringSolverImpl> fImpl;
+	ScatteringSolverImpl *fImpl;
 
 };
 

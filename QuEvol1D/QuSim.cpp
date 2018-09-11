@@ -114,7 +114,7 @@ struct WorkerToGUI {
 
 struct GUIToWorker {
 	// data shard package 2
-	Evolver1D syst;
+	std::shared_ptr<Evolver1D> syst;
 	std::mutex mutex;
 };
 
@@ -133,7 +133,7 @@ struct GUI {
 
 struct Worker {
 	// woker thread
-	Evolver1D syst;
+	std::shared_ptr<Evolver1D> syst;
 
 };
 
@@ -157,36 +157,36 @@ void simulate()
 			worker->syst = guiToWorker->syst;
 			{
 				std::lock_guard<std::mutex> lk(workerToGUI->mutex);
-				workerToGUI->data.psi = worker->syst.GetPsi();
-				workerToGUI->data.norm = worker->syst.Norm2();
-				workerToGUI->data.xavg = worker->syst.Xavg();
-				workerToGUI->data.time = worker->syst.Time();
-				workerToGUI->data.fN = worker->syst.GetN();
-				workerToGUI->data.v = worker->syst.GetV();
-				workerToGUI->data.normLeft = worker->syst.NormLeft();
-				workerToGUI->data.normRight = worker->syst.NormRight();
-				workerToGUI->data.pot = worker->syst.PotEn();
-				workerToGUI->data.kin = worker->syst.KinEn();
-				workerToGUI->data.enPartialTime = worker->syst.EnPartialT();
+				workerToGUI->data.psi = worker->syst->GetPsi();
+				workerToGUI->data.norm = worker->syst->Norm2();
+				workerToGUI->data.xavg = worker->syst->Xavg();
+				workerToGUI->data.time = worker->syst->Time();
+				workerToGUI->data.fN = worker->syst->GetN();
+				workerToGUI->data.v = worker->syst->GetV();
+				workerToGUI->data.normLeft = worker->syst->NormLeft();
+				workerToGUI->data.normRight = worker->syst->NormRight();
+				workerToGUI->data.pot = worker->syst->PotEn();
+				workerToGUI->data.kin = worker->syst->KinEn();
+				workerToGUI->data.enPartialTime = worker->syst->EnPartialT();
 			}
 			PostMessage(hMainWin, WM_DATAREADY, 0, 0);
 			what = messager.GetWhat();
 		} else if (what == WhatToDo::Run) {
 
-			worker->syst.step();
+			worker->syst->step();
 			{
 				std::lock_guard<std::mutex> lk(workerToGUI->mutex);
-				workerToGUI->data.psi = worker->syst.GetPsi();
-				workerToGUI->data.norm = worker->syst.Norm2();
-				workerToGUI->data.xavg = worker->syst.Xavg();
-				workerToGUI->data.time = worker->syst.Time();
-				workerToGUI->data.fN = worker->syst.GetN();
-				workerToGUI->data.v = worker->syst.GetV();
-				workerToGUI->data.normLeft = worker->syst.NormLeft();
-				workerToGUI->data.normRight = worker->syst.NormRight();
-				workerToGUI->data.pot = worker->syst.PotEn();
-				workerToGUI->data.kin = worker->syst.KinEn();
-				workerToGUI->data.enPartialTime = worker->syst.EnPartialT();
+				workerToGUI->data.psi = worker->syst->GetPsi();
+				workerToGUI->data.norm = worker->syst->Norm2();
+				workerToGUI->data.xavg = worker->syst->Xavg();
+				workerToGUI->data.time = worker->syst->Time();
+				workerToGUI->data.fN = worker->syst->GetN();
+				workerToGUI->data.v = worker->syst->GetV();
+				workerToGUI->data.normLeft = worker->syst->NormLeft();
+				workerToGUI->data.normRight = worker->syst->NormRight();
+				workerToGUI->data.pot = worker->syst->PotEn();
+				workerToGUI->data.kin = worker->syst->KinEn();
+				workerToGUI->data.enPartialTime = worker->syst->EnPartialT();
 			}
 			PostMessage(hMainWin, WM_DATAREADY, 0, 0);
 			what = messager.GetWhat();
@@ -1124,8 +1124,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (gui.runningState == STATE_STOPPED || gui.runningState == STATE_PAUSED) {
 					try {
 						if (gui.runningState == STATE_STOPPED) {
-							Evolver1D syst;
-							InitialASystem1D(syst);
+							std::shared_ptr<Evolver1D> syst(new Evolver1D());
+							InitialASystem1D(*syst);
 							std::lock_guard<std::mutex> lk(guiToWorker->mutex);
 							guiToWorker->syst = syst;
 							messager.SetWhat(WhatToDo::InitAndRun);
