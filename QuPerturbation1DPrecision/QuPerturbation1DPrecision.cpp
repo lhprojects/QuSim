@@ -43,10 +43,14 @@ void test0()
 		inv3.Compute();
 
 		auto geti = [&](double x) -> size_t {  return (size_t)((x - x0) / (x1 - x0) * n); };
-		printf("%10.2E %10.2E %10.2E\n",
+		printf("%5d | %10.2E %10.2E %10.2E\n", n,
 			abs2(inv1.GetPsi()[geti(-10)]) - solver.GetR(),
 			abs2(inv2.GetPsi()[geti(-10)]) - solver.GetR(),
 			abs2(inv3.GetPsi()[geti(-10)]) - solver.GetR());
+		printf("%5d | %10.2E %10.2E %10.2E\n", n,
+			inv1.GetR() - solver.GetR(),
+			inv2.GetR() - solver.GetR(),
+			inv3.GetR() - solver.GetR());
 	}
 }
 
