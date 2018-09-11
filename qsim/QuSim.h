@@ -215,7 +215,7 @@ struct Solver1D : Solver {
 };
 
 struct QuScatteringProblemSolver {
-	virtual ~QuScatteringProblemSolver();
+	~QuScatteringProblemSolver();
 	void Compute();
 protected:
 	QuScatteringProblemSolver();
