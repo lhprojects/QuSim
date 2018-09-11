@@ -287,6 +287,7 @@
     <ClCompile Include="..\qsim\GaussLegendreMethod.cpp" />
     <ClCompile Include="..\qsim\GaussLegendreMethod2D.cpp" />
     <ClCompile Include="..\qsim\IVPSolverImpl.cpp" />
+    <ClCompile Include="..\qsim\MatrixSolver.cpp" />
     <ClCompile Include="..\qsim\Perturbation1DImpl.cpp" />
     <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix.cpp" />
     <ClCompile Include="..\qsim\ScatteringSolverImpl.cpp" />
@@ -311,6 +312,7 @@
     <ClInclude Include="..\qsim\kissfft.hh" />
     <ClInclude Include="..\qsim\Linear.h" />
     <ClInclude Include="..\qsim\Matrix2.h" />
+    <ClInclude Include="..\qsim\MatrixSolver.h" />
     <ClInclude Include="..\qsim\ScatteringSolverImpl.h" />
     <ClInclude Include="..\qsim\Perturbation1DImpl.h" />
     <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix.h" />
