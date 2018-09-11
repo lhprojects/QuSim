@@ -213,6 +213,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\qsim\Cal.cpp" />
+    <ClCompile Include="..\qsim\TestCal.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>

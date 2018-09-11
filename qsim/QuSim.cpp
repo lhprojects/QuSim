@@ -481,3 +481,25 @@ Real QuPerturbation1D::GetEpsilonBoundaryError()
 }
 /*                    QuPerturbation1D                          */
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+Calculator::Calculator(char const * expr) : fImpl(new Cal(expr))
+{
+}
+
+Complex & Calculator::SetVaraible(char const *str, Complex v)
+{
+	fImpl->SetVarVal(str, v);
+	return fImpl->GetVarVal(str);
+}
+
+Complex & Calculator::GetVaraible(char const *str)
+{
+	return fImpl->GetVarVal(str);
+}
+
+Complex Calculator::Evaluate()
+{
+	return fImpl->Val();
+}

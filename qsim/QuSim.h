@@ -8,6 +8,16 @@
 #include <functional>
 #include <assert.h>
 
+#ifdef QUEXPORT
+#ifdef _MSC_VER
+#define EXPORT_FUNC __declspec(dllexport)
+#define EXPORT_STRUCT __declspec(dllexport)
+#endif
+#else
+#define EXPORT_FUNC __declspec(dllimport)
+#define EXPORT_STRUCT __declspec(dllimport)
+#endif
+
 template<class T>
 struct VectorView {
 
@@ -96,7 +106,7 @@ struct EvolverImpl;
 struct IVPSolverImpl;
 struct ScatteringSolverImpl;
 
-struct FunctorWrapper
+struct EXPORT_STRUCT FunctorWrapper
 {
 	FunctorWrapper(char const *);
 	Complex operator()(Real x);
@@ -106,7 +116,7 @@ private:
 	std::shared_ptr<Cal> fCal;
 };
 
-struct Functor2DWrapper {
+struct EXPORT_STRUCT Functor2DWrapper {
 	Functor2DWrapper(char const *);
 	Complex operator()(Real x, Real y);
 	~Functor2DWrapper();
@@ -116,8 +126,16 @@ private:
 	std::shared_ptr<Cal> fCal;
 };
 
+struct EXPORT_STRUCT Calculator {
+	Calculator(char const *expr);
+	Complex &SetVaraible(char const *, Complex v);
+	Complex &GetVaraible(char const *);
+	Complex Evaluate();
+private:
+	std::shared_ptr<Cal> fImpl;
+};
 
-struct Evolver {
+struct EXPORT_STRUCT Evolver {
 
 	void step();
 	Real Norm2();
@@ -132,7 +150,7 @@ protected:
 	std::shared_ptr<EvolverImpl> fImpl;
 };
 
-struct Evolver1D : Evolver {
+struct EXPORT_STRUCT Evolver1D : Evolver {
 
 	void init(std::function<Complex(Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
@@ -153,7 +171,7 @@ struct Evolver1D : Evolver {
 };
 
 
-struct Evolver2D : Evolver
+struct EXPORT_STRUCT Evolver2D : Evolver
 {
 	Evolver2D();
 
@@ -173,7 +191,7 @@ struct Evolver2D : Evolver
 
 };
 
-struct Solver {
+struct EXPORT_STRUCT Solver {
 
 	void Compute();
 	~Solver();
@@ -183,7 +201,7 @@ protected:
 };
 
 
-struct Solver1D : Solver {
+struct EXPORT_STRUCT Solver1D : Solver {
 
 
 	void init(
@@ -214,7 +232,7 @@ struct Solver1D : Solver {
 
 };
 
-struct QuScatteringProblemSolver {
+struct EXPORT_STRUCT QuScatteringProblemSolver {
 	~QuScatteringProblemSolver();
 	void Compute();
 protected:
@@ -223,7 +241,7 @@ protected:
 
 };
 
-struct QuScatteringProblemSolver1D : QuScatteringProblemSolver {
+struct EXPORT_STRUCT QuScatteringProblemSolver1D : QuScatteringProblemSolver {
 
 	PsiVector const &GetPsi();
 	std::vector<Real> const &GetV();
@@ -236,7 +254,7 @@ struct QuScatteringProblemSolver1D : QuScatteringProblemSolver {
 
 };
 
-struct QuScatteringInverseMatrix1D : QuScatteringProblemSolver1D {
+struct EXPORT_STRUCT QuScatteringInverseMatrix1D : QuScatteringProblemSolver1D {
 
 	void init(
 		std::function<Complex(Real)> const & v,
@@ -253,7 +271,7 @@ struct QuScatteringInverseMatrix1D : QuScatteringProblemSolver1D {
 };
 
 
-struct QuPerturbation1D : QuScatteringProblemSolver1D {
+struct EXPORT_STRUCT QuPerturbation1D : QuScatteringProblemSolver1D {
 
 	QuPerturbation1D();
 	void init(

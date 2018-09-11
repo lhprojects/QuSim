@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\qsim\Cal.cpp" />
     <ClCompile Include="QuCalBenchmark.cpp" />
   </ItemGroup>
   <ItemGroup>

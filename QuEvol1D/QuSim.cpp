@@ -6,7 +6,6 @@
 
 // core
 #include "../qsim/QuSim.h"
-#include "../qsim/Cal.h"
 
 
 // windows theme
@@ -580,8 +579,8 @@ void InitialASystem1D(Evolver1D &syst)
 		int len = GetWindowTextLength(hDeltaT);
 		psiStr.resize(len + 1);
 		GetWindowTextA(hDeltaT, psiStr.data(), len + 1);
-		Cal cal(psiStr.data());
-		deltaT = cal.Val();
+		Calculator cal(psiStr.data());
+		deltaT = cal.Evaluate();
 	}
 	std::map<std::string, std::string> opts;
 #ifdef USE_CUDA
@@ -650,14 +649,13 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 
 			if (show_psi) {
 				try {
-					Cal cal(psiStr.data());
-					cal.SetVarVal("x", 0);
-					cal.GenPseudoCode();
-					Complex *x = &cal.GetVarVal("x");
+					Calculator cal(psiStr.data());
+					cal.SetVaraible("x", 0);
+					Complex *x = &cal.GetVaraible("x");
 					double norm2 = 0;
 					for (int i = 0; i < n; ++i) {
 						*x = x0 + i * (x1 - x0) / n;
-						psiv[i] = cal.Val();
+						psiv[i] = cal.Evaluate();
 						norm2 += abs2(psiv[i])*(x1 - x0) / n;
 					}
 					if (fn) for(auto &x : psiv) x *= 1.0 / sqrt(norm2);
@@ -677,14 +675,13 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 			if (psiStr.empty()) show_pot = false;
 			if (show_pot) {
 				try {
-					Cal cal(psiStr.data());
-					cal.SetVarVal("x", 0);
-					cal.GenPseudoCode();
-					Complex *x = &cal.GetVarVal("x");
+					Calculator cal(psiStr.data());
+					cal.SetVaraible("x", 0);
+					Complex *x = &cal.GetVaraible("x");
 
 					for (int i = 0; i < n; ++i) {
 						*x = x0 + i * (x1 - x0) / n;
-						vv[i] = cal.Val().real();
+						vv[i] = cal.Evaluate().real();
 					}
 					DrawPotential(graphics, vv, left, top, w, h);
 				} catch (std::exception &e) {

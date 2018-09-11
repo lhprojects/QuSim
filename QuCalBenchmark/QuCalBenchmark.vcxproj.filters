@@ -18,5 +18,8 @@
     <ClCompile Include="QuCalBenchmark.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\Cal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

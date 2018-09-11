@@ -18,6 +18,12 @@
     <ClCompile Include="Test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\Cal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qsim\TestCal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\Cal.h">
