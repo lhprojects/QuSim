@@ -140,5 +140,8 @@
     <ClInclude Include="..\qsim\View.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\qsim\Linear.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

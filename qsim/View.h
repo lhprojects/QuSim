@@ -2,12 +2,20 @@
 
 #include "QuSim.h"
 #include "eigen/Eigen/Dense"
+#include "Linear.h"
 
 template<class T>
 VectorView<T> View(std::vector<T> const &v)
 {
 	return VectorView<T>(v.data(), v.size());
 }
+
+template<class T>
+inline std::vector<T> ToVector(VectorView<T> const &v)
+{
+	return std::vector<T>(v.begin(), v.end());
+}
+
 
 inline MatrixView<Complex> View(Eigen::MatrixXcd const &v)
 {

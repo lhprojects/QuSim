@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vector>
 #include <complex>
 #include <map>
 #include <functional>
@@ -20,7 +19,6 @@ template<class T>
 struct VectorView {
 
 	VectorView(T const *d, size_t s) : fData(d), fSize(s) { }
-	VectorView(std::vector<T> const &v) : fData(v.data()), fSize(v.size()) { }
 
 	T const *begin() const { return fData; }
 	T const *end() const { return fData + fSize; }
@@ -62,7 +60,6 @@ private:
 
 using Real = double;
 using Complex = std::complex<Real>;
-using PsiVector = std::vector<Complex>;
 using Int = int64_t;
 using UInt = uint64_t;
 static constexpr Complex I = Complex(0, 1);
@@ -167,8 +164,8 @@ struct EXPORT_STRUCT Evolver1D : Evolver {
 		Real mass, Real hbar,
 		std::map<std::string, std::string> const &opts);
 
-	PsiVector const &GetPsi();
-	std::vector<Real> const &GetV();
+	VectorView<Complex> GetPsi();
+	VectorView<Real> GetV();
 	Real Xavg();
 	size_t GetN();
 	Real NormLeft();
@@ -226,8 +223,8 @@ struct EXPORT_STRUCT Solver1D : Solver {
 		Real hbar,
 		std::map<std::string, std::string> const &opts);
 
-	PsiVector const &GetPsi();
-	std::vector<Real> const &GetV();
+	VectorView<Complex> GetPsi();
+	VectorView<Real> GetV();
 
 	size_t GetNPoints();
 	MatrixView<Real> GetTMat();
@@ -256,8 +253,8 @@ protected:
 
 struct EXPORT_STRUCT QuScatteringProblemSolver1D : QuScatteringProblemSolver {
 
-	PsiVector const &GetPsi();
-	std::vector<Real> const &GetV();
+	VectorView<Complex> GetPsi();
+	VectorView<Real> GetV();
 
 	size_t GetNPoints();
 	Real GetT();

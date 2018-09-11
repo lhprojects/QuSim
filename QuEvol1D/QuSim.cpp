@@ -3,9 +3,11 @@
 #include "QuSim.h"
 #include <thread>
 #include <mutex>
+#include <vector>
 
 // core
 #include "../qsim/QuSim.h"
+#include "../qsim/View.h"
 
 
 // windows theme
@@ -93,7 +95,7 @@ struct Messager {
 Messager messager;
 
 struct Data {
-	PsiVector psi;
+	std::vector<Complex> psi;
 	Real norm;
 	Real kin;
 	Real pot;
@@ -157,12 +159,12 @@ void simulate()
 			worker->syst = guiToWorker->syst;
 			{
 				std::lock_guard<std::mutex> lk(workerToGUI->mutex);
-				workerToGUI->data.psi = worker->syst->GetPsi();
+				workerToGUI->data.psi = ToVector(worker->syst->GetPsi());
 				workerToGUI->data.norm = worker->syst->Norm2();
 				workerToGUI->data.xavg = worker->syst->Xavg();
 				workerToGUI->data.time = worker->syst->Time();
 				workerToGUI->data.fN = worker->syst->GetN();
-				workerToGUI->data.v = worker->syst->GetV();
+				workerToGUI->data.v = ToVector(worker->syst->GetV());
 				workerToGUI->data.normLeft = worker->syst->NormLeft();
 				workerToGUI->data.normRight = worker->syst->NormRight();
 				workerToGUI->data.pot = worker->syst->PotEn();
@@ -176,12 +178,12 @@ void simulate()
 			worker->syst->step();
 			{
 				std::lock_guard<std::mutex> lk(workerToGUI->mutex);
-				workerToGUI->data.psi = worker->syst->GetPsi();
+				workerToGUI->data.psi = ToVector(worker->syst->GetPsi());
 				workerToGUI->data.norm = worker->syst->Norm2();
 				workerToGUI->data.xavg = worker->syst->Xavg();
 				workerToGUI->data.time = worker->syst->Time();
 				workerToGUI->data.fN = worker->syst->GetN();
-				workerToGUI->data.v = worker->syst->GetV();
+				workerToGUI->data.v = ToVector(worker->syst->GetV());
 				workerToGUI->data.normLeft = worker->syst->NormLeft();
 				workerToGUI->data.normRight = worker->syst->NormRight();
 				workerToGUI->data.pot = worker->syst->PotEn();
@@ -402,7 +404,7 @@ void DrawPotential(Gdiplus::Graphics &graphics,
 }
 
 void DrawPsi(Gdiplus::Graphics &graphics,
-	PsiVector const &psi,
+	std::vector<Complex> const &psi,
 	long left, long top, long w, long h)
 {
 	std::vector<Point> abc;
@@ -639,7 +641,7 @@ void OnPaint2(Gdiplus::Graphics &graphics, long left, long top, long w, long h)
 		GetInt(hBins, n, "nbins");
 		if (n < 0) throw std::runtime_error("nbins < 0");
 		if (show_psi) {
-			PsiVector psiv(n);
+			std::vector<Complex> psiv(n);
 			std::vector<char> psiStr;
 			int len = GetWindowTextLength(hInitalPsi);
 			psiStr.resize(len + 1);

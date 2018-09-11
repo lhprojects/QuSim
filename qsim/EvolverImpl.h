@@ -5,7 +5,7 @@
 #include "QuSim.h"
 #include "eigen/Eigen/Dense"
 #include <functional>
-
+#include "Linear.h"
 
 struct EvolverImpl
 {

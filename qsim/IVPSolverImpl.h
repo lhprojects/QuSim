@@ -1,6 +1,7 @@
 #pragma once
 
 #include "QuSim.h"
+#include "Linear.h"
 
 struct IVPSolverImpl {
 

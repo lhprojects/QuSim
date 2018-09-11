@@ -309,6 +309,7 @@
     <ClInclude Include="..\qsim\GaussLegendreMethod2D.h" />
     <ClInclude Include="..\qsim\IVPSolverImpl.h" />
     <ClInclude Include="..\qsim\kissfft.hh" />
+    <ClInclude Include="..\qsim\Linear.h" />
     <ClInclude Include="..\qsim\Matrix2.h" />
     <ClInclude Include="..\qsim\ScatteringSolverImpl.h" />
     <ClInclude Include="..\qsim\Perturbation1DImpl.h" />

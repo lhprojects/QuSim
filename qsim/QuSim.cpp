@@ -112,14 +112,14 @@ Evolver1D::Evolver1D() {
 }
 
 
-PsiVector const & Evolver1D::GetPsi()
+VectorView<Complex> Evolver1D::GetPsi()
 {
-	return static_cast<EvolverImpl1D*>(fImpl)->fPsi;
+	return View(static_cast<EvolverImpl1D*>(fImpl)->fPsi);
 }
 
-std::vector<Real> const & Evolver1D::GetV()
+VectorView<Real> Evolver1D::GetV()
 {
-	return static_cast<EvolverImpl1D*>(fImpl)->fV;
+	return View(static_cast<EvolverImpl1D*>(fImpl)->fV);
 }
 
 Real Evolver1D::Xavg()
@@ -351,14 +351,14 @@ void Solver1D::init(std::function<Complex(Real)> const & v,
 	static_cast<SolverImpl1D*>(fImpl)->initSystem1D(v, x0, x1, n, en, initPsi, initPsiPrime, met, mass, hbar, opts);
 }
 
-PsiVector const & Solver1D::GetPsi()
+VectorView<Complex> Solver1D::GetPsi()
 {
-	return static_cast<SolverImpl1D*>(fImpl)->fPsi;
+	return View(static_cast<SolverImpl1D*>(fImpl)->fPsi);
 }
 
-std::vector<Real> const & Solver1D::GetV()
+VectorView<Real> Solver1D::GetV()
 {
-	return static_cast<SolverImpl1D*>(fImpl)->fV;
+	return View(static_cast<SolverImpl1D*>(fImpl)->fV);
 }
 
 size_t Solver1D::GetNPoints()
@@ -429,14 +429,14 @@ void QuScatteringProblemSolver::Compute()
 
 
 
-PsiVector const & QuScatteringProblemSolver1D::GetPsi()
+VectorView<Complex> QuScatteringProblemSolver1D::GetPsi()
 {
-	return static_cast<ScatteringSolver1DImpl*>(fImpl)->fPsiX;
+	return View(static_cast<ScatteringSolver1DImpl*>(fImpl)->fPsiX);
 }
 
-std::vector<Real> const & QuScatteringProblemSolver1D::GetV()
+VectorView<Real> QuScatteringProblemSolver1D::GetV()
 {
-	return static_cast<ScatteringSolver1DImpl*>(fImpl)->fV;
+	return View(static_cast<ScatteringSolver1DImpl*>(fImpl)->fV);
 }
 
 size_t QuScatteringProblemSolver1D::GetNPoints()

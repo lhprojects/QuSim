@@ -1,6 +1,8 @@
 #pragma once
 
 #include "QuSim.h"
+#include "Linear.h"
+
 struct ScatteringSolverImpl {
 
 	ScatteringSolverImpl() : fHbar(0), fMass(0), fE(0), fMet(), fOpts() { }

@@ -1,6 +1,6 @@
 #include "SolverImpl.h"
 #include "Matrix2.h"
-
+#include "Linear.h"
 
 SolverImpl1D::SolverImpl1D()
 {

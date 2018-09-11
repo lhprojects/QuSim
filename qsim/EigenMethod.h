@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EvolverImpl.h"
+#include "Linear.h"
 #include "eigen/Eigen/Dense"
 #include "eigen/Eigen/Eigenvalues"
 

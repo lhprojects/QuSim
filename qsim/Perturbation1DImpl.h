@@ -2,6 +2,7 @@
 
 #include "ScatteringSolverImpl.h"
 #include "FourierTransform.h"
+#include "Linear.h"
 
 struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 
