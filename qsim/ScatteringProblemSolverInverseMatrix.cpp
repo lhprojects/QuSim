@@ -5,7 +5,7 @@ void ScatteringProblemSolverInverseMatrix1D::InitScatteringSolver1D(std::functio
 	Real mass, Real hbar, std::map<std::string, std::string> const & opts)
 {
 	ScatteringSolver1DImpl::InitScatteringSolver1D(v, x0, x1, n, en, direction, met, mass, hbar, opts);
-	
+
 	{
 		int order = 2;
 		auto it = opts.find("space_order");
@@ -100,9 +100,9 @@ void ScatteringProblemSolverInverseMatrix1D::InitScatteringSolver1D(std::functio
 
 void ScatteringProblemSolverInverseMatrix1D::Compute()
 {
-	
+
 	Eigen::VectorXcd v;
-	v.resize(fNx);	
+	v.resize(fNx);
 	for (size_t i = 0; i < fNx; ++i) v(i) = fPsi0X[i];
 
 	for (size_t i = 0; i < fNx; ++i) {
@@ -111,7 +111,7 @@ void ScatteringProblemSolverInverseMatrix1D::Compute()
 
 	Eigen::VectorXcd v1;
 	fMatrixSolver.Solve(fEMinusH, v, v1);
-	
+
 	for (size_t i = 0; i < fNx; ++i) fPsiX[i] = v1(i);
 
 	if (0) {
@@ -125,8 +125,8 @@ void ScatteringProblemSolverInverseMatrix1D::Compute()
 			r += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(+I * fK0*GetX(i));
 			t += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(-I * fK0*GetX(i));
 		}
-		fR = abs(r / (2 * fK0 * I));
-		fT = abs(t / (2 * fK0 * I));
+		fR = abs2(r*fDx / (fMass*fHbar*fHbar*fK0 * I));
+		fT = abs2(t*fDx / (fMass*fHbar*fHbar*fK0 * I));
 
 	}
 

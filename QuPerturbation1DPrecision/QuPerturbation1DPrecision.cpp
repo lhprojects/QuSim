@@ -1,18 +1,21 @@
 #include "../qsim/QuSim.h"
 
 
-void test0()
+void test0(double p)
 {
-
-	printf("Test inverse matrix method\n");
+	printf("Test inverse matrix method V(x)=%lf exp(-x*x)\n", p);
+	auto f = [&](Real x) { return p * exp(-x * x); };
 	Solver1D solver;
 	std::map<std::string, std::string> small;
 	small["small_round_error"] = "1";
-	solver.init(FunctorWrapper("1*exp(-x*x)"), -10, 10, 20000, 0.5, 1, I,
+	solver.init(f, -10, 10, 20000, 0.5, 1, I,
 		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, std::map<std::string, std::string>());
 	solver.Compute();
-	double R = 1 - 0.1355284179587569045304922;
-	printf("%.2E\n", solver.GetR() - R);
+
+	if (p == 1) {
+		double R = 1 - 0.1355284179587569045304922;
+		printf("solver error %.2E\n", solver.GetR() - R);
+	}
 
 	for (int i = 0; i < 10; ++i) {
 
@@ -28,17 +31,17 @@ void test0()
 		space_o6["space_order"] = "6";
 
 		QuScatteringInverseMatrix1D inv1;
-		inv1.init(FunctorWrapper("1*exp(-x*x)"), x0, x1, n, 0.5, 1,
+		inv1.init(f, x0, x1, n, 0.5, 1,
 			SolverMethod::MatrixInverse, 1, 1, space_o2);
 		inv1.Compute();
 
 		QuScatteringInverseMatrix1D inv2;
-		inv2.init(FunctorWrapper("1*exp(-x*x)"), x0, x1, n, 0.5, 1,
+		inv2.init(f, x0, x1, n, 0.5, 1,
 			SolverMethod::MatrixInverse, 1, 1, space_o4);
 		inv2.Compute();
 
 		QuScatteringInverseMatrix1D inv3;
-		inv3.init(FunctorWrapper("1*exp(-x*x)"), x0, x1, n, 0.5, 1,
+		inv3.init(f, x0, x1, n, 0.5, 1,
 			SolverMethod::MatrixInverse, 1, 1, space_o6);
 		inv3.Compute();
 
@@ -244,7 +247,8 @@ void test3()
 
 int main()
 {
-	test0();
+	test0(0.1);
+	test0(1);
 	test10();
 	test1();
 	test2();
