@@ -424,6 +424,16 @@ void QuScatteringProblemSolver::Compute()
 	static_cast<ScatteringSolverImpl*>(fImpl)->Compute();
 }
 
+Real QuScatteringProblemSolver::GetEnergy()
+{
+	return static_cast<ScatteringSolverImpl*>(fImpl)->fE;
+}
+
+Real QuScatteringProblemSolver::GetMomentum()
+{
+	return static_cast<ScatteringSolverImpl*>(fImpl)->GetMomentum();
+}
+
 
 
 
@@ -456,15 +466,6 @@ Real QuScatteringProblemSolver1D::GetR()
 }
 
 
-Real QuScatteringProblemSolver1D::GetEnergy()
-{
-	return static_cast<ScatteringSolver1DImpl*>(fImpl)->fE;
-}
-
-Real QuScatteringProblemSolver1D::GetMomentum()
-{
-	return static_cast<ScatteringSolver1DImpl*>(fImpl)->GetMomentum();
-}
 
 
 

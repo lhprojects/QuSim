@@ -241,6 +241,8 @@ struct EXPORT_STRUCT Solver1D : Solver {
 struct EXPORT_STRUCT QuScatteringProblemSolver {
 	~QuScatteringProblemSolver();
 	void Compute();
+	Real GetEnergy();
+	Real GetMomentum();
 
 	QuScatteringProblemSolver(QuScatteringProblemSolver const &) = delete;
 	QuScatteringProblemSolver const &operator=(QuScatteringProblemSolver const &) = delete;
@@ -259,8 +261,6 @@ struct EXPORT_STRUCT QuScatteringProblemSolver1D : QuScatteringProblemSolver {
 	size_t GetNPoints();
 	Real GetT();
 	Real GetR();
-	Real GetEnergy();
-	Real GetMomentum();
 
 };
 

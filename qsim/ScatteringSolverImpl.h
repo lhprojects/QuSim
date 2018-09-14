@@ -20,6 +20,8 @@ struct ScatteringSolverImpl {
 	}
 	virtual void Compute() = 0;
 
+	Real GetMomentum() { return sqrt(2 * fMass*fE); }
+
 	Real const fE;
 	SolverMethod const fMet;
 	Real const fMass;
@@ -45,10 +47,6 @@ struct ScatteringSolver1DImpl : ScatteringSolverImpl {
 
 	Real GetX(ptrdiff_t i) const { return fX0 + fDx * i; }
 
-	Real GetMomentum()
-	{
-		return sqrt(2 * fMass*fE);
-	}
 
 	size_t const fNx;
 	Real const fX0;
