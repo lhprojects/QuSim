@@ -26,8 +26,8 @@ struct ScatteringProblemSolverInverseMatrix2D : ScatteringSolver2DImpl {
 
 	void Compute() override;
 	
-	Real ComputeXSection(Real cosx, Real cosy);
-	Real ComputeTotalXSection();
+	Real ComputeXSection(Real cosx, Real cosy) override;
+	Real ComputeTotalXSection() override;
 
 	SparseMatrixSolver fMatrixSolver;
 	int const fOrder;
