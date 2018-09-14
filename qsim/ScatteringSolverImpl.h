@@ -2,6 +2,7 @@
 
 #include "QuSim.h"
 #include "Linear.h"
+#include "eigen/Eigen/Dense"
 
 struct ScatteringSolverImpl {
 
@@ -60,6 +61,52 @@ struct ScatteringSolver1DImpl : ScatteringSolverImpl {
 	PsiVector fPsiX;
 	Real fT;
 	Real fR;
+private:
+	void InitPotential();
+};
+
+struct ScatteringSolver2DImpl : ScatteringSolverImpl {
+
+	ScatteringSolver2DImpl() : fNx(0), fNy(0), fVFunc(), fX0(), fY0(), fDx(), fDy(),
+		fK0Y(), fK0X(), fV(), fPsi0X(), fK0() {}
+
+	virtual void InitScatteringSolver2D(
+		std::function<Complex(Real, Real)> const & v,
+		Real x0,
+		Real x1,
+		size_t nx,
+		Real y0,
+		Real y1,
+		size_t ny,
+		Real en,
+		Real directionx,
+		Real directiony,
+		SolverMethod met,
+		Real mass,
+		Real hbar,
+		std::map<std::string, std::string> const &opts);
+
+	Real GetX(ptrdiff_t i) const { return fX0 + fDx * i; }
+	Real GetY(ptrdiff_t i) const { return fY0 + fDy * i; }
+
+	Real GetMomentum()
+	{
+		return sqrt(2 * fMass*fE);
+	}
+
+	size_t const fNx;
+	size_t const fNy;
+	Real const fX0;
+	Real const fY0;
+	Real const fDx;
+	Real const fDy;
+	std::function<Complex(Real, Real)> const fVFunc;
+	Real const fK0;
+	Real const fK0X;
+	Real const fK0Y;
+	Eigen::MatrixXd const fV;
+	Eigen::MatrixXcd const fPsi0X;
+	Eigen::MatrixXcd fPsiX;
 private:
 	void InitPotential();
 };

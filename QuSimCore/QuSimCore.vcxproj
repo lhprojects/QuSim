@@ -290,6 +290,7 @@
     <ClCompile Include="..\qsim\MatrixSolver.cpp" />
     <ClCompile Include="..\qsim\Perturbation1DImpl.cpp" />
     <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix.cpp" />
+    <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix2D.cpp" />
     <ClCompile Include="..\qsim\ScatteringSolverImpl.cpp" />
     <ClCompile Include="..\qsim\SolverImpl.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod.cpp" />
@@ -313,6 +314,7 @@
     <ClInclude Include="..\qsim\Linear.h" />
     <ClInclude Include="..\qsim\Matrix2.h" />
     <ClInclude Include="..\qsim\MatrixSolver.h" />
+    <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix2D.h" />
     <ClInclude Include="..\qsim\ScatteringSolverImpl.h" />
     <ClInclude Include="..\qsim\Perturbation1DImpl.h" />
     <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix.h" />
