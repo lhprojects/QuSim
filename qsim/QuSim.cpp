@@ -15,6 +15,8 @@
 
 #include "Perturbation1DImpl.h"
 #include "ScatteringProblemSolverInverseMatrix.h"
+#include "ScatteringProblemSolverInverseMatrix2D.h"
+
 #include "Cal.h"
 #include "View.h"
 
@@ -565,4 +567,35 @@ Complex & Calculator::GetVaraible(char const *str)
 Complex Calculator::Evaluate()
 {
 	return fImpl->Val();
+}
+
+MatrixView<Complex> QuScatteringProblemSolver2D::GetPsi()
+{
+	return View(static_cast<ScatteringSolver2DImpl*>(fImpl)->fPsiX);
+}
+
+MatrixView<Real> QuScatteringProblemSolver2D::GetV()
+{
+	return View(static_cast<ScatteringSolver2DImpl*>(fImpl)->fV);
+}
+
+Real QuScatteringProblemSolver2D::ComputeXSection(Real cosx, Real cosy)
+{
+	return static_cast<ScatteringSolver2DImpl*>(fImpl)->ComputeXSection(cosx, cosy);
+}
+
+Real QuScatteringProblemSolver2D::ComputeTotalXSection()
+{
+	return static_cast<ScatteringSolver2DImpl*>(fImpl)->ComputeTotalXSection();
+}
+
+void QuScatteringInverseMatrix2D::init(std::function<Complex(Real, Real)> const & v, Real x0,
+	Real x1, size_t nx, Real y0, Real y1, size_t ny,
+	Real en, Real directionx, Real directiony, SolverMethod met, Real mass, 
+	Real hbar, std::map<std::string, std::string> const & opts)
+{
+	fImpl = new ScatteringProblemSolverInverseMatrix2D();
+	static_cast<ScatteringProblemSolverInverseMatrix2D*>(fImpl)->InitScatteringSolver2D(v, x0, x1,
+		nx, y0, y1, ny,
+		en, directionx, directiony, met, mass, hbar, opts);
 }
