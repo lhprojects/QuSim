@@ -89,6 +89,9 @@ struct ScatteringSolver2DImpl : ScatteringSolverImpl {
 	Real GetX(ptrdiff_t i) const { return fX0 + fDx * i; }
 	Real GetY(ptrdiff_t i) const { return fY0 + fDy * i; }
 
+	virtual Real ComputeXSection(Real cosx, Real cosy) = 0;
+	virtual Real ComputeTotalXSection() = 0;
+
 	Real GetMomentum()
 	{
 		return sqrt(2 * fMass*fE);
