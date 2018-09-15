@@ -61,10 +61,11 @@ void ScatteringProblemSolverInverseMatrix2D::InitScatteringSolver2D(std::functio
 					if (i < (ptrdiff_t)fNx / 2) xx = (x - fX0) / (4 * lambda);
 					else  xx = ((fX0 + fDx * fNx) - x) / (4 * lambda);
 
-					if (i < (ptrdiff_t)fNy / 2) yy = (y - fY0) / (4 * lambda);
+					if (j < (ptrdiff_t)fNy / 2) yy = (y - fY0) / (4 * lambda);
 					else  yy = ((fY0 + fDy * fNy) - y) / (4 * lambda);
 
 					asb = -I * 1.5 *fE* (exp(-yy * yy) + exp(-xx * xx));
+					//const_cast<Eigen::MatrixXd&>(fV)(j, i) += 1.5 *fE* (exp(-yy * yy) + exp(-xx * xx));
 				}
 
 				Complex const dig = fE - (fV(j, i) + asb);
