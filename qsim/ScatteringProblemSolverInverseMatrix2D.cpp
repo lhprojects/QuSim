@@ -38,8 +38,8 @@ void ScatteringProblemSolverInverseMatrix2D::InitScatteringSolver2D(std::functio
 			return i;
 		};
 
-		auto global = [&](ptrdiff_t y, ptrdiff_t x)->ptrdiff_t {
-			return foldy(y) + foldx(x) * fNy;
+		auto global = [&](ptrdiff_t y, ptrdiff_t x)->int {
+			return (int)(foldy(y) + foldx(x) * fNy);
 		};
 
 		std::vector<Eigen::Triplet<Complex> > elems;
