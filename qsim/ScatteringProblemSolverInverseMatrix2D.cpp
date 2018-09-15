@@ -48,12 +48,12 @@ void ScatteringProblemSolverInverseMatrix2D::InitScatteringSolver2D(std::functio
 
 				Real const lambda = 2 * Pi / sqrt(2 * fE*fMass) * fHbar;
 				Real const x = GetX(i);
-				Real const y = GetX(j);
+				Real const y = GetY(j);
 
 				Complex asb = 0;
 				{
 
-					if (4 * lambda * 4 * 2 > fNx *fDx || 4 * lambda * 4 * 2 > fNy *fDy) {
+					if (3 * lambda * 3 * 2 > fNx *fDx || 3 * lambda * 3 * 2 > fNy *fDy) {
 						throw std::runtime_error("too small size of to fill absorbtion layer");
 					}
 					Real xx;
@@ -113,6 +113,7 @@ void ScatteringProblemSolverInverseMatrix2D::InitScatteringSolver2D(std::functio
 					throw std::runtime_error("too higher order");
 				}
 
+
 				
 
 			}
@@ -123,11 +124,12 @@ void ScatteringProblemSolverInverseMatrix2D::InitScatteringSolver2D(std::functio
 
 }
 
+
 void ScatteringProblemSolverInverseMatrix2D::Compute()
 {
 
 	Eigen::VectorXcd v;
-	v.resize(fNx*fNy, fNx*fNy);
+	v.resize(fNx*fNy);
 	for (size_t i = 0; i < fNx; ++i) {
 		for (size_t j = 0; j < fNy; ++j) {
 			v(j + i * fNy) = fPsi0X(j, i) * fV(j, i);
