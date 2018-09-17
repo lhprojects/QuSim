@@ -73,8 +73,29 @@ void test2()
 
 }
 
+
+void test3()
+{
+
+	std::map<std::string, std::string> opts;
+	QuScatteringInverseMatrix2D solver;
+	solver.init([](Real x, Real y) { return 1 * exp(-x * x - y * y); }, -100, 100, 300, -100, 100, 300,
+		0.5, 1, 0, SolverMethod::MatrixInverse, 1, 1, opts);
+	solver.Compute();
+
+	Real ref = solver.ComputeTotalXSection(1000);
+	for (int i = 0; i < 20; ++i) {
+		int n = 1 + i;
+		Real xs = solver.ComputeTotalXSection(n);
+		printf("%d %8.1E\n", n, xs - ref);
+	}
+
+
+}
+
 int main()
 {
+	test3();
 	test2();
 	test1();
 	test0();

@@ -177,9 +177,8 @@ Real ScatteringProblemSolverInverseMatrix2D::ComputeXSection(Real cosx, Real cos
 
 }
 
-Real ScatteringProblemSolverInverseMatrix2D::ComputeTotalXSection()
+Real ScatteringProblemSolverInverseMatrix2D::ComputeTotalXSection(Int n)
 {
-	Int n = 250;
 	Real xsec_t = 0;
 	for (Int i = 0; i < n; ++i) {
 		Real theta = i * 2 * Pi / n;
@@ -188,7 +187,7 @@ Real ScatteringProblemSolverInverseMatrix2D::ComputeTotalXSection()
 		Real xsec = ComputeXSection(cosx, cosy);
 		xsec_t += xsec;
 	}
-	xsec_t *= 1/n;
+	xsec_t *= 2*Pi/n;
 
 	return xsec_t;
 }

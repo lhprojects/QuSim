@@ -584,9 +584,9 @@ Real QuScatteringProblemSolver2D::ComputeXSection(Real cosx, Real cosy)
 	return static_cast<ScatteringSolver2DImpl*>(fImpl)->ComputeXSection(cosx, cosy);
 }
 
-Real QuScatteringProblemSolver2D::ComputeTotalXSection()
+Real QuScatteringProblemSolver2D::ComputeTotalXSection(Int n)
 {
-	return static_cast<ScatteringSolver2DImpl*>(fImpl)->ComputeTotalXSection();
+	return static_cast<ScatteringSolver2DImpl*>(fImpl)->ComputeTotalXSection(n);
 }
 
 void QuScatteringInverseMatrix2D::init(std::function<Complex(Real, Real)> const & v, Real x0,

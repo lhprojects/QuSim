@@ -314,7 +314,7 @@ struct EXPORT_STRUCT QuScatteringProblemSolver2D : QuScatteringProblemSolver {
 	MatrixView<Real> GetV();
 
 	Real ComputeXSection(Real cosx, Real cosy);
-	Real ComputeTotalXSection();
+	Real ComputeTotalXSection(Int n);
 
 };
 
