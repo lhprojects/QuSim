@@ -32,7 +32,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfftw-3.3", "fftw-3.3.2\f
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuCalBenchmark", "QuCalBenchmark\QuCalBenchmark.vcxproj", "{60375801-6CFF-447A-A2FD-5041FCB25E3A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuPerturbation1DPrecision", "QuPerturbation1DPrecision\QuPerturbation1DPrecision.vcxproj", "{1F2151FF-EB7C-4321-899D-4FC4CEB63451}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuScattering1DPrecision", "QuScattering1DPrecision\QuScattering1DPrecision.vcxproj", "{1F2151FF-EB7C-4321-899D-4FC4CEB63451}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuScattering2D", "QuScattering2D\QuScattering2D.vcxproj", "{57E493D6-BA2A-4106-8408-8C7D7619B369}"
 EndProject

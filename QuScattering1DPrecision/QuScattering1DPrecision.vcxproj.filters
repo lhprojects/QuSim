@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="QuPerturbation1DPrecision.cpp">
+    <ClCompile Include="QuScattering1DPrecision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
