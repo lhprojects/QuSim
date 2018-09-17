@@ -167,7 +167,7 @@ Real ScatteringProblemSolverInverseMatrix2D::ComputeXSection(Real cosx, Real cos
 		for (size_t j = 0; j < fNy; ++j) {
 			r += (fPsi0X(j, i) + fPsiX(j, i))
 				*fV(j, i)
-				* exp(-I * (fK0X * GetX(i) + fK0Y * GetY(j)));
+				* exp(-I * (fK0 * cosx * GetX(i) + fK0 * cosy * GetY(j)));
 		}
 	}
 
