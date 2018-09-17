@@ -15,16 +15,9 @@ double born(double mass, double hbar, double p, double v0, double alpha, double 
 void test0()
 {
 
-
-}
-
-int main()
-{
-
-
 	std::map<std::string, std::string> opts;
 	QuScatteringInverseMatrix2D solver;
-	solver.init([](Real x, Real y) { return 0.01*exp(-x * x - y * y); }, -100, 100, 200, -100, 100, 200,
+	solver.init([](Real x, Real y) { return 0.001*exp(-x * x - y * y); }, -100, 100, 300, -100, 100, 300,
 		0.5, 1, 0, SolverMethod::MatrixInverse, 1, 1, opts);
 	solver.Compute();
 
@@ -34,8 +27,56 @@ int main()
 		Real cosx = cos(theta);
 		Real cosy = sin(theta);
 		Real a = solver.ComputeXSection(cosx, cosy);
-		Real b = born(1, 1, 1, 0.01, 1, theta);
-		printf("%12lf | %12.8E %12.8E | %12.8E\n", theta, a, b, a/b);
+		Real b = born(1, 1, 1, 0.001, 1, theta);
+		printf("%12lf | %12.8E %12.8E | %12.8E\n", theta, a, b, a / b);
 	}
+
+}
+
+void test1()
+{
+
+
+	for (int i = 0; i < 10; ++i) {
+		Real v0 = 0.1 + 0.1 * i;
+		std::map<std::string, std::string> opts;
+		QuScatteringInverseMatrix2D solver;
+		solver.init([&](Real x, Real y) { return v0 *exp(-x * x - y * y); }, -100, 100, 300, -100, 100, 300,
+			0.5, 1, 0, SolverMethod::MatrixInverse, 1, 1, opts);
+		solver.Compute();
+
+		Real a = solver.ComputeXSection(1, 0);
+		Real b = born(1, 1, 1, v0, 1, 0);
+		printf("%lf %lf\n", a , b);
+	}
+
+}
+
+void test2()
+{
+
+	std::map<std::string, std::string> opts;
+	QuScatteringInverseMatrix2D solver;
+	solver.init([](Real x, Real y) { return 10*exp(-x * x - y * y); }, -100, 100, 300, -100, 100, 300,
+		0.5, 1, 0, SolverMethod::MatrixInverse, 1, 1, opts);
+	solver.Compute();
+
+	printf("%12s | %12s\n", "theta", "ana.for.");
+	for (int i = 0; i < 10; ++i) {
+		Real theta = i * 2 * Pi / 10;
+		Real cosx = cos(theta);
+		Real cosy = sin(theta);
+		Real a = solver.ComputeXSection(cosx, cosy);
+		printf("%12lf | %12.8E\n", theta, a);
+	}
+
+
+}
+
+int main()
+{
+	test2();
+	test1();
+	test0();
 
 }
