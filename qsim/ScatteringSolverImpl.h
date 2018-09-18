@@ -90,11 +90,6 @@ struct ScatteringSolver2DImpl : ScatteringSolverImpl {
 	virtual Real ComputeXSection(Real cosx, Real cosy) = 0;
 	virtual Real ComputeTotalXSection(Int n) = 0;
 
-	Real GetMomentum()
-	{
-		return sqrt(2 * fMass*fE);
-	}
-
 	size_t const fNx;
 	size_t const fNy;
 	Real const fX0;
