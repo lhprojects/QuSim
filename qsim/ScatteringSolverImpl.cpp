@@ -52,7 +52,6 @@ void ScatteringSolver2DImpl::InitScatteringSolver2D(std::function<Complex(Real, 
 	const_cast<Real&>(fDx) = (x1 - x0) / nx;
 	const_cast<Real&>(fDy) = (y1 - y0) / ny;
 	const_cast<std::function<Complex(Real, Real)>&>(fVFunc) = v;
-	const_cast<Real&>(fK0) = sqrt(2 * fMass * fE) / fHbar;
 	{
 		Real const nm = 1 / sqrt(directionx*directionx + directiony * directiony);
 		directionx *= nm;

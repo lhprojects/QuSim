@@ -6,13 +6,14 @@
 
 struct ScatteringSolverImpl {
 
-	ScatteringSolverImpl() : fHbar(0), fMass(0), fE(0), fMet(), fOpts() { }
+	ScatteringSolverImpl() : fHbar(0), fMass(0), fE(0), fMet(), fOpts(), fK0() { }
 	~ScatteringSolverImpl() { }
 
 	void InitScatteringSolver(Real en, SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const &opts)
 	{
 		
 		const_cast<Real&>(fE) = en;
+		const_cast<Real&>(fK0) = sqrt(2 * fMass * fE) / fHbar;
 		const_cast<SolverMethod&>(fMet) = met;
 		const_cast<Real&>(fMass) = mass;
 		const_cast<Real&>(fHbar) = hbar;
@@ -23,6 +24,7 @@ struct ScatteringSolverImpl {
 	Real GetMomentum() { return sqrt(2 * fMass*fE); }
 
 	Real const fE;
+	Real const fK0;
 	SolverMethod const fMet;
 	Real const fMass;
 	Real const fHbar;
@@ -66,7 +68,7 @@ private:
 struct ScatteringSolver2DImpl : ScatteringSolverImpl {
 
 	ScatteringSolver2DImpl() : fNx(0), fNy(0), fVFunc(), fX0(), fY0(), fDx(), fDy(),
-		fK0Y(), fK0X(), fV(), fPsi0X(), fK0() {}
+		fK0Y(), fK0X(), fV(), fPsi0X() {}
 
 	virtual void InitScatteringSolver2D(
 		std::function<Complex(Real, Real)> const & v,
@@ -97,7 +99,6 @@ struct ScatteringSolver2DImpl : ScatteringSolverImpl {
 	Real const fDx;
 	Real const fDy;
 	std::function<Complex(Real, Real)> const fVFunc;
-	Real const fK0;
 	Real const fK0X;
 	Real const fK0Y;
 	Eigen::MatrixXd const fV;
