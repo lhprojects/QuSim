@@ -13,11 +13,11 @@ struct ScatteringSolverImpl {
 	{
 		
 		const_cast<Real&>(fE) = en;
-		const_cast<Real&>(fK0) = sqrt(2 * fMass * fE) / fHbar;
 		const_cast<SolverMethod&>(fMet) = met;
 		const_cast<Real&>(fMass) = mass;
 		const_cast<Real&>(fHbar) = hbar;
 		const_cast<std::map<std::string, std::string>&>(fOpts) = opts;
+		const_cast<Real&>(fK0) = sqrt(2 * fMass * fE) / fHbar;
 	}
 	virtual void Compute() = 0;
 
