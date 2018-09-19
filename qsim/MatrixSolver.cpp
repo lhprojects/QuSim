@@ -60,13 +60,13 @@ void SparseMatrixSolver::Solve(Eigen::SparseMatrix<Complex> const & m,
 		v1 = fSparseLU.solve(x);
 	} else if (fMatrixSolver == MatrixSolverMethod::BiCGSTAB) {
 		if (fPreconditioner == Preconditioner::DiagonalPreconditioner) {
-			fBiCGSTAB_diag.setMaxIterations(10000);
+			fBiCGSTAB_diag.setMaxIterations(500);
 			v1 = fBiCGSTAB_diag.solve(x);
 		} else if (fPreconditioner == Preconditioner::IncompleteLUT) {
-			fBiCGSTAB_ilu.setMaxIterations(10000);
+			fBiCGSTAB_ilu.setMaxIterations(500);
 			v1 = fBiCGSTAB_ilu.solve(x);
 		} else if (fPreconditioner == Preconditioner::IdentityPreconditioner) {
-			fBiCGSTAB_ilu.setMaxIterations(10000);
+			fBiCGSTAB_ident.setMaxIterations(500);
 			v1 = fBiCGSTAB_ident.solve(x);
 		}
 	}
