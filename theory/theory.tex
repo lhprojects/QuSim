@@ -1,4 +1,9 @@
-\documentstyle[11pt]{article}
+    \documentclass[12pt,twoside]{article}
+    \usepackage{amsmath}
+    \usepackage{amssymb}
+    \usepackage{amsthm}
+    \usepackage{amsfonts}
+    \usepackage{braket}
 
 \begin{document}
 
@@ -352,5 +357,98 @@ Stable unconditionally.
 The transform each step is unitary matrix, so that the probability and energy are conserved.
 
 
+\section{Perburbation}
+
+The fermi golden rule
+$$
+\Gamma_{i\rightarrow f} = \frac{2\pi}{\hbar} \rho_E |\bra{\psi_f}V\ket{\psi_i}|^2
+$$
+
+\subsection{3D dimential}
+
+In 3D,
+$$
+\rho_E = \frac{
+\frac{V}{(2\pi\hbar)^3}{ p^2 d\Omega dp}
+}{
+\frac{p dp}{m}
+}
+=
+\frac{m V}{(2\pi\hbar)^3}{ p d\Omega}
+$$
+Box normalization:
+$$
+\psi_i(r) = \frac{1}{\sqrt{V}} e^{i k_i r}
+$$
+
+$$
+\psi_i(r) = \frac{1}{\sqrt{V}} e^{i k_f r}
+$$
+
+$$
+\bra{\psi_f} V(r) \ket{\psi_i} =  \frac{1}{V} \int dr V(r) e^{i(k_f - k_i) r}
+$$
+
+$$
+\Gamma_{i\rightarrow f} = \frac{mp d\Omega}{(2\pi \hbar^2)^2 V} |\int dr V(r) e^{i(k_f - k_i) r}|^2
+$$
+
+$$
+\Gamma_{i\rightarrow f} = \frac{d\sigma}{d\Omega} \frac{p}{m} |\psi_i|^2 d\Omega
+$$
+
+$$
+\frac{d\sigma}{d\Omega} = \frac{m^2}{(2\pi \hbar^2)^2} |\int dr V(r) e^{i(k_f - k_i) r}|^2
+$$
+
+For $V(r) = V_0 e^{-\alpha r^2}$
+
+$$
+\int dr V(r) e^{i(k_f - k_i) r} = V_0 (\frac{\pi}{\alpha})^{3/2} e^{-(k_i - k_f)^2/(4\alpha)}
+$$
+
+
+\subsection{2D dimential}
+
+In 2D,
+$$
+\rho_E = \frac{
+\frac{V}{(2\pi\hbar)^2}{ p d\Omega dp}
+}{
+\frac{p dp}{m}
+}
+=
+\frac{m V}{(2\pi\hbar)^2}{d\Omega}
+$$
+Box normalization:
+$$
+\psi_i(r) = \frac{1}{\sqrt{V}} e^{i k_i r}
+$$
+
+$$
+\psi_i(r) = \frac{1}{\sqrt{V}} e^{i k_f r}
+$$
+
+$$
+\bra{\psi_f} V(r) \ket{\psi_i} =  \frac{1}{V} \int dr V(r) e^{i(k_f - k_i) r}
+$$
+
+$$
+\Gamma_{i\rightarrow f} = \frac{m d\Omega}{2\pi \hbar^3 V} |\int dr V(r) e^{i(k_f - k_i) r}|^2
+$$
+
+$$
+\Gamma_{i\rightarrow f} = \frac{d\sigma}{d\Omega} \frac{p}{m} |\psi_i|^2 d\Omega
+$$
+
+$$
+\frac{d\sigma}{d\Omega} = \frac{m^2}{2\pi \hbar^3 p} |\int dr V(r) e^{i(k_f - k_i) r}|^2
+$$
+
+For $V(r) = V_0 e^{-\alpha r^2}$
+
+$$
+\int dr V(r) e^{i(k_f - k_i) r} = \frac{V_0 \pi}{\alpha} e^{-(k_i - k_f)^2/(4\alpha)}
+$$
 
 \end{document}
