@@ -124,7 +124,7 @@ void ScatteringProblemSolverInverseMatrix3D::InitEMinusH()
 					Real const tz = 1. / (2 * fMass)*fHbar*fHbar / (fDz*fDz);
 					if (fOrder <= 2) {
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i), -2 * (tx + ty) * tz + dig));
+						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i), -2 * (tx + ty + tz) + dig));
 
 						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i - 1), tx));
 						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i + 1), tx));
