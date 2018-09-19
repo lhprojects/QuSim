@@ -16,6 +16,7 @@
 #include "Perturbation1DImpl.h"
 #include "ScatteringProblemSolverInverseMatrix.h"
 #include "ScatteringProblemSolverInverseMatrix2D.h"
+#include "ScatteringProblemSolverInverseMatrix3D.h"
 
 #include "Cal.h"
 #include "View.h"
@@ -598,4 +599,41 @@ void QuScatteringInverseMatrix2D::init(std::function<Complex(Real, Real)> const 
 	static_cast<ScatteringProblemSolverInverseMatrix2D*>(fImpl)->InitScatteringSolver2D(v, x0, x1,
 		nx, y0, y1, ny,
 		en, directionx, directiony, met, mass, hbar, opts);
+}
+
+Tensor3View<Complex> QuScatteringProblemSolver3D::GetPsi()
+{
+	auto impl = static_cast<ScatteringProblemSolverInverseMatrix3D*>(fImpl);
+	return View(impl->fPsiX.data(), impl->fNx, impl->fNy, impl->fNz);
+}
+
+Tensor3View<Real> QuScatteringProblemSolver3D::GetV()
+{
+	auto impl = static_cast<ScatteringProblemSolverInverseMatrix3D*>(fImpl);
+	return View(impl->fV.data(), impl->fNx, impl->fNy, impl->fNz);
+}
+
+Real QuScatteringProblemSolver3D::ComputeXSection(Real cosx, Real cosy, Real cosz)
+{
+	return static_cast<ScatteringProblemSolverInverseMatrix3D*>(fImpl)->ComputeXSection(cosx, cosy, cosz);
+}
+
+Real QuScatteringProblemSolver3D::ComputeTotalXSection(Int npsi, Int ntheta)
+{
+	return static_cast<ScatteringProblemSolverInverseMatrix3D*>(fImpl)->ComputeTotalXSection(npsi, ntheta);
+}
+
+void QuScatteringInverseMatrix3D::init(std::function<Complex(Real, Real, Real)> const & v,
+	Real x0, Real x1, size_t nx, Real y0, Real y1, size_t ny, Real z0, Real z1, size_t nz,
+	Real en, Real directionx, Real directiony, Real directionz,
+	SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+{
+	fImpl = new ScatteringProblemSolverInverseMatrix3D();
+	static_cast<ScatteringProblemSolverInverseMatrix3D*>(fImpl)->InitScatteringSolver3D(v,
+		x0, x1, nx,
+		y0, y1, ny,
+		z0, z1, nz,
+		en, directionx, directiony, directionz,
+		SolverMethod::MatrixInverse, mass, hbar, opts);
+
 }

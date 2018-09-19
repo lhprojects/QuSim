@@ -27,6 +27,16 @@ inline MatrixView<Real> View(Eigen::MatrixXd const &v)
 	return MatrixView<Real>(v.data(), v.rows(), v.cols());
 }
 
+inline Tensor3View<Complex> View(Complex const * d, size_t sz1, size_t sz2, size_t sz3)
+{
+	return Tensor3View<Complex>(d, sz1, sz2, sz3);
+}
+
+inline Tensor3View<Real> View(Real const * d, size_t sz1, size_t sz2, size_t sz3)
+{
+	return Tensor3View<Real>(d, sz1, sz2, sz3);
+}
+
 inline Eigen::MatrixXd ToEigen(MatrixView<Real> const &v)
 {
 	return Eigen::Map< Eigen::MatrixXd >((double*)v.data(), (Eigen::Map< Eigen::MatrixXd >::Index)v.rows(),

@@ -58,6 +58,38 @@ private:
 	size_t const fCols;
 };
 
+template<class T>
+struct Tensor3View {
+
+	// sz3 most inner
+	// sz1 most outer
+	Tensor3View(T const *d, size_t sz1, size_t sz2, size_t sz3) : fData(d), fSize1(sz1), fSize2(sz2), fSize3(sz3) {}
+
+	T const *begin() const { return fData; }
+	T const *end() const { return fData + fSize1 * fSize2 * fSize3; }
+	T const *cbegin() const { return fData; }
+	T const *cend() const { return fData + fSize1 * fSize2 * fSize3; }
+	size_t size() const { return fSize1 * fSize2 * fSize3; }
+	size_t size1() const { return fSize1; }
+	size_t size2() const { return fSize2; }
+	size_t size3() const { return fSize3; }
+	T const *data() const { return fData; }
+	T const & operator[](size_t i) const { assert(i < size()); return fData[i]; }
+	T const & operator()(size_t i) const { assert(i < size()); return fData[i]; }
+	T const & operator()(size_t i3, size_t i2, size_t i1) const
+	{
+		assert(i3 < fSize3);
+		assert(i2 < fSize2);
+		assert(i1 < fSize1);
+		return fData[i3 + fSize3 *(i2  + fSize2 * i1)];
+	}
+private:
+	T const * const fData;
+	size_t const fSize1;
+	size_t const fSize2;
+	size_t const fSize3;
+};
+
 using Real = double;
 using Complex = std::complex<Real>;
 using Int = int64_t;
@@ -331,6 +363,40 @@ struct EXPORT_STRUCT QuScatteringInverseMatrix2D : QuScatteringProblemSolver2D {
 		Real en,
 		Real directionx,
 		Real directiony,
+		SolverMethod met,
+		Real mass,
+		Real hbar,
+		std::map<std::string, std::string> const &opts);
+
+};
+
+struct EXPORT_STRUCT QuScatteringProblemSolver3D : QuScatteringProblemSolver {
+
+	Tensor3View<Complex> GetPsi();
+	Tensor3View<Real> GetV();
+
+	Real ComputeXSection(Real cosx, Real cosy, Real cosz);
+	Real ComputeTotalXSection(Int npsi, Int ntheta);
+};
+
+struct EXPORT_STRUCT QuScatteringInverseMatrix3D : QuScatteringProblemSolver3D {
+
+
+	void init(
+		std::function<Complex(Real, Real, Real)> const & v,
+		Real x0,
+		Real x1,
+		size_t nx,
+		Real y0,
+		Real y1,
+		size_t ny,
+		Real z0,
+		Real z1,
+		size_t nz,
+		Real en,
+		Real directionx,
+		Real directiony,
+		Real directionz,
 		SolverMethod met,
 		Real mass,
 		Real hbar,

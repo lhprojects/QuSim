@@ -107,3 +107,78 @@ struct ScatteringSolver2DImpl : ScatteringSolverImpl {
 private:
 	void InitPotential();
 };
+
+struct ScatteringSolver3DImpl : ScatteringSolverImpl {
+
+	ScatteringSolver3DImpl() : fNx(0), fNy(0), fNz(0), fVFunc(), fX0(), fY0(), fZ0(), fDx(), fDy(), fDz(),
+		fK0X(), fK0Y(), fK0Z(), fV(), fPsi0X() { }
+
+	virtual void InitScatteringSolver3D(
+		std::function<Complex(Real, Real, Real)> const & v,
+		Real x0,
+		Real x1,
+		size_t nx,
+		Real y0,
+		Real y1,
+		size_t ny,
+		Real z0,
+		Real z1,
+		size_t nz,
+		Real en,
+		Real directionx,
+		Real directiony,
+		Real directionz,
+		SolverMethod met,
+		Real mass,
+		Real hbar,
+		std::map<std::string, std::string> const &opts);
+
+	Real GetX(ptrdiff_t i) const { return fX0 + fDx * i; }
+	Real GetY(ptrdiff_t i) const { return fY0 + fDy * i; }
+	Real GetZ(ptrdiff_t i) const { return fZ0 + fDz * i; }
+
+	ptrdiff_t Idx(ptrdiff_t iz, ptrdiff_t iy, ptrdiff_t ix) const { return (ix * fNy + iy) * fNz + iz; }
+
+	ptrdiff_t IdxFold(ptrdiff_t iz, ptrdiff_t iy, ptrdiff_t ix) const {
+		if (iz < 0) iz += fNz;
+		else if (iz >= fNz) iz -= fNz;
+
+		if (iy < 0) iy += fNy;
+		else if (iy >= fNy) iy -= fNy;
+
+		if (ix < 0) ix += fNx;
+		else if (ix >= fNx) ix -= fNx;
+
+		return Idx(iz, iy, ix);
+	}
+
+	// cosx = cos(psi)
+	// cosy = sin(psi)
+	// cosz = cos(theta)
+	virtual Real ComputeXSection(Real cosx, Real cosy, Real cosz) = 0;
+	// npsi = number of sampling points for psi
+	// ntheta = number of sampling points for theta
+	virtual Real ComputeTotalXSection(Int npsi, Int ntheta) = 0;
+
+	size_t const fNx;
+	size_t const fNy;
+	size_t const fNz;
+	Real const fX0;
+	Real const fY0;
+	Real const fZ0;
+	Real const fDx;
+	Real const fDy;
+	Real const fDz;
+	std::function<Complex(Real, Real, Real)> const fVFunc;
+	Real const fK0X;
+	Real const fK0Y;
+	Real const fK0Z;
+
+	Complex const FV;
+
+	Eigen::VectorXd const fV;
+	Eigen::VectorXcd const fPsi0X;
+	Eigen::VectorXcd fPsiX;
+private:
+	void InitPotential();
+};

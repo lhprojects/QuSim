@@ -83,11 +83,13 @@ void test3()
 		0.5, 1, 0, SolverMethod::MatrixInverse, 1, 1, opts);
 	solver.Compute();
 
+	printf("Test Total X section\n");
+	printf("%2s %8s", "N", "Err.\n");
 	Real ref = solver.ComputeTotalXSection(1000);
 	for (int i = 0; i < 20; ++i) {
 		int n = 1 + i;
 		Real xs = solver.ComputeTotalXSection(n);
-		printf("%d %8.1E\n", n, xs - ref);
+		printf("%2d %8.1E\n", n, xs - ref);
 	}
 
 

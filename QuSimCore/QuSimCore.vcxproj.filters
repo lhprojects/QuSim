@@ -75,6 +75,9 @@
     <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix2D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix3D.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\SplittingMethod2D.h">
@@ -153,6 +156,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix2D.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix3D.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
