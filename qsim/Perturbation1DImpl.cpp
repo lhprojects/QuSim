@@ -113,6 +113,17 @@ void QuPerturbation1DImpl::Compute()
 
 		};
 
+		auto G0ProdEpsilonU = [this](PsiVector &psik, Real epsilon) {
+			for (size_t i = 0; i < fNx; ++i) {
+				ptrdiff_t ii = i < fNx / 2 ? i : fNx - i;
+				Real p = 2 * Pi / (fNx * fDx) * ii * fHbar;
+				Real e = p * p / (2 * fMass);
+				Complex Green0K = 1. / (fE + I * epsilon - e);
+				psik[i] = Green0K * psik[i];
+			}
+
+		};
+
 		auto X2K = [this](PsiVector const &psix, PsiVector &psik) {
 			fFFT->Transform(psix.data(), psik.data());
 		};
@@ -141,6 +152,7 @@ void QuPerturbation1DImpl::Compute()
 			// new psi = (gamma G V - gamma + 1) psi  + gamma G S
 			// new psi = gamma G (V psi + S) + (1 - gamma) psi
 
+			/////////////////////////////////////////
 			// In Ref: A convergent Born series for solving the inhomogeneous Helmholtz equation in arbitrarily large media
 			// V = V0 - I epsilon
 			// epsilon >= abs(V0)
@@ -157,26 +169,55 @@ void QuPerturbation1DImpl::Compute()
 			// gamma_ = 1 - I V0_ /epsilon_
 
 			// new psi = gamma_ G_ ((V0_ + I epsilon_) psi + S) + (I V0_ / epsilon_) psi
+			/////////////////////////////////////////
+
+
+			/////////////////////////////////////////
+			// My preconditioner
+			// first:
+			// gamma_ =  1 - I conj(V0_)/ epsilon
+			// second: 0 = 1 -  1/2 gamma (1 + I V0_ / epsilon)
+			/////////////////////////////////////////
+
+
+
+
 			Real minEpsilon = 0;
 			for (int i = 0; i < fNx; ++i) {
 				if (abs(VplusAsb(i)) > minEpsilon) {
 					minEpsilon = abs(VplusAsb(i));
 				}
 			}
-			Real const epsilon = fEpsilon < minEpsilon ? minEpsilon : fEpsilon;
-
+			Real const epsilon = (fEpsilon < minEpsilon ? minEpsilon : fEpsilon);
 			ftmp1.resize(fNx);
+
+
 			for (int i = 0; i < fOrder; ++i) {
 				for (size_t i = 0; i < fNx; ++i) {
 					ftmp1[i] = (VplusAsb(i) + I * epsilon) * fPsiX[i] + fV[i] * fPsi0X[i];
 				}
 				X2K(ftmp1, fPsiK);
-				G0ProdU(fPsiK);
+				G0ProdEpsilonU(fPsiK, epsilon);
 				K2X(fPsiK, ftmp1);
-				for (size_t i = 0; i < fNx; ++i) {
-					Complex gamma = (1. - I * VplusAsb(i) / epsilon);
-					Complex oneMinusGamma =  I * VplusAsb(i) / epsilon;
-					fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
+				if (1) {
+					for (size_t i = 0; i < fNx; ++i) {
+						Complex gamma = (1. - I * VplusAsb(i) / epsilon);
+						Complex oneMinusGamma = I * VplusAsb(i) / epsilon;
+						fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
+					}
+				} else if(0) {
+					for (size_t i = 0; i < fNx; ++i) {
+						Complex gamma = (1. - I * conj(VplusAsb(i)) / epsilon);
+						Complex oneMinusGamma = I * conj(VplusAsb(i)) / epsilon;
+						fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
+					}
+				} else {
+					for (size_t i = 0; i < fNx; ++i) {
+						Complex f = 1. + I * VplusAsb(i) / epsilon;
+						Complex gamma = 2. / f;
+						Complex oneMinusGamma = 1. - gamma;
+						fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
+					}
 				}
 			}
 
