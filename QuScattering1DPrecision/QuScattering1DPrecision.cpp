@@ -182,7 +182,8 @@ void test1d5()
 
 void testPerburbation()
 {
-	printf("%10s | %10s %10s %10s %10s | %10s\n", "V0", "RO1", "RO2", "RO10", "RO3N3", "Exact");
+	printf("%10s | %10s %10s %10s %10s %10s %10s | %10s\n",
+		    "V0", "RO1", "RO2", "RO10", "RO3N3", "RP5", "RP20", "Exact");
 	for (int i = 0; i < 10; ++i) {
 
 		Real v0 = 0.05 + 0.1*i;
@@ -227,8 +228,16 @@ void testPerburbation()
 			1, SolverMethod::BornSerise, 1, 1, o5);
 		per5.Compute();
 
-		printf("%10lf | %10lf %10lf %10f %10lf %10lf| %10lf\n",
-			v0, per1.GetR(), per2.GetR(), per3.GetR(), per4.GetR(), per5.GetR(),
+		QuPerturbation1D per6;
+		std::map<std::string, std::string> o6;
+		o6["order"] = "20";
+		o6["preconditional"] = "1";
+		per6.init(vfunc, -100, 100, 2000, 0.5, 0.51,
+			1, SolverMethod::BornSerise, 1, 1, o6);
+		per6.Compute();
+
+		printf("%10lf | %10lf %10lf %10f %10lf %10lf %10lf| %10lf\n",
+			v0, per1.GetR(), per2.GetR(), per3.GetR(), per4.GetR(), per5.GetR(), per6.GetR(),
 			solver.GetR());
 	}
 
