@@ -243,13 +243,14 @@ void testPerburbation()
 
 }
 
-void testPerburbativeConditioner(Real p, int n = 1000)
+void testPerburbativeConditioner(char const *name, Real p, int n = 100)
 {
-	printf("%6s | %8s %8s %8s\n",
-		"Order", "Vellekoop", "Hao1", "Hao2");
+	printf("Test slow factor %lf\n", p);
+	printf("%6s | %8s\n",
+		"Order", name);
 
 	char order[10];
-	sprintf(order, "%d", 1);
+	sprintf(order, "%d", 10);
 
 	Real v0 = p;
 	auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
@@ -264,26 +265,6 @@ void testPerburbativeConditioner(Real p, int n = 1000)
 		solver.Compute();
 	}
 
-	QuPerturbation1D per1;
-	{
-		std::map<std::string, std::string> opts;
-		opts["preconditional"] = "1";
-		opts["order"] = order;
-		opts["preconditioner"] = "Vellekoop";
-		per1.init(vfunc, -150, 150, 10000, 0.5, 0,
-			1, SolverMethod::BornSerise, 1, 1, opts);
-	}
-
-	QuPerturbation1D per2;
-	{
-		std::map<std::string, std::string> opts;
-		opts["preconditional"] = "1";
-		opts["order"] = order;
-		opts["preconditioner"] = "Hao1";
-		per2.init(vfunc, -150, 150, 10000, 0.5, 0,
-			1, SolverMethod::BornSerise, 1, 1, opts);
-	}
-
 	QuPerturbation1D per3[9];
 	{
 		for (int i = 0; i < 9; ++i) {
@@ -292,7 +273,7 @@ void testPerburbativeConditioner(Real p, int n = 1000)
 			std::map<std::string, std::string> opts;
 			opts["preconditional"] = "1";
 			opts["order"] = order;
-			opts["preconditioner"] = "Hao2";
+			opts["preconditioner"] = name;
 			opts["slow"] = b;
 			per3[i].init(vfunc, -150, 150, 10000, 0.5, 0,
 				1, SolverMethod::BornSerise, 1, 1, opts);
@@ -301,12 +282,7 @@ void testPerburbativeConditioner(Real p, int n = 1000)
 
 	for (int i = 0; i < n; ++i) {
 
-		per1.Compute();
-		per2.Compute();
-
-		printf("%6d | %8.1E %8.1E",
-			i, per1.GetR() - solver.GetR(),
-			per2.GetR() - solver.GetR());
+		printf("%6d | ", i * 10);
 
 		for (int i = 0; i < 9; ++i) {
 			per3[i].Compute();
@@ -322,16 +298,31 @@ void testPerburbativeConditioner(Real p, int n = 1000)
 int main()
 {
 
-	testPerburbativeConditioner(0.25);
-	testPerburbativeConditioner(0.5);
-	testPerburbativeConditioner(1);
-	testPerburbativeConditioner(2);
+	testPerburbativeConditioner("Vellekoop", 0.25);
+	testPerburbativeConditioner("Hao1", 0.25);
+	testPerburbativeConditioner("Hao2", 0.25);
+
+	testPerburbativeConditioner("Vellekoop", 0.5);
+	testPerburbativeConditioner("Hao1", 0.5);
+	testPerburbativeConditioner("Hao2", 0.5);
+
+	testPerburbativeConditioner("Vellekoop", 1);
+	testPerburbativeConditioner("Hao1", 1);
+	testPerburbativeConditioner("Hao2", 1);
+
+
+	testPerburbativeConditioner("Vellekoop", 5, 500);
+	testPerburbativeConditioner("Hao1", 5, 500);
+	testPerburbativeConditioner("Hao2", 5, 500);
+
+
+
+
 	testPerburbation();
 	test0(0.1);
 	test0(1);
 	test10();
 	test1();
 	test1d5();
-	testPerburbativeConditioner(10, 20000);
 }
 

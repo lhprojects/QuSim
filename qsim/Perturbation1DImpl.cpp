@@ -232,14 +232,14 @@ void QuPerturbation1DImpl::Compute()
 				K2X(fPsiK, ftmp1);
 				if (fPreconditioner == PerburbativePreconditioner::Vellekoop) {
 					for (size_t i = 0; i < fNx; ++i) {
-						Complex gamma = (1. - I * VplusAsb(i) / epsilon);
-						Complex oneMinusGamma = I * VplusAsb(i) / epsilon;
+						Complex gamma = fSlow * (1. - I * VplusAsb(i) / epsilon);
+						Complex oneMinusGamma = (1. - fSlow) + fSlow * I * VplusAsb(i) / epsilon;
 						fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
 					}
 				} else if(fPreconditioner == PerburbativePreconditioner::Hao1) {
 					for (size_t i = 0; i < fNx; ++i) {
-						Complex gamma = (1. - I * conj(VplusAsb(i)) / epsilon);
-						Complex oneMinusGamma = I * conj(VplusAsb(i)) / epsilon;
+						Complex gamma = fSlow * (1. - I * conj(VplusAsb(i)) / epsilon);
+						Complex oneMinusGamma = (1. - fSlow) + fSlow * I * conj(VplusAsb(i)) / epsilon;
 						fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
 					}
 				} else if(fPreconditioner == PerburbativePreconditioner::Hao2) {
