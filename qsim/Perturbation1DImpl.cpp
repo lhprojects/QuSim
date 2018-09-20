@@ -52,6 +52,24 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 			const_cast<bool&>(fPreconditional) = prec;
 		}
 
+		{
+			PerburbativePreconditioner precer = PerburbativePreconditioner::Vellekoop;
+			auto it = fOpts.find("preconditioner");
+			if (it != fOpts.end()) {
+				if (it->second == "Vellekoop") {
+					precer = PerburbativePreconditioner::Vellekoop;
+				} else if (it->second == "Hao1") {
+					precer = PerburbativePreconditioner::Hao1;
+				} else if (it->second == "Hao2") {
+					precer = PerburbativePreconditioner::Hao2;
+				} else {
+					throw std::runtime_error("Unknown preconditioner");
+				}
+			}
+			const_cast<PerburbativePreconditioner&>(fPreconditioner) = precer;
+
+		}
+
 	}
 }
 
@@ -199,19 +217,19 @@ void QuPerturbation1DImpl::Compute()
 				X2K(ftmp1, fPsiK);
 				G0ProdEpsilonU(fPsiK, epsilon);
 				K2X(fPsiK, ftmp1);
-				if (1) {
+				if (fPreconditioner == PerburbativePreconditioner::Vellekoop) {
 					for (size_t i = 0; i < fNx; ++i) {
 						Complex gamma = (1. - I * VplusAsb(i) / epsilon);
 						Complex oneMinusGamma = I * VplusAsb(i) / epsilon;
 						fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
 					}
-				} else if(0) {
+				} else if(fPreconditioner == PerburbativePreconditioner::Hao1) {
 					for (size_t i = 0; i < fNx; ++i) {
 						Complex gamma = (1. - I * conj(VplusAsb(i)) / epsilon);
 						Complex oneMinusGamma = I * conj(VplusAsb(i)) / epsilon;
 						fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
 					}
-				} else {
+				} else if(fPreconditioner == PerburbativePreconditioner::Hao2) {
 					for (size_t i = 0; i < fNx; ++i) {
 						Complex f = 1. + I * VplusAsb(i) / epsilon;
 						Complex gamma = 2. / f;
