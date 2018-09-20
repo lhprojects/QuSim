@@ -125,8 +125,8 @@ void ScatteringProblemSolverInverseMatrix1D::Compute()
 			r += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(+I * fK0*GetX(i));
 			t += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(-I * fK0*GetX(i));
 		}
-		fR = abs2(r*fDx / (fMass*fHbar*fHbar*fK0 * I));
-		fT = abs2(t*fDx / (fMass*fHbar*fHbar*fK0 * I));
+		fR = abs2(r*fDx*fMass / (fHbar*fHbar*fK0 * I));
+		fT = abs2(t*fDx*fMass / (fHbar*fHbar*fK0 * I));
 
 	}
 

@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "../qsim/QuSim.h"
 
 
@@ -122,30 +123,60 @@ void test10()
 void test1()
 {
 
+	printf("Test R T calculation\n");
 	Solver1D solver;
-	solver.init(FunctorWrapper("0.0001*exp(-x*x)"), -10, 10, 20000, 0.5, 1, I,
+	solver.init(FunctorWrapper("0.000001*exp(-x*x)"), -10, 10, 20000, 0.5, 1, I,
 		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, std::map<std::string, std::string>());
 	solver.Compute();
 
 	QuPerturbation1D per;
-	per.init(FunctorWrapper("exp(-x*x)"), -5000, 5000, 200000, 0.5, 0.001,
+	per.init(FunctorWrapper("exp(-x*x)"), -50, 50, 20000, 0.5, 0.001,
 		1, SolverMethod::BornSerise, 1, 1, std::map<std::string, std::string>());
 
-	printf("Max MOmentum %lf\n", per.GetMaxMomentum());
-	printf("Max Energy %lf\n", per.GetMaxEnergy());
-
-	printf("Momentum Gap %lf\n", per.GetMomentumGap());
-	printf("Energy Gap %lf\n", per.GetEnergyGap());
-
-	printf("Epsilon %lf\n", per.GetEpsilon());
-	printf("Epsilon Momentum Width %lf\n", per.GetEpsilonMomentumWidth());
-
-	printf("Momentum Gap / Epsilon Momentum Width %lf\n", per.GetMomentumGap() / per.GetEpsilonMomentumWidth());
-	printf("Energy Gap / Epsilon %lf\n", per.GetEnergyGap() / per.GetEpsilon());
-	printf("Epsilon Boundary Error %lf\n", per.GetEpsilonBoundaryError());
-
 	per.Compute();
-	printf("R %g (Exact %g)\n", per.GetR(), solver.GetR()/(0.0001*0.0001));
+	printf("    R %g (Exact %g)\n", per.GetR(), solver.GetR()/(0.000001*0.000001));
+
+}
+
+void test1d5()
+{
+
+	printf("Test perburbation 1 order correction\n");
+	Solver1D solver;
+	solver.init(FunctorWrapper("0.1*exp(-x*x)"), -10, 10, 20000, 0.5, 1, I,
+		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, std::map<std::string, std::string>());
+	solver.Compute();
+
+	for (int i = 0; i < 10; ++i) {
+		QuPerturbation1D per;
+		char b[10];
+		sprintf(b, "%d", i);
+
+		std::map<std::string, std::string> opts;
+		opts["order"] = b;
+		per.init(FunctorWrapper("0.1*exp(-x*x)"), -1000, 1000, 20000, 0.5, 0.01,
+			1, SolverMethod::BornSerise, 1, 1, opts);
+
+		if (i == 0) {
+			printf("  Max Momentum %lf\n", per.GetMaxMomentum());
+			printf("  Max Energy %lf\n", per.GetMaxEnergy());
+
+			printf("  Momentum Gap %lf\n", per.GetMomentumGap());
+			printf("  Energy Gap %lf\n", per.GetEnergyGap());
+
+			printf("  Epsilon %lf\n", per.GetEpsilon());
+			printf("  Epsilon Momentum Width %lf\n", per.GetEpsilonMomentumWidth());
+
+			printf("  Momentum Gap / Epsilon Momentum Width %lf\n", per.GetMomentumGap() / per.GetEpsilonMomentumWidth());
+			printf("  Energy Gap / Epsilon %lf\n", per.GetEnergyGap() / per.GetEpsilon());
+			printf("  Epsilon Boundary Error %lf\n", per.GetEpsilonBoundaryError());
+
+		}
+
+		per.Compute();
+		printf("  R O%d %g (Exact %g)\n", 1 + i, per.GetR(),solver.GetR());
+
+	}
 
 }
 
@@ -195,63 +226,13 @@ void test2()
 }
 
 
-void test3()
-{
-	printf("%10s | %10s %10s %10s %10s | %10s\n", "V0", "RO1", "RO2", "RO10", "RO100", "Exact");
-	for (int i = 0; i < 10; ++i) {
-
-		Real v0 = 0.05 + 0.1*i;
-		auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
-		Solver1D solver;
-		solver.init(vfunc, -10, 10, 20000, 0.5, 1, I,
-			SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, std::map<std::string, std::string>());
-		solver.Compute();
-
-		QuPerturbation1D per1;
-		std::map<std::string, std::string> o1;
-		o1["order"] = "1";
-		o1["absorbtion"] = "1";
-		per1.init(vfunc, -5000, 5000, 200000, 0.5, 0.1,
-			1, SolverMethod::BornSerise, 1, 1, o1);
-		per1.Compute();
-
-		QuPerturbation1D per2;
-		std::map<std::string, std::string> o2;
-		o2["order"] = "2";
-		o2["absorbtion"] = "1";
-		per2.init(vfunc, -5000, 5000, 200000, 0.5, 0.1,
-			1, SolverMethod::BornSerise, 1, 1, o2);
-		per2.Compute();
-
-		QuPerturbation1D per3;
-		std::map<std::string, std::string> o3;
-		o3["order"] = "10";
-		o3["absorbtion"] = "1";
-		per3.init(vfunc, -5000, 5000, 200000, 0.5, 0.1,
-			1, SolverMethod::BornSerise, 1, 1, o3);
-		per3.Compute();
-
-		QuPerturbation1D per4;
-		std::map<std::string, std::string> o4;
-		o4["order"] = "100";
-		o4["absorbtion"] = "1";
-		per4.init(vfunc, -5000, 5000, 200000, 0.5, 0.1,
-			1, SolverMethod::BornSerise, 1, 1, o4);
-		per4.Compute();
-
-		printf("%10lf | %10lf %10lf %10f %10lf | %10lf\n",
-			v0, per1.GetR(), per2.GetR(), per3.GetR(), per4.GetR(), solver.GetR());
-	}
-
-}
-
 int main()
 {
 	test0(0.1);
 	test0(1);
 	test10();
 	test1();
+	test1d5();
 	test2();
-	test3();
 }
 

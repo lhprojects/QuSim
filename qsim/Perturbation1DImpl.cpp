@@ -20,7 +20,7 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 	if (fMet == SolverMethod::BornSerise) {
 
 		{
-			int the_order = 1;
+			int the_order = 0;
 			auto it = fOpts.find("order");
 			if (it != fOpts.end()) {
 				auto &order = it->second;
@@ -243,8 +243,8 @@ void QuPerturbation1DImpl::Compute()
 			Complex r = 0;
 			Complex t = 0;
 			for (size_t i = 0; i < fNx; ++i) {
-				r += (fPsi0X[i] + 0.*fPsiX[i])*fV[i] * exp(+I * fK0*GetX(i));
-				t += (fPsi0X[i] + 0. * fPsiX[i])*fV[i] * exp(-I * fK0*GetX(i));
+				r += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(+I * fK0*GetX(i));
+				t += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(-I * fK0*GetX(i));
 			}
 			fR = abs2(r*fDx*fMass / (fHbar*fHbar*fK0 * I));
 			fT = abs2(t*fDx*fMass / (fHbar*fHbar*fK0 * I));
