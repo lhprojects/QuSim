@@ -14,8 +14,8 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 
 	fPsiX.resize(fNx);
 	fPsiK.resize(fNx);
-	ftmp1.resize(fNx);
-	ftmp2.resize(fNx);
+	//ftmp1.resize(fNx);
+	//ftmp2.resize(fNx);
 
 	if (fMet == SolverMethod::BornSerise) {
 
@@ -67,9 +67,8 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 
 void QuPerturbation1DImpl::Compute()
 {
-	if (fMet == SolverMethod::MatrixInverse) {
 
-	} else if (fMet == SolverMethod::BornSerise) {
+	if (fMet == SolverMethod::BornSerise) {
 
 		auto add = [this](PsiVector const &a, PsiVector &b) {
 			for (size_t i = 0; i < fNx; ++i) {
@@ -107,6 +106,10 @@ void QuPerturbation1DImpl::Compute()
 			}
 		};
 
+		auto VProdU = [&](PsiVector &psix) {
+			VProd(psix, psix);
+		};
+
 		auto G0Prod = [this](PsiVector const &psik, PsiVector &retk) {
 			for (size_t i = 0; i < fNx; ++i) {
 				ptrdiff_t ii = i < fNx / 2 ? i : fNx - i;
@@ -114,6 +117,17 @@ void QuPerturbation1DImpl::Compute()
 				Real e = p * p / (2 * fMass);
 				Complex Green0K = 1. / (fE + I * fEpsilon - e);
 				retk[i] = Green0K * psik[i];
+			}
+
+		};
+
+		auto G0ProdU = [this](PsiVector &psik) {
+			for (size_t i = 0; i < fNx; ++i) {
+				ptrdiff_t ii = i < fNx / 2 ? i : fNx - i;
+				Real p = 2 * Pi / (fNx * fDx) * ii * fHbar;
+				Real e = p * p / (2 * fMass);
+				Complex Green0K = 1. / (fE + I * fEpsilon - e);
+				psik[i] = Green0K * psik[i];
 			}
 
 		};
@@ -186,38 +200,31 @@ void QuPerturbation1DImpl::Compute()
 			for (size_t i = ccoef.size()-1; i > 0; --i) {
 
 				if (i == ccoef.size() - 1) {
-					VProd(fPsi0X, ftmp1);
-					Scale(ccoef[i], ftmp1);
-					X2K(ftmp1, ftmp2);
-					G0Prod(ftmp2, fPsiK);
-					K2X(fPsiK, fPsiX);
+					VProd(fPsi0X, fPsiX);
 				} else {
 					add(fPsi0X, fPsiX);
-					VProd(fPsiX, ftmp1);
-					Scale(ccoef[i], ftmp1);
-					X2K(ftmp1, ftmp2);
-					G0Prod(ftmp2, fPsiK);
-					K2X(fPsiK, fPsiX);
+					VProdU(fPsiX);
 				}
+				Scale(ccoef[i], fPsiX);
+				X2K(fPsiX, fPsiK);
+				G0ProdU(fPsiK);
+				K2X(fPsiK, fPsiX);
 			}
 
 		} else { // naive born serise
 			for (int i = 0; i < fOrder; ++i) {
 				if (i == 0) {
 					// G psi0
-					VProd(fPsi0X, ftmp1);
-					X2K(ftmp1, ftmp2);
-					G0Prod(ftmp2, fPsiK);
-					K2X(fPsiK, fPsiX);
+					VProd(fPsi0X, fPsiX);
 				} else {
 					// O2: G ( 1 + G ) psi0 = G ( psi0 + O1)
 					// O3: G ( 1 + G ( 1 + G ) ) psi0 = G ( psi0 + O2)
 					add(fPsi0X, fPsiX);
-					VProd(fPsiX, ftmp1);
-					X2K(ftmp1, ftmp2);
-					G0Prod(ftmp2, fPsiK);
-					K2X(fPsiK, fPsiX);
+					VProdU(fPsiX);
 				}
+				X2K(fPsiX, fPsiK);
+				G0ProdU(fPsiK);
+				K2X(fPsiK, fPsiX);
 			}
 		}
 
