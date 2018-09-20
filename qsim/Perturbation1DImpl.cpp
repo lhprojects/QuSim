@@ -45,20 +45,11 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 
 		{
 			bool prec = false;
-			auto it = fOpts.find("preconditonal");
+			auto it = fOpts.find("preconditional");
 			if (it != fOpts.end()) {
 				prec = it->second != "0";
 			}
 			const_cast<bool&>(fPreconditional) = prec;
-		}
-
-		{
-			bool prec = false;
-			auto it = fOpts.find("absorbtion");
-			if (it != fOpts.end()) {
-				prec = it->second != "0";
-			}
-			const_cast<bool&>(fAbsorbtion) = prec;
 		}
 
 	}
@@ -88,26 +79,16 @@ void QuPerturbation1DImpl::Compute()
 			}
 		};
 
-		auto VProd = [this](PsiVector const &psix, PsiVector &retx) {
+		auto VProd = [&](PsiVector const &psix, PsiVector &retx) {
 			for (size_t i = 0; i < fNx; ++i) {
-				if (!fAbsorbtion) {
-					retx[i] = fV[i] * psix[i];
-				} else {
-					Real lambda = 2 * Pi / (sqrt(2 * fE*fMass) / fHbar);
-					Real x = GetX(i);
-					if (i < fNx / 2) {	
-						Real xx = (x - fX0) / (5 * lambda);
-						retx[i] = (fV[i] - 0.1*I * exp(-xx * xx) + 1.*I * fEpsilon) * psix[i];
-					} else {
-						Real xx = (x - (fX0 + fDx*fNx)) / (5 * lambda);
-						retx[i] = (fV[i] - 0.1*I * exp(-xx * xx) + 1. * I * fEpsilon) * psix[i];
-					}
-				}
+				retx[i] = fV[i] * psix[i];
 			}
 		};
 
 		auto VProdU = [&](PsiVector &psix) {
-			VProd(psix, psix);
+			for (size_t i = 0; i < fNx; ++i) {
+				psix[i] *= fV[i];
+			}
 		};
 
 		auto G0Prod = [this](PsiVector const &psik, PsiVector &retk) {
@@ -144,7 +125,61 @@ void QuPerturbation1DImpl::Compute()
 		};
 
 		if (fPreconditional) { // Preconditional Born serise
-			throw std::runtime_error("not implemented");
+			
+			auto VplusAsb = [&](ptrdiff_t i) {
+				Real lambda = 2 * Pi / (sqrt(2 * fE*fMass) / fHbar);
+				Real x = GetX(i);
+				if (i < fNx / 2) {
+					Real xx = (x - fX0) / (4 * lambda);
+					return fV[i] - fE * I * exp(-xx * xx);
+				} else {
+					Real xx = (x - (fX0 + fDx * fNx)) / (4 * lambda);
+					return fV[i] - fE * I * exp(-xx * xx);
+				}
+			};
+
+			// new psi = (gamma G V - gamma + 1) psi  + gamma G S
+			// new psi = gamma G (V psi + S) + (1 - gamma) psi
+
+			// In Ref: A convergent Born series for solving the inhomogeneous Helmholtz equation in arbitrarily large media
+			// V = V0 - I epsilon
+			// epsilon >= abs(V0)
+			// gamma = I V / espilon
+			// new psi = gamma G (V psi + S) + (- I V0 / epsilon) psi
+
+			// Transform:
+			// V0 = -2 V0_
+			// epsilon = 2 epsilon_
+
+			// In This implementation:
+			// V_ =  V0_ + I epsilon_
+			// epsilon_ >= abs(V0_)
+			// gamma_ = 1 - I V0_ /epsilon_
+
+			// new psi = gamma_ G_ ((V0_ + I epsilon_) psi + S) + (I V0_ / epsilon_) psi
+			Real minEpsilon = 0;
+			for (int i = 0; i < fNx; ++i) {
+				if (abs(VplusAsb(i)) > minEpsilon) {
+					minEpsilon = abs(VplusAsb(i));
+				}
+			}
+			Real const epsilon = fEpsilon < minEpsilon ? minEpsilon : fEpsilon;
+
+			ftmp1.resize(fNx);
+			for (int i = 0; i < fOrder; ++i) {
+				for (size_t i = 0; i < fNx; ++i) {
+					ftmp1[i] = (VplusAsb(i) + I * epsilon) * fPsiX[i] + fV[i] * fPsi0X[i];
+				}
+				X2K(ftmp1, fPsiK);
+				G0ProdU(fPsiK);
+				K2X(fPsiK, ftmp1);
+				for (size_t i = 0; i < fNx; ++i) {
+					Complex gamma = (1. - I * VplusAsb(i) / epsilon);
+					Complex oneMinusGamma =  I * VplusAsb(i) / epsilon;
+					fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
+				}
+			}
+
 		} else if (fSplit != 0 && fSplit != 0) { // n-split Born serise
 
 			size_t const NP = (int)pow(fOrder + 1, fSplit);

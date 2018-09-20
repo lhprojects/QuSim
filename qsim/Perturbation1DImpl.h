@@ -6,7 +6,7 @@
 
 struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 
-	QuPerturbation1DImpl() : fEpsilon(), fOrder(), fSplit(), fPreconditional(), fAbsorbtion() { }
+	QuPerturbation1DImpl() : fEpsilon(), fOrder(), fSplit(), fPreconditional() { }
 
 	virtual void InitPerturbation1D(
 		std::function<Complex(Real)> const & v,
@@ -59,7 +59,6 @@ struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 	int const fOrder;
 	int const fSplit;
 	bool const fPreconditional;
-	bool const fAbsorbtion;
 
 	Real const fEpsilon;
 
