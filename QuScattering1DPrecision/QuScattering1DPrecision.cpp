@@ -243,10 +243,74 @@ void testPerburbation()
 
 }
 
+void testPerburbativeConditioner()
+{
+	printf("%10s | %10s %10s %10s\n",
+		"Order", "Vellekoop", "Hao1", "Hao2");
+	for (int i = 0; i < 200; ++i) {
+		char order[10];
+		sprintf(order, "%d", i);
+
+		Real v0 = 1;
+		auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
+
+		Solver1D solver;
+		{
+
+			std::map<std::string, std::string> opts;
+			opts["small_round_error"] = "1";
+			solver.init(vfunc, -10, 10, 2000, 0.5, 1, I,
+				SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, opts);
+			solver.Compute();
+		}
+
+		QuPerturbation1D per1;
+		{
+			std::map<std::string, std::string> opts;
+			opts["preconditional"] = "1";
+			opts["order"] = order;
+			opts["preconditioner"] = "Vellekoop";
+			per1.init(vfunc, -150, 150, 10000, 0.5, 0,
+				1, SolverMethod::BornSerise, 1, 1, opts);
+			per1.Compute();
+		}
+
+		QuPerturbation1D per2;
+		{
+			std::map<std::string, std::string> opts;
+			opts["preconditional"] = "1";
+			opts["order"] = order;
+			opts["preconditioner"] = "Hao1";
+			per2.init(vfunc, -150, 150, 10000, 0.5, 0,
+				1, SolverMethod::BornSerise, 1, 1, opts);
+			per2.Compute();
+		}
+
+		QuPerturbation1D per3;
+		{
+			std::map<std::string, std::string> opts;
+			opts["preconditional"] = "1";
+			opts["order"] = order;
+			opts["preconditioner"] = "Hao2";
+			per3.init(vfunc, -150, 150, 10000, 0.5, 0,
+				1, SolverMethod::BornSerise, 1, 1, opts);
+			per3.Compute();
+		}
+
+
+		printf("%10d | %10.2E %10.2E %10.2E\n",
+			i, per1.GetR() - solver.GetR(),
+			per2.GetR() - solver.GetR(),
+			per3.GetR() - solver.GetR());
+	}
+
+}
+
 
 int main()
 {
 
+	testPerburbativeConditioner();
 	testPerburbation();
 	test0(0.1);
 	test0(1);
