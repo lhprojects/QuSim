@@ -340,7 +340,7 @@ void testPerburbativeConditioner()
 			opts["preconditional"] = "1";
 			opts["order"] = order;
 			opts["preconditioner"] = "Hao2";
-			opts["slow"] = "0.125";
+			opts["slow"] = "0.2";
 			per7.init(vfunc, -150, 150, 10000, 0.5, 0,
 				1, SolverMethod::BornSerise, 1, 1, opts);
 			per7.Compute();
