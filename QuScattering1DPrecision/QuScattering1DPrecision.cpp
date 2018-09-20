@@ -245,116 +245,75 @@ void testPerburbation()
 
 void testPerburbativeConditioner()
 {
-	printf("%10s | %10s %10s %10s\n",
+	printf("%6s | %8s %8s %8s\n",
 		"Order", "Vellekoop", "Hao1", "Hao2");
-	for (int i = 0; i < 500; ++i) {
-		char order[10];
-		sprintf(order, "%d", i);
 
-		Real v0 = 1;
-		auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
+	char order[10];
+	sprintf(order, "%d", 1);
 
-		Solver1D solver;
-		{
+	Real v0 = 1;
+	auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
 
-			std::map<std::string, std::string> opts;
-			opts["small_round_error"] = "1";
-			solver.init(vfunc, -10, 10, 2000, 0.5, 1, I,
-				SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, opts);
-			solver.Compute();
-		}
+	Solver1D solver;
+	{
 
-		QuPerturbation1D per1;
-		{
-			std::map<std::string, std::string> opts;
-			opts["preconditional"] = "1";
-			opts["order"] = order;
-			opts["preconditioner"] = "Vellekoop";
-			per1.init(vfunc, -150, 150, 10000, 0.5, 0,
-				1, SolverMethod::BornSerise, 1, 1, opts);
-			per1.Compute();
-		}
+		std::map<std::string, std::string> opts;
+		opts["small_round_error"] = "1";
+		solver.init(vfunc, -10, 10, 2000, 0.5, 1, I,
+			SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, opts);
+		solver.Compute();
+	}
 
-		QuPerturbation1D per2;
-		{
-			std::map<std::string, std::string> opts;
-			opts["preconditional"] = "1";
-			opts["order"] = order;
-			opts["preconditioner"] = "Hao1";
-			per2.init(vfunc, -150, 150, 10000, 0.5, 0,
-				1, SolverMethod::BornSerise, 1, 1, opts);
-			per2.Compute();
-		}
+	QuPerturbation1D per1;
+	{
+		std::map<std::string, std::string> opts;
+		opts["preconditional"] = "1";
+		opts["order"] = order;
+		opts["preconditioner"] = "Vellekoop";
+		per1.init(vfunc, -150, 150, 10000, 0.5, 0,
+			1, SolverMethod::BornSerise, 1, 1, opts);
+	}
 
-		QuPerturbation1D per3;
-		{
-			std::map<std::string, std::string> opts;
-			opts["preconditional"] = "1";
-			opts["order"] = order;
-			opts["preconditioner"] = "Hao2";
-			opts["slow"] = "1.0";
-			per3.init(vfunc, -150, 150, 10000, 0.5, 0,
-				1, SolverMethod::BornSerise, 1, 1, opts);
-			per3.Compute();
-		}
+	QuPerturbation1D per2;
+	{
+		std::map<std::string, std::string> opts;
+		opts["preconditional"] = "1";
+		opts["order"] = order;
+		opts["preconditioner"] = "Hao1";
+		per2.init(vfunc, -150, 150, 10000, 0.5, 0,
+			1, SolverMethod::BornSerise, 1, 1, opts);
+	}
 
-		QuPerturbation1D per4;
-		{
+	QuPerturbation1D per3[10];
+	{
+		for (int i = 0; i < 10; ++i) {
+			char b[10];
+			sprintf(b, "%lf", 0.1 + 0.1*i);
 			std::map<std::string, std::string> opts;
 			opts["preconditional"] = "1";
 			opts["order"] = order;
 			opts["preconditioner"] = "Hao2";
-			opts["slow"] = "0.75";
-			per4.init(vfunc, -150, 150, 10000, 0.5, 0,
+			opts["slow"] = b;
+			per3[i].init(vfunc, -150, 150, 10000, 0.5, 0,
 				1, SolverMethod::BornSerise, 1, 1, opts);
-			per4.Compute();
 		}
+	}
 
-		QuPerturbation1D per5;
-		{
-			std::map<std::string, std::string> opts;
-			opts["preconditional"] = "1";
-			opts["order"] = order;
-			opts["preconditioner"] = "Hao2";
-			opts["slow"] = "0.5";
-			per5.init(vfunc, -150, 150, 10000, 0.5, 0,
-				1, SolverMethod::BornSerise, 1, 1, opts);
-			per5.Compute();
-		}
+	for (int i = 0; i < 2000; ++i) {
 
-		QuPerturbation1D per6;
-		{
-			std::map<std::string, std::string> opts;
-			opts["preconditional"] = "1";
-			opts["order"] = order;
-			opts["preconditioner"] = "Hao2";
-			opts["slow"] = "0.25";
-			per6.init(vfunc, -150, 150, 10000, 0.5, 0,
-				1, SolverMethod::BornSerise, 1, 1, opts);
-			per6.Compute();
-		}
+		per1.Compute();
+		per2.Compute();
 
-		QuPerturbation1D per7;
-		{
-			std::map<std::string, std::string> opts;
-			opts["preconditional"] = "1";
-			opts["order"] = order;
-			opts["preconditioner"] = "Hao2";
-			opts["slow"] = "0.2";
-			per7.init(vfunc, -150, 150, 10000, 0.5, 0,
-				1, SolverMethod::BornSerise, 1, 1, opts);
-			per7.Compute();
-		}
-
-
-		printf("%10d | %10.2E %10.2E %10.2E %10.2E %10.2E %10.2E %10.2E\n",
+		printf("%6d | %8.1E %8.1E",
 			i, per1.GetR() - solver.GetR(),
-			per2.GetR() - solver.GetR(),
-			per3.GetR() - solver.GetR(),
-			per4.GetR() - solver.GetR(),
-			per5.GetR() - solver.GetR(),
-			per6.GetR() - solver.GetR(),
-			per7.GetR() - solver.GetR());
+			per2.GetR() - solver.GetR());
+
+		for (int i = 0; i < 10; ++i) {
+			per3[i].Compute();
+			printf(" %8.1E", per3[i].GetR() - solver.GetR());
+		}
+		printf("\n");
+
 	}
 
 }
