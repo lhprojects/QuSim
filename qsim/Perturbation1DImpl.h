@@ -12,7 +12,7 @@ enum class PerburbativePreconditioner {
 
 struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 
-	QuPerturbation1DImpl() : fEpsilon(), fOrder(), fSplit(), fPreconditional() { }
+	QuPerturbation1DImpl() : fEpsilon(), fOrder(), fSplit(), fPreconditional(), fSlow() { }
 
 	virtual void InitPerturbation1D(
 		std::function<Complex(Real)> const & v,
@@ -66,6 +66,7 @@ struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 	int const fSplit;
 	bool const fPreconditional;
 	PerburbativePreconditioner fPreconditioner;
+	Real const fSlow;
 	Real const fEpsilon;
 
 	PsiVector fPsiX;

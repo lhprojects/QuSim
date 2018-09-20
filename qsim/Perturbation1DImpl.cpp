@@ -70,6 +70,19 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 
 		}
 
+		{
+
+			auto it = fOpts.find("slow");
+			Real slow = 1;
+			if (it != fOpts.end()) {
+				if (sscanf(it->second.c_str(), "%lf", &slow) < 1) {
+					throw std::runtime_error("parse slow factor error");
+				}
+
+			}
+			const_cast<Real&>(fSlow) = slow;
+
+		}
 	}
 }
 
@@ -232,7 +245,7 @@ void QuPerturbation1DImpl::Compute()
 				} else if(fPreconditioner == PerburbativePreconditioner::Hao2) {
 					for (size_t i = 0; i < fNx; ++i) {
 						Complex f = 1. + I * VplusAsb(i) / epsilon;
-						Complex gamma = 1. / f;
+						Complex gamma = 2 * fSlow / f;
 						Complex oneMinusGamma = 1. - gamma;
 						fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
 					}

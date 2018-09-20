@@ -247,7 +247,7 @@ void testPerburbativeConditioner()
 {
 	printf("%10s | %10s %10s %10s\n",
 		"Order", "Vellekoop", "Hao1", "Hao2");
-	for (int i = 0; i < 200; ++i) {
+	for (int i = 0; i < 500; ++i) {
 		char order[10];
 		sprintf(order, "%d", i);
 
@@ -292,16 +292,69 @@ void testPerburbativeConditioner()
 			opts["preconditional"] = "1";
 			opts["order"] = order;
 			opts["preconditioner"] = "Hao2";
+			opts["slow"] = "1.0";
 			per3.init(vfunc, -150, 150, 10000, 0.5, 0,
 				1, SolverMethod::BornSerise, 1, 1, opts);
 			per3.Compute();
 		}
 
+		QuPerturbation1D per4;
+		{
+			std::map<std::string, std::string> opts;
+			opts["preconditional"] = "1";
+			opts["order"] = order;
+			opts["preconditioner"] = "Hao2";
+			opts["slow"] = "0.75";
+			per4.init(vfunc, -150, 150, 10000, 0.5, 0,
+				1, SolverMethod::BornSerise, 1, 1, opts);
+			per4.Compute();
+		}
 
-		printf("%10d | %10.2E %10.2E %10.2E\n",
+		QuPerturbation1D per5;
+		{
+			std::map<std::string, std::string> opts;
+			opts["preconditional"] = "1";
+			opts["order"] = order;
+			opts["preconditioner"] = "Hao2";
+			opts["slow"] = "0.5";
+			per5.init(vfunc, -150, 150, 10000, 0.5, 0,
+				1, SolverMethod::BornSerise, 1, 1, opts);
+			per5.Compute();
+		}
+
+		QuPerturbation1D per6;
+		{
+			std::map<std::string, std::string> opts;
+			opts["preconditional"] = "1";
+			opts["order"] = order;
+			opts["preconditioner"] = "Hao2";
+			opts["slow"] = "0.25";
+			per6.init(vfunc, -150, 150, 10000, 0.5, 0,
+				1, SolverMethod::BornSerise, 1, 1, opts);
+			per6.Compute();
+		}
+
+		QuPerturbation1D per7;
+		{
+			std::map<std::string, std::string> opts;
+			opts["preconditional"] = "1";
+			opts["order"] = order;
+			opts["preconditioner"] = "Hao2";
+			opts["slow"] = "0.125";
+			per7.init(vfunc, -150, 150, 10000, 0.5, 0,
+				1, SolverMethod::BornSerise, 1, 1, opts);
+			per7.Compute();
+		}
+
+
+		printf("%10d | %10.2E %10.2E %10.2E %10.2E %10.2E %10.2E %10.2E\n",
 			i, per1.GetR() - solver.GetR(),
 			per2.GetR() - solver.GetR(),
-			per3.GetR() - solver.GetR());
+			per3.GetR() - solver.GetR(),
+			per4.GetR() - solver.GetR(),
+			per5.GetR() - solver.GetR(),
+			per6.GetR() - solver.GetR(),
+			per7.GetR() - solver.GetR());
 	}
 
 }
