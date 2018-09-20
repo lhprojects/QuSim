@@ -243,7 +243,7 @@ void testPerburbation()
 
 }
 
-void testPerburbativeConditioner()
+void testPerburbativeConditioner(Real p, int n = 1000)
 {
 	printf("%6s | %8s %8s %8s\n",
 		"Order", "Vellekoop", "Hao1", "Hao2");
@@ -251,7 +251,7 @@ void testPerburbativeConditioner()
 	char order[10];
 	sprintf(order, "%d", 1);
 
-	Real v0 = 1;
+	Real v0 = p;
 	auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
 
 	Solver1D solver;
@@ -284,11 +284,11 @@ void testPerburbativeConditioner()
 			1, SolverMethod::BornSerise, 1, 1, opts);
 	}
 
-	QuPerturbation1D per3[10];
+	QuPerturbation1D per3[9];
 	{
-		for (int i = 0; i < 10; ++i) {
+		for (int i = 0; i < 9; ++i) {
 			char b[10];
-			sprintf(b, "%lf", 0.1 + 0.1*i);
+			sprintf(b, "%lf", 0.2 + 0.1*i);
 			std::map<std::string, std::string> opts;
 			opts["preconditional"] = "1";
 			opts["order"] = order;
@@ -299,7 +299,7 @@ void testPerburbativeConditioner()
 		}
 	}
 
-	for (int i = 0; i < 2000; ++i) {
+	for (int i = 0; i < n; ++i) {
 
 		per1.Compute();
 		per2.Compute();
@@ -308,7 +308,7 @@ void testPerburbativeConditioner()
 			i, per1.GetR() - solver.GetR(),
 			per2.GetR() - solver.GetR());
 
-		for (int i = 0; i < 10; ++i) {
+		for (int i = 0; i < 9; ++i) {
 			per3[i].Compute();
 			printf(" %8.1E", per3[i].GetR() - solver.GetR());
 		}
@@ -322,12 +322,16 @@ void testPerburbativeConditioner()
 int main()
 {
 
-	testPerburbativeConditioner();
+	testPerburbativeConditioner(0.25);
+	testPerburbativeConditioner(0.5);
+	testPerburbativeConditioner(1);
+	testPerburbativeConditioner(2);
 	testPerburbation();
 	test0(0.1);
 	test0(1);
 	test10();
 	test1();
 	test1d5();
+	testPerburbativeConditioner(10, 20000);
 }
 
