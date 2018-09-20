@@ -32,7 +32,7 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 		}
 
 		{
-			int the_split = 1;
+			int the_split = 0;
 			auto it = fOpts.find("split_n");
 			if (it != fOpts.end()) {
 				auto &split = it->second;
@@ -223,18 +223,33 @@ void QuPerturbation1DImpl::Compute()
 
 
 		// post calculation
-		Real r = 0;
-		Real t = 0;
-		for (size_t i = fNx / 2; i < fNx; ++i) {
-			r += abs2(fPsiK[i]);
-		}
+		if (0) {
+			// calculate in momentum space
+			Real r = 0;
+			Real t = 0;
+			for (size_t i = fNx / 2; i < fNx; ++i) {
+				r += abs2(fPsiK[i]);
+			}
 
-		for (size_t i = 0; i < fNx / 2; ++i) {
-			t += abs2(fPsiK[i]);
-		}
+			for (size_t i = 0; i < fNx / 2; ++i) {
+				t += abs2(fPsiK[i]);
+			}
 
-		fR = r * fEpsilon / fE * fDx / fNx;
-		fT = t * fEpsilon / fE * fDx / fNx;
+			fR = r * fEpsilon / fE * fDx / fNx;
+			fT = t * fEpsilon / fE * fDx / fNx;
+
+		} else {
+			// calculate in real space
+			Complex r = 0;
+			Complex t = 0;
+			for (size_t i = 0; i < fNx; ++i) {
+				r += (fPsi0X[i] + 0.*fPsiX[i])*fV[i] * exp(+I * fK0*GetX(i));
+				t += (fPsi0X[i] + 0. * fPsiX[i])*fV[i] * exp(-I * fK0*GetX(i));
+			}
+			fR = abs2(r*fDx*fMass / (fHbar*fHbar*fK0 * I));
+			fT = abs2(t*fDx*fMass / (fHbar*fHbar*fK0 * I));
+
+		}
 	}
 
 }
