@@ -7,7 +7,7 @@
 struct ScatteringSolverImpl {
 
 	ScatteringSolverImpl() : fHbar(0), fMass(0), fE(0), fMet(), fOpts(), fK0() { }
-	~ScatteringSolverImpl() { }
+	virtual ~ScatteringSolverImpl() { }
 
 	void InitScatteringSolver(Real en, SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const &opts)
 	{
