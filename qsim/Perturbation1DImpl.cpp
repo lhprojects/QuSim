@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Perturbation1DImpl.h"
+#include "Perburbation.h"
 
 void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const & v,
 	Real x0, Real x1, size_t n, Real en, Real epsilon, Real direction,
@@ -319,19 +320,23 @@ void QuPerturbation1DImpl::Compute()
 			}
 
 		} else { // naive born serise
-			for (int i = 0; i < fOrder; ++i) {
-				if (i == 0) {
-					// G psi0
-					VProd(fPsi0X, fPsiX);
-				} else {
-					// O2: G ( 1 + G ) psi0 = G ( psi0 + O1)
-					// O3: G ( 1 + G ( 1 + G ) ) psi0 = G ( psi0 + O2)
-					add(fPsi0X, fPsiX);
-					VProdU(fPsiX);
+			BornSerise bs;
+
+			auto X2K = [this](Complex const *psix, Complex *psik) {
+				fFFT->Transform(psix, psik);
+			};
+
+			auto K2X = [this](Complex const *psik, Complex *psix) {
+				fInvFFT->Transform(psik, psix);
+				for (size_t i = 0; i < fNx; ++i) {
+					psix[i] *= 1. / (fNx);
 				}
-				X2K(fPsiX, fPsiK);
-				G0ProdU(fPsiK);
-				K2X(fPsiK, fPsiX);
+			};
+
+			for (int i = 0; i < fOrder; ++i) {
+				bs.Update1D(fNx, fPsi0X.data(), fPsiX.data(),
+					fPsiK.data(), fV.data(), fEpsilon, fE, fMass, fHbar, fDx,
+					X2K, K2X);
 			}
 		}
 

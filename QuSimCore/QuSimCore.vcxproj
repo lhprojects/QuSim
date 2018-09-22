@@ -315,6 +315,7 @@
     <ClInclude Include="..\qsim\Linear.h" />
     <ClInclude Include="..\qsim\Matrix2.h" />
     <ClInclude Include="..\qsim\MatrixSolver.h" />
+    <ClInclude Include="..\qsim\Perburbation.h" />
     <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix2D.h" />
     <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix3D.h" />
     <ClInclude Include="..\qsim\ScatteringSolverImpl.h" />

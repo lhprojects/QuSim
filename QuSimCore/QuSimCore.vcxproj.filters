@@ -161,5 +161,8 @@
     <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix3D.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\qsim\Perburbation.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
