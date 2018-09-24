@@ -65,7 +65,7 @@ struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 	Real const fSlow;
 	Real const fEpsilon;
 
-	PsiVector fPsiX;
+	//PsiVector fPsiX;
 	PsiVector fPsiK;
 
 	PsiVector ftmp1;
