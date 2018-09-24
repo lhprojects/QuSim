@@ -1,10 +1,12 @@
 #pragma once
 
-#include <complex>
-
 typedef double PeReal;
-typedef std::complex<PeReal> PeComp;
+#include <math.h>
 PeReal const PI = 3.141592653589793;
+
+#include <complex>
+typedef std::complex<PeReal> PeComp;
+
 
 namespace PerburbationUtility {
 
@@ -114,6 +116,17 @@ enum class BornSerisePreconditioner {
 };
 
 struct PreconditionalBornSerise {
+
+	PeReal GetMinEpsilon(size_t n, PeReal const *reV, PeReal const *imV)
+	{
+		PeReal minEpsilon = 0;
+		for (int i = 0; i < n; ++i) {
+			if (abs(PeComp(reV[i], imV[i])) > minEpsilon) {
+				minEpsilon = abs(PeComp(reV[i], imV[i]));
+			}
+		}
+		return minEpsilon;
+	}
 
 	// S = V psi0
 	// deltaPsi = psi - psi0

@@ -168,17 +168,6 @@ void QuPerturbation1DImpl::Compute()
 
 		if (fPreconditional) { // Preconditional Born serise
 			
-			auto VplusAsb = [&](ptrdiff_t i) {
-				Real lambda = 2 * Pi / (sqrt(2 * fE*fMass) / fHbar);
-				Real x = GetX(i);
-				if (i < fNx / 2) {
-					Real xx = (x - fX0) / (4 * lambda);
-					return fV[i] - fE * I * exp(-xx * xx);
-				} else {
-					Real xx = (x - (fX0 + fDx * fNx)) / (4 * lambda);
-					return fV[i] - fE * I * exp(-xx * xx);
-				}
-			};
 
 			std::vector<Real> imV(fNx);
 			{
@@ -196,6 +185,10 @@ void QuPerturbation1DImpl::Compute()
 			};
 
 
+			PreconditionalBornSerise pbs;
+			Real minEpsilon = pbs.GetMinEpsilon(fNx, fV.data(), imV.data());
+			Real const epsilon = (fEpsilon < minEpsilon ? minEpsilon : fEpsilon);
+
 			auto X2K = [this](Complex const *psix, Complex *psik) {
 				fFFT->Transform(psix, psik);
 			};
@@ -209,15 +202,7 @@ void QuPerturbation1DImpl::Compute()
 
 			ftmp1.resize(fNx);
 
-			Real minEpsilon = 0;
-			for (int i = 0; i < fNx; ++i) {
-				if (abs(VplusAsb(i)) > minEpsilon) {
-					minEpsilon = abs(VplusAsb(i));
-				}
-			}
-			Real const epsilon = (fEpsilon < minEpsilon ? minEpsilon : fEpsilon);
 
-			PreconditionalBornSerise pbs;
 			for (int i = 0; i < fOrder; ++i) {
 				pbs.Update1D(fNx, fPsi0X.data(), fPsiX.data(), fPsiK.data(),
 					fV.data(), imV.data(), ftmp1.data(), epsilon, fE,
