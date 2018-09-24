@@ -3,12 +3,8 @@
 #include "ScatteringSolverImpl.h"
 #include "FourierTransform.h"
 #include "Linear.h"
+#include "Perburbation.h"
 
-enum class PerburbativePreconditioner {
-	Vellekoop,
-	Hao1,
-	Hao2,
-};
 
 struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 
@@ -65,7 +61,7 @@ struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 	int const fOrder;
 	int const fSplit;
 	bool const fPreconditional;
-	PerburbativePreconditioner fPreconditioner;
+	BornSerisePreconditioner fPreconditioner;
 	Real const fSlow;
 	Real const fEpsilon;
 

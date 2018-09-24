@@ -1,6 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Perturbation1DImpl.h"
-#include "Perburbation.h"
 
 void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const & v,
 	Real x0, Real x1, size_t n, Real en, Real epsilon, Real direction,
@@ -54,20 +53,20 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 		}
 
 		{
-			PerburbativePreconditioner precer = PerburbativePreconditioner::Vellekoop;
+			BornSerisePreconditioner precer = BornSerisePreconditioner::Vellekoop;
 			auto it = fOpts.find("preconditioner");
 			if (it != fOpts.end()) {
 				if (it->second == "Vellekoop") {
-					precer = PerburbativePreconditioner::Vellekoop;
+					precer = BornSerisePreconditioner::Vellekoop;
 				} else if (it->second == "Hao1") {
-					precer = PerburbativePreconditioner::Hao1;
+					precer = BornSerisePreconditioner::Hao1;
 				} else if (it->second == "Hao2") {
-					precer = PerburbativePreconditioner::Hao2;
+					precer = BornSerisePreconditioner::Hao2;
 				} else {
 					throw std::runtime_error("Unknown preconditioner");
 				}
 			}
-			const_cast<PerburbativePreconditioner&>(fPreconditioner) = precer;
+			const_cast<BornSerisePreconditioner&>(fPreconditioner) = precer;
 
 		}
 
@@ -181,38 +180,34 @@ void QuPerturbation1DImpl::Compute()
 				}
 			};
 
-			// new psi = (gamma G V - gamma + 1) psi  + gamma G S
-			// new psi = gamma G (V psi + S) + (1 - gamma) psi
-
-			/////////////////////////////////////////
-			// In Ref: A convergent Born series for solving the inhomogeneous Helmholtz equation in arbitrarily large media
-			// V = V0 - I epsilon
-			// epsilon >= abs(V0)
-			// gamma = I V / espilon
-			// new psi = gamma G (V psi + S) + (- I V0 / epsilon) psi
-
-			// Transform:
-			// V0 = -2 V0_
-			// epsilon = 2 epsilon_
-
-			// In This implementation:
-			// V_ =  V0_ + I epsilon_
-			// epsilon_ >= abs(V0_)
-			// gamma_ = 1 - I V0_ /epsilon_
-
-			// new psi = gamma_ G_ ((V0_ + I epsilon_) psi + S) + (I V0_ / epsilon_) psi
-			/////////////////////////////////////////
+			std::vector<Real> imV(fNx);
+			{
+				for (size_t i = 0; i < fNx; ++i) {
+					Real lambda = 2 * Pi / (sqrt(2 * fE*fMass) / fHbar);
+					Real x = GetX(i);
+					if (i < fNx / 2) {
+						Real xx = (x - fX0) / (4 * lambda);
+						imV[i] = -fE * exp(-xx * xx);
+					} else {
+						Real xx = (x - (fX0 + fDx * fNx)) / (4 * lambda);
+						imV[i] = -fE * exp(-xx * xx);
+					}
+				}
+			};
 
 
-			/////////////////////////////////////////
-			// My preconditioner
-			// first:
-			// gamma_ =  1 - I conj(V0_)/ epsilon
-			// second: 0 = 1 -  1/2 gamma (1 + I V0_ / epsilon)
-			/////////////////////////////////////////
+			auto X2K = [this](Complex const *psix, Complex *psik) {
+				fFFT->Transform(psix, psik);
+			};
 
+			auto K2X = [this](Complex const *psik, Complex *psix) {
+				fInvFFT->Transform(psik, psix);
+				for (size_t i = 0; i < fNx; ++i) {
+					psix[i] *= 1. / (fNx);
+				}
+			};
 
-
+			ftmp1.resize(fNx);
 
 			Real minEpsilon = 0;
 			for (int i = 0; i < fNx; ++i) {
@@ -221,36 +216,12 @@ void QuPerturbation1DImpl::Compute()
 				}
 			}
 			Real const epsilon = (fEpsilon < minEpsilon ? minEpsilon : fEpsilon);
-			ftmp1.resize(fNx);
 
-
+			PreconditionalBornSerise pbs;
 			for (int i = 0; i < fOrder; ++i) {
-				for (size_t i = 0; i < fNx; ++i) {
-					ftmp1[i] = (VplusAsb(i) + I * epsilon) * fPsiX[i] + fV[i] * fPsi0X[i];
-				}
-				X2K(ftmp1, fPsiK);
-				G0ProdEpsilonU(fPsiK, epsilon);
-				K2X(fPsiK, ftmp1);
-				if (fPreconditioner == PerburbativePreconditioner::Vellekoop) {
-					for (size_t i = 0; i < fNx; ++i) {
-						Complex gamma = fSlow * (1. - I * VplusAsb(i) / epsilon);
-						Complex oneMinusGamma = (1. - fSlow) + fSlow * I * VplusAsb(i) / epsilon;
-						fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
-					}
-				} else if(fPreconditioner == PerburbativePreconditioner::Hao1) {
-					for (size_t i = 0; i < fNx; ++i) {
-						Complex gamma = fSlow * (1. - I * conj(VplusAsb(i)) / epsilon);
-						Complex oneMinusGamma = (1. - fSlow) + fSlow * I * conj(VplusAsb(i)) / epsilon;
-						fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
-					}
-				} else if(fPreconditioner == PerburbativePreconditioner::Hao2) {
-					for (size_t i = 0; i < fNx; ++i) {
-						Complex f = 1. + I * VplusAsb(i) / epsilon;
-						Complex gamma = 2 * fSlow / f;
-						Complex oneMinusGamma = 1. - gamma;
-						fPsiX[i] = gamma * ftmp1[i] + oneMinusGamma * fPsiX[i];
-					}
-				}
+				pbs.Update1D(fNx, fPsi0X.data(), fPsiX.data(), fPsiK.data(),
+					fV.data(), imV.data(), ftmp1.data(), epsilon, fE,
+					fMass, fHbar, fDx, X2K, K2X, fSlow, fPreconditioner);
 			}
 
 		} else if (fSplit != 0 && fSplit != 0) { // n-split Born serise
