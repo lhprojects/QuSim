@@ -59,14 +59,15 @@ struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 	std::shared_ptr<FourierTransform> fInvFFT;
 
 	int const fOrder;
-	int const fSplit;
-	bool const fPreconditional;
-	BornSerisePreconditioner fPreconditioner;
-	Real const fSlow;
 	Real const fEpsilon;
-
-	//PsiVector fPsiX;
 	PsiVector fPsiK;
+
+	int const fSplit;
+
+	bool const fPreconditional;
+	Real const fSlow;
+	BornSerisePreconditioner fPreconditioner;
+	std::vector<Real> fVasb;
 
 	PsiVector ftmp1;
 	PsiVector ftmp2;

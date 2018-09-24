@@ -7,7 +7,6 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 	std::map<std::string, std::string> const & opts)
 {
 	InitScatteringSolver1D(v, x0, x1, n, en, direction, met, mass, hbar, opts);
-	const_cast<Real&>(fEpsilon) = epsilon;
 
 	fFFT.reset(FourierTransform::Create(fNx, false, FourierTransformLibrary::KISS));
 	fInvFFT.reset(FourierTransform::Create(fNx, true, FourierTransformLibrary::KISS));
@@ -48,6 +47,26 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 			auto it = fOpts.find("preconditional");
 			if (it != fOpts.end()) {
 				prec = it->second != "0";
+
+				fVasb.resize(fNx);
+				{
+					for (size_t i = 0; i < fNx; ++i) {
+						Real lambda = 2 * Pi / (sqrt(2 * fE*fMass) / fHbar);
+						Real x = GetX(i);
+						if (i < fNx / 2) {
+							Real xx = (x - fX0) / (4 * lambda);
+							fVasb[i] = -fE * exp(-xx * xx);
+						} else {
+							Real xx = (x - (fX0 + fDx * fNx)) / (4 * lambda);
+							fVasb[i] = -fE * exp(-xx * xx);
+						}
+					}
+				}
+
+				PreconditionalBornSerise pbs;
+				Real minEpsilon = pbs.GetMinEpsilon(fNx, fV.data(), fVasb.data());
+				const_cast<Real&>(fEpsilon) = (epsilon < minEpsilon ? minEpsilon : epsilon);
+
 			}
 			const_cast<bool&>(fPreconditional) = prec;
 		}
@@ -102,39 +121,7 @@ void QuPerturbation1DImpl::Compute()
 	};
 
 
-	if (fPreconditional) { // Preconditional Born serise
-
-
-		std::vector<Real> imV(fNx);
-		{
-			for (size_t i = 0; i < fNx; ++i) {
-				Real lambda = 2 * Pi / (sqrt(2 * fE*fMass) / fHbar);
-				Real x = GetX(i);
-				if (i < fNx / 2) {
-					Real xx = (x - fX0) / (4 * lambda);
-					imV[i] = -fE * exp(-xx * xx);
-				} else {
-					Real xx = (x - (fX0 + fDx * fNx)) / (4 * lambda);
-					imV[i] = -fE * exp(-xx * xx);
-				}
-			}
-		};
-
-
-		PreconditionalBornSerise pbs;
-		Real minEpsilon = pbs.GetMinEpsilon(fNx, fV.data(), imV.data());
-		Real const epsilon = (fEpsilon < minEpsilon ? minEpsilon : fEpsilon);
-
-		ftmp1.resize(fNx);
-
-
-		for (int i = 0; i < fOrder; ++i) {
-			pbs.Update1D(fNx, fPsi0X.data(), fPsiX.data(), fPsiK.data(),
-				fV.data(), imV.data(), ftmp1.data(), epsilon, fE,
-				fMass, fHbar, fDx, X2K, K2X, fSlow, fPreconditioner);
-		}
-
-	} else if (fSplit != 0 && fSplit != 0) { // n-split Born serise
+	if (fSplit != 0 && fSplit != 0) { // n-split Born serise
 
 		auto add = [this](PsiVector const &a, PsiVector &b) {
 			for (size_t i = 0; i < fNx; ++i) {
@@ -241,19 +228,19 @@ void QuPerturbation1DImpl::Compute()
 			K2X(fPsiK.data(), fPsiX.data());
 		}
 
+	} else if (fPreconditional) { // Preconditional Born serise
+
+		ftmp1.resize(fNx);
+
+		PreconditionalBornSerise pbs;
+		for (int i = 0; i < fOrder; ++i) {
+			pbs.Update1D(fNx, fPsi0X.data(), fPsiX.data(), fPsiK.data(),
+				fV.data(), fVasb.data(), ftmp1.data(), fEpsilon, fE,
+				fMass, fHbar, fDx, X2K, K2X, fSlow, fPreconditioner);
+		}
+
 	} else { // naive born serise
 		BornSerise bs;
-
-		auto X2K = [this](Complex const *psix, Complex *psik) {
-			fFFT->Transform(psix, psik);
-		};
-
-		auto K2X = [this](Complex const *psik, Complex *psix) {
-			fInvFFT->Transform(psik, psix);
-			for (size_t i = 0; i < fNx; ++i) {
-				psix[i] *= 1. / (fNx);
-			}
-		};
 
 		for (int i = 0; i < fOrder; ++i) {
 			bs.Update1D(fNx, fPsi0X.data(), fPsiX.data(),
