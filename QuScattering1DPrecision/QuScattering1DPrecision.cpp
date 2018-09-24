@@ -295,12 +295,51 @@ void testPerburbativeConditioner(char const *name, Real p, int n = 100)
 }
 
 
+void testNaiveBornSerise(Real p, int n = 100)
+{
+	printf("Test NaiveBornSerise %lf\n", p);
+	printf("%6s\n", "Order");
+
+	char order[10];
+	sprintf(order, "%d", 1);
+
+	Real v0 = p;
+	auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
+
+	Solver1D solver;
+	{
+
+		std::map<std::string, std::string> opts;
+		opts["small_round_error"] = "1";
+		solver.init(vfunc, -10, 10, 2000, 0.5, 1, I,
+			SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, opts);
+		solver.Compute();
+	}
+
+	QuPerturbation1D per1;
+	std::map<std::string, std::string> opts;
+	opts["order"] = order;
+	per1.init(vfunc, -5000, 5000, 200000, 0.5, 0.002,
+		1, SolverMethod::BornSerise, 1, 1, opts);
+
+
+	for (int i = 0; i < n; ++i) {
+
+		printf("%6d | ", i);
+
+		per1.Compute();
+		printf(" %8.3E %8.3E", per1.GetR(), solver.GetR());
+		printf("\n");
+
+	}
+
+}
+
 int main()
 {
 
-	testPerburbativeConditioner("Vellekoop", 0.25);
-	testPerburbativeConditioner("Hao1", 0.25);
-	testPerburbativeConditioner("Hao2", 0.25);
+	testNaiveBornSerise(0.4);
+	testPerburbation();
 
 	testPerburbativeConditioner("Vellekoop", 0.5);
 	testPerburbativeConditioner("Hao1", 0.5);
@@ -318,7 +357,6 @@ int main()
 
 
 
-	testPerburbation();
 	test0(0.1);
 	test0(1);
 	test10();

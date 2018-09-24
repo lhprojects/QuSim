@@ -10,6 +10,7 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 
 	fFFT.reset(FourierTransform::Create(fNx, false, FourierTransformLibrary::KISS));
 	fInvFFT.reset(FourierTransform::Create(fNx, true, FourierTransformLibrary::KISS));
+	const_cast<Real&>(fEpsilon) = epsilon;
 
 	fPsiX.resize(fNx);
 	fPsiK.resize(fNx);
