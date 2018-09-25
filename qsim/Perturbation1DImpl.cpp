@@ -21,8 +21,8 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 
 		{
 			int the_order = 0;
-			auto it = fOpts.find("order");
-			if (it != fOpts.end()) {
+			auto it = opts.find("order");
+			if (it != opts.end()) {
 				auto &order = it->second;
 				if (sscanf(order.c_str(), "%d", &the_order) < 1) {
 					throw std::runtime_error("not valid order");
@@ -43,66 +43,29 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 			const_cast<int&>(fSplit) = the_split;
 		}
 
-		{
-			bool prec = false;
-			auto it = fOpts.find("preconditional");
-			if (it != fOpts.end()) {
-				prec = it->second != "0";
+		fPerturbationOptions.Init(opts);
+		if (fPerturbationOptions.fPreconditional) {
 
-				fVasb.resize(fNx);
-				{
-					for (size_t i = 0; i < fNx; ++i) {
-						Real lambda = 2 * Pi / (sqrt(2 * fE*fMass) / fHbar);
-						Real x = GetX(i);
-						if (i < fNx / 2) {
-							Real xx = (x - fX0) / (4 * lambda);
-							fVasb[i] = -fE * exp(-xx * xx);
-						} else {
-							Real xx = (x - (fX0 + fDx * fNx)) / (4 * lambda);
-							fVasb[i] = -fE * exp(-xx * xx);
-						}
+			fVasb.resize(fNx);
+			{
+				for (size_t i = 0; i < fNx; ++i) {
+					Real lambda = 2 * Pi / (sqrt(2 * fE*fMass) / fHbar);
+					Real x = GetX(i);
+					if (i < fNx / 2) {
+						Real xx = (x - fX0) / (4 * lambda);
+						fVasb[i] = -fE * exp(-xx * xx);
+					} else {
+						Real xx = (x - (fX0 + fDx * fNx)) / (4 * lambda);
+						fVasb[i] = -fE * exp(-xx * xx);
 					}
 				}
-
-				PreconditionalBornSerise pbs;
-				Real minEpsilon = pbs.GetMinEpsilon(fNx, fV.data(), fVasb.data());
-				const_cast<Real&>(fEpsilon) = (epsilon < minEpsilon ? minEpsilon : epsilon);
-
 			}
-			const_cast<bool&>(fPreconditional) = prec;
+
+			PreconditionalBornSerise pbs;
+			Real minEpsilon = pbs.GetMinEpsilon(fNx, fV.data(), fVasb.data());
+			const_cast<Real&>(fEpsilon) = (epsilon < minEpsilon ? minEpsilon : epsilon);
 		}
 
-		{
-			BornSerisePreconditioner precer = BornSerisePreconditioner::Vellekoop;
-			auto it = fOpts.find("preconditioner");
-			if (it != fOpts.end()) {
-				if (it->second == "Vellekoop") {
-					precer = BornSerisePreconditioner::Vellekoop;
-				} else if (it->second == "Hao1") {
-					precer = BornSerisePreconditioner::Hao1;
-				} else if (it->second == "Hao2") {
-					precer = BornSerisePreconditioner::Hao2;
-				} else {
-					throw std::runtime_error("Unknown preconditioner");
-				}
-			}
-			const_cast<BornSerisePreconditioner&>(fPreconditioner) = precer;
-
-		}
-
-		{
-
-			auto it = fOpts.find("slow");
-			Real slow = 1;
-			if (it != fOpts.end()) {
-				if (sscanf(it->second.c_str(), "%lf", &slow) < 1) {
-					throw std::runtime_error("parse slow factor error");
-				}
-
-			}
-			const_cast<Real&>(fSlow) = slow;
-
-		}
 	}
 }
 
@@ -229,7 +192,7 @@ void QuPerturbation1DImpl::Compute()
 			K2X(fPsiK.data(), fPsiX.data());
 		}
 
-	} else if (fPreconditional) { // Preconditional Born serise
+	} else if (fPerturbationOptions.fPreconditional) { // Preconditional Born serise
 
 		ftmp1.resize(fNx);
 
@@ -237,7 +200,9 @@ void QuPerturbation1DImpl::Compute()
 		for (int i = 0; i < fOrder; ++i) {
 			pbs.Update1D(fNx, fPsi0X.data(), fPsiX.data(), fPsiK.data(),
 				fV.data(), fVasb.data(), ftmp1.data(), fEpsilon, fE,
-				fMass, fHbar, fDx, X2K, K2X, fSlow, fPreconditioner);
+				fMass, fHbar, fDx, X2K, K2X,
+				fPerturbationOptions.fSlow,
+				fPerturbationOptions.fPreconditioner);
 		}
 
 	} else { // naive born serise

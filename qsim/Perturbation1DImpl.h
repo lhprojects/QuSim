@@ -4,11 +4,11 @@
 #include "FourierTransform.h"
 #include "Linear.h"
 #include "Perburbation.h"
-
+#include "PerturbationOptions.h"
 
 struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 
-	QuPerturbation1DImpl() : fEpsilon(), fOrder(), fSplit(), fPreconditional(), fSlow() { }
+	QuPerturbation1DImpl() : fEpsilon(), fOrder(), fSplit() { }
 
 	virtual void InitPerturbation1D(
 		std::function<Complex(Real)> const & v,
@@ -63,10 +63,7 @@ struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 	PsiVector fPsiK;
 
 	int const fSplit;
-
-	bool const fPreconditional;
-	Real const fSlow;
-	BornSerisePreconditioner fPreconditioner;
+	PerturbationOptions fPerturbationOptions;
 	std::vector<Real> fVasb;
 
 	PsiVector ftmp1;

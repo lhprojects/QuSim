@@ -78,6 +78,9 @@
     <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix3D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\PerturbationOptions.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\SplittingMethod2D.h">
@@ -162,6 +165,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\qsim\Perburbation.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\PerturbationOptions.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
