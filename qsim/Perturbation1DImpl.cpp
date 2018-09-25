@@ -8,8 +8,9 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 {
 	InitScatteringSolver1D(v, x0, x1, n, en, direction, met, mass, hbar, opts);
 
-	fFFT.reset(FourierTransform::Create(fNx, false, FourierTransformLibrary::KISS));
-	fInvFFT.reset(FourierTransform::Create(fNx, true, FourierTransformLibrary::KISS));
+	fFourierTransformOptions.Init(opts);
+	fFFT.reset(FourierTransform::Create(fNx, false, fFourierTransformOptions.fLib));
+	fInvFFT.reset(FourierTransform::Create(fNx, true, fFourierTransformOptions.fLib));
 	const_cast<Real&>(fEpsilon) = epsilon;
 
 	fPsiX.resize(fNx);

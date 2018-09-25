@@ -4,6 +4,7 @@
 #include "eigen/Eigen/Dense"
 #include <memory>
 #include "FourierTransform.h"
+#include "FourierTransformOptions.h"
 
 struct SplittingMethod2D : EvolverImpl2D {
 	
@@ -22,6 +23,7 @@ struct SplittingMethod2D : EvolverImpl2D {
 	mutable Eigen::MatrixXcd fFTPsi;
 	mutable Eigen::VectorXcd fPsiYIn;
 	mutable Eigen::VectorXcd fPsiYOut;
+	FourierTransformOptions fFourierTransformOptions;
 	std::shared_ptr<FourierTransform2D > fft;
 	std::shared_ptr<FourierTransform2D > inv_fft;
 

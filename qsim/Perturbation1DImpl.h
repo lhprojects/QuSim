@@ -2,6 +2,7 @@
 
 #include "ScatteringSolverImpl.h"
 #include "FourierTransform.h"
+#include "FourierTransformOptions.h"
 #include "Linear.h"
 #include "Perburbation.h"
 #include "PerturbationOptions.h"
@@ -55,6 +56,7 @@ struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 	}
 
 
+	FourierTransformOptions fFourierTransformOptions;
 	std::shared_ptr<FourierTransform> fFFT;
 	std::shared_ptr<FourierTransform> fInvFFT;
 

@@ -22,25 +22,13 @@ void SplittingMethod2D::initSystem2D(std::function<Complex(Real, Real)> const &p
 	initExpV();
 	initExpT();
 
-	FourierTransformLibrary lib = FourierTransformLibrary::KISS;
-	{
-		auto it = opts.find("fft_lib");
-		if (it != opts.end()) {
-			if (it->second == "kiss") {
-				lib = FourierTransformLibrary::KISS;
-			} else if (it->second == "FFTW") {
-				lib = FourierTransformLibrary::FFTW;
-			} else if (it->second == "cuda") {
-				lib = FourierTransformLibrary::CUDA;
-			}
-		}
-	}
+	fFourierTransformOptions.Init(opts);
 
 	if (b == BoundaryCondition::Period) {
 		fFTPsi.resize(fNy, fNx);
 
-		fft.reset(FourierTransform2D::Create(fNy, fNx, false, lib));
-		inv_fft.reset(FourierTransform2D::Create(fNy, fNx, true, lib));
+		fft.reset(FourierTransform2D::Create(fNy, fNx, false, fFourierTransformOptions.fLib));
+		inv_fft.reset(FourierTransform2D::Create(fNy, fNx, true, fFourierTransformOptions.fLib));
 
 	} else {
 		throw std::runtime_error("unsupported boundary condition!");

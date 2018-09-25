@@ -170,5 +170,8 @@
     <ClInclude Include="..\qsim\PerturbationOptions.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\qsim\FourierTransformOptions.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

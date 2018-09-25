@@ -309,6 +309,7 @@
     <ClInclude Include="..\qsim\Dump.h" />
     <ClInclude Include="..\qsim\EigenMethod.h" />
     <ClInclude Include="..\qsim\FourierTransform.h" />
+    <ClInclude Include="..\qsim\FourierTransformOptions.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod2D.h" />
     <ClInclude Include="..\qsim\IVPSolverImpl.h" />

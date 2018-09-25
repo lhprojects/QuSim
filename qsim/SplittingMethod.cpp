@@ -28,28 +28,16 @@ void SplittingMethod::initSystem1D(std::function<Complex(Real)> const &psi, bool
 
 	initExpV();
 
-	FourierTransformLibrary lib = FourierTransformLibrary::KISS;
-	{
-		auto it = opts.find("fft_lib");
-		if (it != opts.end()) {
-			if (it->second == "kiss") {
-				lib = FourierTransformLibrary::KISS;
-			} else if (it->second == "FFTW") {
-				lib = FourierTransformLibrary::FFTW;
-			} else if (it->second == "cuda") {
-				lib = FourierTransformLibrary::CUDA;
-			}
-		}
-	}
+	fFourierTransformOptions.Init(opts);
 
 	if (fBoundaryCondition == BoundaryCondition::Period) {
 		fFTPsi.resize(n);
 
-		fft_N.reset(FourierTransform::Create(fN, false, lib));
-		inv_fft_N.reset(FourierTransform::Create(fN, true, lib));
+		fft_N.reset(FourierTransform::Create(fN, false, fFourierTransformOptions.fLib));
+		inv_fft_N.reset(FourierTransform::Create(fN, true, fFourierTransformOptions.fLib));
 
 	} else if (fBoundaryCondition == BoundaryCondition::InfiniteWall) {
-		inv_fft_2N.reset(FourierTransform::Create(2*fN, true, lib));
+		inv_fft_2N.reset(FourierTransform::Create(2*fN, true, fFourierTransformOptions.fLib));
 		fIWPsi.resize(2 * n);
 		fIWKPsi.resize(2 * n);
 	}

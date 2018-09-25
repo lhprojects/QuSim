@@ -1,6 +1,7 @@
 #pragma once
 #include "EvolverImpl.h"
 #include "FourierTransform.h"
+#include "FourierTransformOptions.h"
 #include <memory>
 
 
@@ -14,6 +15,7 @@ struct SplittingMethod : EvolverImpl1D {
 	// period only
 	std::vector<Complex> fFTPsi;
 	
+	FourierTransformOptions fFourierTransformOptions;
 	std::shared_ptr<FourierTransform> fft_N;
 	std::shared_ptr<FourierTransform> inv_fft_N;
 	// infinite wall
