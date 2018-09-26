@@ -14,6 +14,7 @@
 #include "ComplexPotentialIVPSolver1DImpl.h"
 
 #include "Perturbation1DImpl.h"
+#include "Perturbation2DImpl.h"
 #include "ScatteringProblemSolverInverseMatrix.h"
 #include "ScatteringProblemSolverInverseMatrix2D.h"
 #include "ScatteringProblemSolverInverseMatrix3D.h"
@@ -600,6 +601,20 @@ void QuScatteringInverseMatrix2D::init(std::function<Complex(Real, Real)> const 
 		nx, y0, y1, ny,
 		en, directionx, directiony, met, mass, hbar, opts);
 }
+
+
+void QuPerturbation2D::init(std::function<Complex(Real, Real)> const & v, Real x0, Real x1, size_t nx, 
+	Real y0, Real y1, size_t ny, Real en, Real epsilon,
+	Real directionx, Real directiony, SolverMethod met, Real mass,
+	Real hbar, std::map<std::string, std::string> const & opts)
+{
+	fImpl = new QuPerturbation2DImpl();
+	static_cast<QuPerturbation2DImpl*>(fImpl)->InitPerturbation2D(v, x0, x1,
+		nx, y0, y1, ny,
+		en, epsilon,
+		directionx, directiony, met, mass, hbar, opts);
+}
+
 
 Tensor3View<Complex> QuScatteringProblemSolver3D::GetPsi()
 {

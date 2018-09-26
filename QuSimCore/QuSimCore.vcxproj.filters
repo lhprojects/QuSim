@@ -81,6 +81,9 @@
     <ClCompile Include="..\qsim\PerturbationOptions.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\Perturbation2DImpl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\SplittingMethod2D.h">
@@ -171,6 +174,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\qsim\FourierTransformOptions.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\Perturbation2DImpl.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

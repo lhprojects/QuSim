@@ -12,9 +12,9 @@ double born(double mass, double hbar, double p, double v0, double alpha, double 
 
 }
 
-void test0()
+void testBorn()
 {
-
+	printf("test Born\n");
 	std::map<std::string, std::string> opts;
 	QuScatteringInverseMatrix2D solver;
 	solver.init([](Real x, Real y) { return 0.001*exp(-x * x - y * y); }, -100, 100, 300, -100, 100, 300,
@@ -33,10 +33,150 @@ void test0()
 
 }
 
-void test1()
+void testInverseAndPerburbation()
+{
+	printf("test Inverse And Perburbation\n");
+	auto vf = [](Real x, Real y) { return 0.2*exp(-x * x - y * y); };
+
+	QuScatteringInverseMatrix2D solver;
+	{
+		std::map<std::string, std::string> opts;
+		solver.init(vf, -100, 100, 300, -100, 100, 300,
+			0.5, 1, 0, SolverMethod::MatrixInverse, 1, 1, opts);
+		solver.Compute();
+	}
+
+	QuPerturbation2D per1;
+	{
+		std::map<std::string, std::string> opts;
+		opts["order"] = "1";
+		per1.init(vf, -100, 100, 300, -100, 100, 300,
+			0.5, 0.1, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
+		per1.Compute();
+	}
+
+	QuPerturbation2D per2;
+	{
+		std::map<std::string, std::string> opts;
+		opts["order"] = "2";
+		per2.init(vf, -100, 100, 300, -100, 100, 300,
+			0.5, 0.1, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
+		per2.Compute();
+	}
+
+	QuPerturbation2D per10;
+	{
+		std::map<std::string, std::string> opts;
+		opts["order"] = "10";
+		per10.init(vf, -100, 100, 300, -100, 100, 300,
+			0.5, 0.1, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
+		per10.Compute();
+	}
+
+	QuPerturbation2D perp10;
+	{
+		std::map<std::string, std::string> opts;
+		opts["preconditional"] = "1";
+		opts["preconditioner"] = "Vellekoop";
+		opts["order"] = "100";
+		perp10.init(vf, -100, 100, 300, -100, 100, 300,
+			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
+		perp10.Compute();
+	}
+
+
+	printf("%12s | %12s %12s %12s %12s %12s\n", "theta", "inv.mat.", "per.1", "per.2", "per.10", "perp.10");
+	for (int i = 0; i < 10; ++i) {
+		Real theta = i * 2 * Pi / 10;
+		Real cosx = cos(theta);
+		Real cosy = sin(theta);
+		printf("%12lf | %12.5E %12.5E %12.5E %12.5E %12.5E\n",
+			theta,
+			solver.ComputeXSection(cosx, cosy),
+			per1.ComputeXSection(cosx, cosy),
+			per2.ComputeXSection(cosx, cosy),
+			per10.ComputeXSection(cosx, cosy),
+			perp10.ComputeXSection(cosx, cosy)
+			);
+	}
+
+}
+
+
+void testPerburbationConverge(Real v0, int n = 100)
+{
+	printf("test Perburbation Convege\n");
+	auto vf = [&](Real x, Real y) { return v0*exp(-x * x - y * y); };
+
+	QuScatteringInverseMatrix2D solver;
+	{
+		std::map<std::string, std::string> opts;
+		opts["space_order"] = "4";
+		solver.init(vf, -100, 100, 500, -100, 100, 500,
+			0.5, 1, 0, SolverMethod::MatrixInverse, 1, 1, opts);
+		//solver.Compute();
+	}
+
+	QuPerturbation2D perp1;
+	{
+		std::map<std::string, std::string> opts;
+		opts["preconditional"] = "1";
+		opts["preconditioner"] = "Vellekoop";
+		opts["order"] = "1";
+		opts["slow"] = "0.5";
+		opts["fft_lib"] = "FFTW";
+		perp1.init(vf, -150, 150, 1000, -150, 150, 1000,
+			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
+	}
+
+	QuPerturbation2D perp2;
+	{
+		std::map<std::string, std::string> opts;
+		opts["preconditional"] = "1";
+		opts["preconditioner"] = "Hao1";
+		opts["order"] = "1";
+		opts["slow"] = "0.5";
+		opts["fft_lib"] = "FFTW";
+		perp2.init(vf, -150, 150, 1000, -150, 150, 1000,
+			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
+	}
+
+	QuPerturbation2D perp3;
+	{
+		std::map<std::string, std::string> opts;
+		opts["preconditional"] = "1";
+		opts["preconditioner"] = "Hao2";
+		opts["order"] = "1";
+		opts["slow"] = "0.5";
+		opts["fft_lib"] = "FFTW";
+		perp3.init(vf, -150, 150, 1000, -150, 150, 1000,
+			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
+	}
+
+
+	printf("%12s | %12s %12s\n", "theta", "inv.mat.", "perp");
+	for (int i = 0; i < n; ++i) {
+		Real theta = 0;
+		Real cosx = cos(theta);
+		Real cosy = sin(theta);
+		printf("%12d | %12.5E %12.5E %12.5E %12.5E\n",
+			i,
+			5.92704E-2 + 0*solver.ComputeXSection(cosx, cosy),
+			perp1.ComputeXSection(cosx, cosy),
+			perp2.ComputeXSection(cosx, cosy),
+			perp3.ComputeXSection(cosx, cosy)
+		);
+		perp1.Compute();
+		perp2.Compute();
+		perp3.Compute();
+	}
+
+}
+
+void testBornDiffPotential()
 {
 
-
+	printf("Comparsion with born x seciton for different potential\n");
 	for (int i = 0; i < 10; ++i) {
 		Real v0 = 0.1 + 0.1 * i;
 		std::map<std::string, std::string> opts;
@@ -52,31 +192,9 @@ void test1()
 
 }
 
-void test2()
+void testTotalXSection()
 {
-
-	std::map<std::string, std::string> opts;
-	QuScatteringInverseMatrix2D solver;
-	solver.init([](Real x, Real y) { return 10*exp(-x * x - y * y); }, -100, 100, 300, -100, 100, 300,
-		0.5, 1, 0, SolverMethod::MatrixInverse, 1, 1, opts);
-	solver.Compute();
-
-	printf("%12s | %12s\n", "theta", "ana.for.");
-	for (int i = 0; i < 10; ++i) {
-		Real theta = i * 2 * Pi / 10;
-		Real cosx = cos(theta);
-		Real cosy = sin(theta);
-		Real a = solver.ComputeXSection(cosx, cosy);
-		printf("%12lf | %12.8E\n", theta, a);
-	}
-
-
-}
-
-
-void test3()
-{
-
+	printf("test total x section converge");
 	std::map<std::string, std::string> opts;
 	QuScatteringInverseMatrix2D solver;
 	solver.init([](Real x, Real y) { return 1 * exp(-x * x - y * y); }, -100, 100, 300, -100, 100, 300,
@@ -97,9 +215,11 @@ void test3()
 
 int main()
 {
-	test3();
-	test2();
-	test1();
-	test0();
+	testPerburbationConverge(0.5, 1000);
+	testPerburbationConverge(0.2);
+	testInverseAndPerburbation();
+	testBorn();
+	testBornDiffPotential();
+	testTotalXSection();
 
 }

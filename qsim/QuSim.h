@@ -370,6 +370,27 @@ struct EXPORT_STRUCT QuScatteringInverseMatrix2D : QuScatteringProblemSolver2D {
 
 };
 
+struct EXPORT_STRUCT QuPerturbation2D : QuScatteringProblemSolver2D {
+
+	void init(
+		std::function<Complex(Real, Real)> const & v,
+		Real x0,
+		Real x1,
+		size_t nx,
+		Real y0,
+		Real y1,
+		size_t ny,
+		Real en,
+		Real epsilon,
+		Real directionx,
+		Real directiony,
+		SolverMethod met,
+		Real mass,
+		Real hbar,
+		std::map<std::string, std::string> const &opts);
+
+};
+
 struct EXPORT_STRUCT QuScatteringProblemSolver3D : QuScatteringProblemSolver {
 
 	Tensor3View<Complex> GetPsi();

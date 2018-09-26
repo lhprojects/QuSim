@@ -49,8 +49,40 @@ namespace PerburbationUtility {
 		}
 	}
 
-};
+	// psik = G0 * psik
+	inline void Green01D(PeComp *psik, PeReal hbar, PeReal mass, PeReal e, PeReal epsilon,
+		size_t n, PeReal dx)
+	{
+		PeReal dp = hbar * 2 * PI / (n * dx);
+		PeReal divByTwoMass = 1 / (2 * mass);
+		for (size_t i = 0; i < n; ++i) {
+			PeReal p = (i < n / 2) ? (i * dp) : ((n - i) *dp);
+			PeReal t = p * p * divByTwoMass;
+			PeComp g0 = PeReal(1) / (e - t + PeComp(0, epsilon));
+			psik[i] = g0 * psik[i];
+		}
+	}
 
+	// psik = G0 * psik
+	inline void Green02D(PeComp *psik, PeReal hbar, PeReal mass, PeReal e, PeReal epsilon,
+		size_t nx, size_t ny, PeReal dx, PeReal dy)
+	{
+		PeReal dpx = hbar * 2 * PI / (nx * dx);
+		PeReal dpy = hbar * 2 * PI / (ny * dy);
+		PeReal divByTwoMass = 1 / (2 * mass);
+		for (size_t i = 0; i < nx; ++i) {
+			for (size_t j = 0; j < ny; ++j) {
+				PeReal px = (i < nx / 2) ? (i * dpx) : ((nx - i) *dpx);
+				PeReal py = (j < ny / 2) ? (j * dpy) : ((ny - j) *dpy);
+				PeReal t = (px * px + py * py) * divByTwoMass;
+
+				PeComp g0 = PeReal(1) / (e - t + PeComp(0, epsilon));
+				psik[i*ny + j] = g0 * psik[i*ny + j];
+			}
+		}
+	}
+
+};
 
 
 struct BornSerise {
@@ -71,7 +103,7 @@ struct BornSerise {
 	{
 		using namespace PerburbationUtility;
 
-		// psi  =  G (V psi + S)
+		// deltaPsi  =  G0 (V deltaPsi + S)
 		Add(psi0x, deltaPsix, n);
 		Mul(V, deltaPsix, n);
 		X2K(deltaPsix, deltaPsik);
@@ -94,17 +126,30 @@ struct BornSerise {
 		F2 const &K2X)
 	{
 		auto G0 = [&](PeComp *psik) {
-			PeReal dp = hbar * 2 * PI / (n * dx);
-			PeReal divByTwoMass = 1 / (2 * mass);
-			for (size_t i = 0; i < n; ++i) {
-				PeReal p = (i < n / 2) ? (i * dp) : ((n - i) *dp);
-				PeReal t = p * p * divByTwoMass;
-				PeComp g0 = PeReal(1) / (e - t + PeComp(0, epsilon));
-				psik[i] = g0 * psik[i];
-			}
 
 		};
 		Update(n, psi0x, deltaPsix, deltaPsik, V, G0, X2K, K2X);
+	}
+
+	template<class F1, class F2>
+	void Update2D(size_t nx, size_t ny,
+		PeComp const *psi0x,
+		PeComp *deltaPsix,
+		PeComp *deltaPsik,
+		PeReal const *V,
+		PeReal epsilon,
+		PeReal e,
+		PeReal mass,
+		PeReal hbar,
+		PeReal dx,
+		PeReal dy,
+		F1 const &X2K,
+		F2 const &K2X)
+	{
+		auto G0 = [&](PeComp *psik) {
+			PerburbationUtility::Green02D(psik, hbar, mass, e, epsilon, nx, ny, dx, dy);
+		};
+		Update(nx*ny, psi0x, deltaPsix, deltaPsik, V, G0, X2K, K2X);
 	}
 
 };
@@ -229,18 +274,34 @@ struct PreconditionalBornSerise {
 		BornSerisePreconditioner preconditioner)
 	{
 		auto G0 = [&](PeComp *psik) {
-			PeReal dp = hbar * 2 * PI / (n * dx);
-			PeReal divByTwoMass = 1 / (2 * mass);
-			for (size_t i = 0; i < n; ++i) {
-				PeReal p = (i < n / 2) ? (i * dp) : ((n - i) *dp);
-				PeReal t = p * p * divByTwoMass;
-
-				PeComp g0 = PeReal(1) / (e - t + PeComp(0, epsilon));
-				psik[i] = g0 * psik[i];
-			}
-
+			PerburbationUtility::Green01D(psik, hbar, mass, e, epsilon, n, dx);
 		};
 		Update(n, psi0x, deltaPsix, deltaPsik, reV, imV, tmp, epsilon, G0, X2K, K2X, slow, preconditioner);
+	}
+
+	template<class F1, class F2>
+	void Update2D(size_t nx, size_t ny,
+		PeComp const *psi0x,
+		PeComp *deltaPsix,
+		PeComp *deltaPsik,
+		PeReal const *reV,
+		PeReal const *imV,
+		PeComp *tmp,
+		PeReal epsilon,
+		PeReal e,
+		PeReal mass,
+		PeReal hbar,
+		PeReal dx,
+		PeReal dy,
+		F1 const &X2K,
+		F2 const &K2X,
+		PeReal const slow,
+		BornSerisePreconditioner preconditioner)
+	{
+		auto G0 = [&](PeComp *psik) {
+			PerburbationUtility::Green02D(psik, hbar, mass, e, epsilon, nx, ny, dx, dy);
+		};
+		Update(nx * ny, psi0x, deltaPsix, deltaPsik, reV, imV, tmp, epsilon, G0, X2K, K2X, slow, preconditioner);
 	}
 
 };

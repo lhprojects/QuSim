@@ -7,7 +7,7 @@ struct ScatteringProblemSolverInverseMatrix2D : ScatteringSolver2DImpl {
 
 	ScatteringProblemSolverInverseMatrix2D() : fOrder(), fMatrixSolver() {}
 
-	virtual void InitScatteringSolver2D(
+	void InitScatteringSolver2D(
 		std::function<Complex(Real, Real)> const & v,
 		Real x0,
 		Real x1,
@@ -26,9 +26,6 @@ struct ScatteringProblemSolverInverseMatrix2D : ScatteringSolver2DImpl {
 
 	void Compute() override;
 	
-	Real ComputeXSection(Real cosx, Real cosy) override;
-	Real ComputeTotalXSection(Int n) override;
-
 	SparseMatrixSolver fMatrixSolver;
 	int const fOrder;
 	Eigen::SparseMatrix<Complex> fEMinusH;
