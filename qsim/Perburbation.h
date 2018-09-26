@@ -126,7 +126,7 @@ struct BornSerise {
 		F2 const &K2X)
 	{
 		auto G0 = [&](PeComp *psik) {
-
+			PerburbationUtility::Green01D(psik, hbar, mass, e, epsilon, n, dx);
 		};
 		Update(n, psi0x, deltaPsix, deltaPsik, V, G0, X2K, K2X);
 	}
