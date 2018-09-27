@@ -615,6 +615,11 @@ void QuPerturbation2D::init(std::function<Complex(Real, Real)> const & v, Real x
 		directionx, directiony, met, mass, hbar, opts);
 }
 
+Real QuPerturbation2D::GetDeltaPsiNorm()
+{
+	return static_cast<QuPerturbation2DImpl*>(fImpl)->fNormDeltaPsi;
+}
+
 
 Tensor3View<Complex> QuScatteringProblemSolver3D::GetPsi()
 {

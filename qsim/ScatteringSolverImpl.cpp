@@ -69,6 +69,8 @@ void ScatteringSolver2DImpl::InitScatteringSolver2D(std::function<Complex(Real, 
 		}
 	}
 	fPsiX.resize(fNy, fNx);
+	flastPsiX.resize(fNy, fNx);
+	fNormDeltaPsi = 0;
 }
 
 void ScatteringSolver2DImpl::InitPotential()

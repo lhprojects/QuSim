@@ -80,6 +80,8 @@ void QuPerturbation2DImpl::Compute()
 		}
 	};
 
+	std::copy(fPsiX.data(), fPsiX.data() + fNx*fNy, flastPsiX.data());
+
 	if (fPerturbationOptions.fPreconditional) { // Preconditional Born serise
 
 		PreconditionalBornSerise pbs;
@@ -102,5 +104,10 @@ void QuPerturbation2DImpl::Compute()
 		}
 	}
 
-
+	Real norm = 0;
+	for (size_t i = 0; i < fNx * fNy; ++i) {
+		norm += abs2(fPsiX.data()[i] - flastPsiX.data()[i])*fDx*fDy;
+	}
+	norm = sqrt(norm);
+	fNormDeltaPsi = norm;
 }

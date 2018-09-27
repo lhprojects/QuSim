@@ -117,6 +117,8 @@ struct ScatteringSolver2DImpl : ScatteringSolverImpl {
 	Eigen::MatrixXd const fV;
 	Eigen::MatrixXcd const fPsi0X;
 	Eigen::MatrixXcd fPsiX;
+	Eigen::MatrixXcd flastPsiX;
+	Real fNormDeltaPsi;
 private:
 	void InitPotential();
 };

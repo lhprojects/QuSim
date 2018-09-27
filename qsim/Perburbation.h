@@ -54,7 +54,7 @@ namespace PerburbationUtility {
 		size_t n, PeReal dx)
 	{
 		PeReal dp = hbar * 2 * PI / (n * dx);
-		PeReal divByTwoMass = 1 / (2 * mass);
+		PeReal divByTwoMass = PeReal(1) / (PeReal(2) * mass);
 		for (size_t i = 0; i < n; ++i) {
 			PeReal p = (i < n / 2) ? (i * dp) : ((n - i) *dp);
 			PeReal t = p * p * divByTwoMass;
@@ -69,7 +69,7 @@ namespace PerburbationUtility {
 	{
 		PeReal dpx = hbar * 2 * PI / (nx * dx);
 		PeReal dpy = hbar * 2 * PI / (ny * dy);
-		PeReal divByTwoMass = 1 / (2 * mass);
+		PeReal divByTwoMass = PeReal(1) / (PeReal(2) * mass);
 		for (size_t i = 0; i < nx; ++i) {
 			for (size_t j = 0; j < ny; ++j) {
 				PeReal px = (i < nx / 2) ? (i * dpx) : ((nx - i) *dpx);
@@ -125,7 +125,7 @@ namespace PerburbationUtility {
 					yy = (ny - j) * betay;
 				}
 
-				v[i*ny + j] = -e * exp(-(xx * xx + yy * yy));
+				v[i*ny + j] = -e * exp(-(xx * xx) + exp(-yy * yy));
 			}
 		}
 
