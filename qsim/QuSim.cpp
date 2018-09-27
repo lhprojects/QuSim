@@ -615,6 +615,13 @@ void QuPerturbation2D::init(std::function<Complex(Real, Real)> const & v, Real x
 		directionx, directiony, met, mass, hbar, opts);
 }
 
+MatrixView<Real> QuPerturbation2D::GetVabsb()
+{
+	return View(static_cast<QuPerturbation2DImpl*>(fImpl)->fVasb.data(),
+		static_cast<QuPerturbation2DImpl*>(fImpl)->fNx,
+		static_cast<QuPerturbation2DImpl*>(fImpl)->fNy);
+}
+
 Real QuPerturbation2D::GetDeltaPsiNorm()
 {
 	return static_cast<QuPerturbation2DImpl*>(fImpl)->fNormDeltaPsi;

@@ -389,6 +389,7 @@ struct EXPORT_STRUCT QuPerturbation2D : QuScatteringProblemSolver2D {
 		Real hbar,
 		std::map<std::string, std::string> const &opts);
 
+	MatrixView<Real> GetVabsb();
 	Real GetDeltaPsiNorm();
 };
 
