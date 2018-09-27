@@ -37,30 +37,19 @@ void QuPerturbation2DImpl::InitPerturbation2D(std::function<Complex(Real, Real)>
 		fPerturbationOptions.Init(opts);
 		if (fPerturbationOptions.fPreconditional) {
 
-			fVasb.resize(fNx*fNy);
 			{
-				Real lambda = 2 * Pi / (sqrt(2 * fE*fMass) / fHbar);
-				for (size_t i = 0; i < fNx; ++i) {
-					for (size_t j = 0; j < fNy; ++j) {
-						Real x = GetX(i);
-						Real y = GetY(j);
-						Real xx;
-						Real yy;
-						if (i < fNx / 2) {
-							xx = (x - fX0) / (4 * lambda);
-						} else {
-							xx = (x - (fX0 + fDx * fNx)) / (4 * lambda);
-						}
-						if (j < fNy / 2) {
-							yy = (y - fY0) / (4 * lambda);
-						} else {
-							yy = (y - (fY0 + fDy * fNy)) / (4 * lambda);
-						}
-
-
-						fVasb[Idx(j, i)] = -fE * exp(-(xx*xx + yy * yy));
-					}
+				fVasb.resize(fNx*fNy);
+				Real lambda = 2 * Pi / (sqrt(2 * fMass*fE) / hbar);
+				if (fNx*fDx < 24 * lambda) {
+					throw std::runtime_error("too small size");
 				}
+				if (fNy*fDy < 24 * lambda) {
+					throw std::runtime_error("too small size");
+				}
+				PerburbationUtility::GaussAsbLayer2D(fNx, fNy, fDx, fDy,
+					fVasb.data(),
+					fHbar, mass, fE, 4.0);
+
 			}
 
 			PreconditionalBornSerise pbs;
