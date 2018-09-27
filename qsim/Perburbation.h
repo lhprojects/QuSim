@@ -125,7 +125,7 @@ namespace PerburbationUtility {
 					yy = (ny - j) * betay;
 				}
 
-				v[i*ny + j] = -e * exp(-(xx * xx) + exp(-yy * yy));
+				v[i*ny + j] = -e * (exp(-xx * xx) + exp(-yy * yy));
 			}
 		}
 
