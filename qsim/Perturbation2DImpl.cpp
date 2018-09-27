@@ -59,6 +59,8 @@ void QuPerturbation2DImpl::InitPerturbation2D(std::function<Complex(Real, Real)>
 			ftmp1.resize(fNx*fNy);
 		}
 
+	} else {
+		throw std::runtime_error("not support method!");
 	}
 
 
@@ -80,7 +82,9 @@ void QuPerturbation2DImpl::Compute()
 		}
 	};
 
-	std::copy(fPsiX.data(), fPsiX.data() + fNx*fNy, flastPsiX.data());
+	for (size_t i = 0; i < fNx*fNy; ++i) {
+		flastPsiX.data()[i] = fPsiX.data()[i];
+	}
 
 	if (fPerturbationOptions.fPreconditional) { // Preconditional Born serise
 
