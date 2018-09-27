@@ -48,19 +48,12 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 		if (fPerturbationOptions.fPreconditional) {
 
 			fVasb.resize(fNx);
-			{
-				for (size_t i = 0; i < fNx; ++i) {
-					Real lambda = 2 * Pi / (sqrt(2 * fE*fMass) / fHbar);
-					Real x = GetX(i);
-					if (i < fNx / 2) {
-						Real xx = (x - fX0) / (4 * lambda);
-						fVasb[i] = -fE * exp(-xx * xx);
-					} else {
-						Real xx = (x - (fX0 + fDx * fNx)) / (4 * lambda);
-						fVasb[i] = -fE * exp(-xx * xx);
-					}
-				}
+			Real lambda = 2 * Pi / (sqrt(2 * fMass*fE) / hbar);
+			if (fNx*fDx < 24 * lambda) {
+				throw std::runtime_error("too small size");
 			}
+			PerburbationUtility::GaussAsbLayer1D(fNx, fDx, fVasb.data(),
+				fHbar, mass, fE, 4.0);
 
 			PreconditionalBornSerise pbs;
 			Real minEpsilon = pbs.GetMinEpsilon(fNx, fV.data(), fVasb.data());

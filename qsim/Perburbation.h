@@ -82,6 +82,54 @@ namespace PerburbationUtility {
 		}
 	}
 
+
+	inline void GaussAsbLayer1D(size_t nx, PeReal dx,
+		PeReal *v, PeReal hbar, PeReal mass, PeReal e,
+		PeReal alpha)
+	{
+		PeReal lambda = 2 * PI / (sqrt(2 * e * mass) / hbar);
+		PeReal betax = dx / (alpha * lambda);
+		for (size_t i = 0; i < nx; ++i) {
+			PeReal xx;
+
+			if (i < nx / 2) {
+				xx = i * betax;
+			} else {
+				xx = (nx - i) * betax;
+			}
+			v[i] = -e * exp(-(xx * xx));
+		}
+	}
+
+	inline void GaussAsbLayer2D(size_t nx, size_t ny, PeReal dx, PeReal dy,
+		PeReal *v, PeReal hbar, PeReal mass, PeReal e,
+		PeReal alpha)
+	{
+		PeReal lambda = 2 * PI / (sqrt(2 * e * mass) / hbar);
+		PeReal betax = dx / (alpha * lambda);
+		PeReal betay = dy / (alpha * lambda);
+		for (size_t i = 0; i < nx; ++i) {
+			for (size_t j = 0; j < ny; ++j) {
+				PeReal xx;
+				PeReal yy;
+
+				if (i < nx / 2) {
+					xx = i * betax;
+				} else {
+					xx = (nx -  i)*betax;
+				}
+
+				if (j < ny / 2) {
+					yy = j * betay;
+				} else {
+					yy = (ny - j) * betay;
+				}
+
+				v[i*ny + j] = -e * exp(-(xx * xx + yy * yy));
+			}
+		}
+
+	}
 };
 
 
