@@ -15,6 +15,7 @@
 
 #include "Perturbation1DImpl.h"
 #include "Perturbation2DImpl.h"
+#include "Perturbation3DImpl.h"
 #include "ScatteringProblemSolverInverseMatrix.h"
 #include "ScatteringProblemSolverInverseMatrix2D.h"
 #include "ScatteringProblemSolverInverseMatrix3D.h"
@@ -664,3 +665,22 @@ void QuScatteringInverseMatrix3D::init(std::function<Complex(Real, Real, Real)> 
 		SolverMethod::MatrixInverse, mass, hbar, opts);
 
 }
+
+void QuPerturbation3D::init(std::function<Complex(Real, Real, Real)> const & v,
+	Real x0, Real x1, size_t nx,
+	Real y0, Real y1, size_t ny,
+	Real z0, Real z1, size_t nz,
+	Real en, Real epsilon,
+	Real directionx, Real directiony, Real directionz,
+	SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+{
+	fImpl = new QuPerturbation3DImpl();
+	static_cast<QuPerturbation3DImpl*>(fImpl)->InitPerturbation3D(v,
+		x0, x1, nx,
+		y0, y1, ny,
+		z0, z1, nz,
+		en, epsilon,
+		directionx, directiony, directionz,
+		SolverMethod::BornSerise, mass, hbar, opts);
+}
+

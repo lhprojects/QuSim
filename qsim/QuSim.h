@@ -426,3 +426,29 @@ struct EXPORT_STRUCT QuScatteringInverseMatrix3D : QuScatteringProblemSolver3D {
 		std::map<std::string, std::string> const &opts);
 
 };
+
+struct EXPORT_STRUCT QuPerturbation3D : QuScatteringProblemSolver3D {
+
+
+	void init(
+		std::function<Complex(Real, Real, Real)> const & v,
+		Real x0,
+		Real x1,
+		size_t nx,
+		Real y0,
+		Real y1,
+		size_t ny,
+		Real z0,
+		Real z1,
+		size_t nz,
+		Real en,
+		Real epsilon,
+		Real directionx,
+		Real directiony,
+		Real directionz,
+		SolverMethod met,
+		Real mass,
+		Real hbar,
+		std::map<std::string, std::string> const &opts);
+
+};

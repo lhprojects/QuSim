@@ -166,6 +166,7 @@ void ScatteringSolver3DImpl::InitScatteringSolver3D(std::function<Complex(Real, 
 
 	const_cast<Eigen::VectorXcd&>(fPsi0X).resize(fNz*fNy*fNx);
 	const_cast<Eigen::VectorXcd&>(fPsiX).resize(fNz*fNy*fNx);
+	if(fLastPsiXRecord) fLastPsiX.resize(fNx*fNy*fNz);
 
 	for (size_t i = 0; i < fNx; ++i) {
 		for (size_t j = 0; j < fNy; ++j) {
@@ -194,4 +195,53 @@ void ScatteringSolver3DImpl::InitPotential()
 			}
 		}
 	}
+}
+
+
+Real ScatteringSolver3DImpl::ComputeXSection(Real cosx, Real cosy, Real cosz)
+{
+	Real const nm = 1 / sqrt(cosx * cosx + cosy * cosy + cosz * cosz);
+	cosx *= nm;
+	cosy *= nm;
+	cosz *= nm;
+
+	Complex r = 0;
+
+	// Prolbem: (nabla^2+k0^2) delta psi = 2m/hbar^2 v psi
+	// Green's: (nabla^2+k0^2) G = delta(x)
+	//     => : delta psi  = \int G (2m / hbar^2) v psi dx dy dz
+	// G = 1/(4 Pi) exp(i k z) / z
+	//     => : delta psi  = \int psi v exp(i k r) / r   1/(4 Pi) * [(2m / hbar^2) dx dy dz
+
+	for (size_t i = 0; i < fNx; ++i) {
+		for (size_t j = 0; j < fNy; ++j) {
+			for (size_t k = 0; k < fNz; ++k) {
+				r += (fPsi0X(Idx(k, j, i)) + fPsiX(Idx(k, j, i)))
+					*fV(Idx(k, j, i))
+					* exp(-I * (fK0 * cosx * GetX(i) + fK0 * cosy * GetY(j) + fK0 * cosz * GetZ(k)));
+			}
+		}
+	}
+
+	Real dX_dOmega = abs2(r*(2 * fMass) / (fHbar*fHbar)*fDx*fDy*fDz / (4 * Pi));
+
+	return dX_dOmega;
+}
+
+Real ScatteringSolver3DImpl::ComputeTotalXSection(Int npsi, Int ntheta)
+{
+	Real t = 0;
+	for (Int j = 0; j < ntheta; ++j) {
+		for (Int i = 0; i < npsi; ++i) {
+			Real phi = i * 2 * Pi / npsi;
+			Real theta = i * Pi / ntheta;
+			Real cosx = sin(theta)*cos(phi);
+			Real cosy = sin(theta)*sin(phi);
+			Real cosz = cos(theta);
+			Real xsec = ComputeXSection(cosx, cosy, cosz)*sin(theta);
+			t += xsec;
+		}
+	}
+	t *= 4 * Pi / (ntheta * npsi);
+	return t;
 }

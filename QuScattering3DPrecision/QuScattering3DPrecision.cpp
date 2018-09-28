@@ -12,6 +12,35 @@ double born(double mass, double hbar, double p,
 
 }
 
+void testPerturbationConverge()
+{
+	std::map<std::string, std::string> opts;
+	QuPerturbation3D solver;
+
+	Real p = 1;
+	Real e = p * p / 2;
+
+	opts["order"] = "1";
+	solver.init([](Real x, Real y, Real z) { return 0.01*exp(-(x * x + y * y + z * z)); },
+		-100, 100, 400, -100, 100, 400, -100, 100, 400,
+		e, 0,
+		0, 0, 1, SolverMethod::BornSerise, 1, 1, opts);
+
+
+	for (int i = 0; i < 11; ++i) {
+		Real theta = 0;
+		Real cosx = sin(theta);
+		Real cosy = 0;
+		Real cosz = cos(theta);
+		Real a = solver.ComputeXSection(cosx, cosy, cosz);
+		Real b = born(1, 1, p, 0.01, 1, cosx, cosy, cosz);
+		printf("%d | %10.5E %10.5E %10.5E\n", i, a, b, (a - b) / b);
+
+		solver.Compute();
+	}
+
+}
+
 void test0()
 {
 	std::map<std::string, std::string> opts;
@@ -66,6 +95,7 @@ void test1()
 
 int main()
 {
+	testPerturbationConverge();
 	test0();
 	test1();
 }

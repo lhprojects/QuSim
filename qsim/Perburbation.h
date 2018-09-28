@@ -82,6 +82,32 @@ namespace PerburbationUtility {
 		}
 	}
 
+	// psik = G0 * psik
+	inline void Green03D(PeComp *psik, PeReal hbar, PeReal mass, PeReal e, PeReal epsilon,
+		size_t nx, size_t ny, size_t nz,
+		PeReal dx, PeReal dy, PeReal dz)
+	{
+		PeReal dpx = hbar * 2 * PI / (nx * dx);
+		PeReal dpy = hbar * 2 * PI / (ny * dy);
+		PeReal dpz = hbar * 2 * PI / (nz * dz);
+		PeReal divByTwoMass = PeReal(1) / (PeReal(2) * mass);
+		for (size_t i = 0; i < nx; ++i) {
+			PeReal px = (i < nx / 2) ? (i * dpx) : ((nx - i) *dpx);
+
+			for (size_t j = 0; j < ny; ++j) {
+				PeReal py = (j < ny / 2) ? (j * dpy) : ((ny - j) *dpy);
+
+				for (size_t k = 0; k < ny; ++k) {
+					PeReal pz = (k < nz / 2) ? (k * dpz) : ((nz - k) *dpz);
+
+					PeReal t = (px * px + py * py + pz * pz) * divByTwoMass;
+
+					PeComp g0 = PeReal(1) / (e - t + PeComp(0, epsilon));
+					psik[(i*ny + j)*nz + k] = g0 * psik[(i*ny + j)*nz + k];
+				}
+			}
+		}
+	}
 
 	inline void GaussAsbLayer1D(size_t nx, PeReal dx,
 		PeReal *v, PeReal hbar, PeReal mass, PeReal e,
@@ -130,6 +156,48 @@ namespace PerburbationUtility {
 		}
 
 	}
+
+	inline void GaussAsbLayer3D(size_t nx, size_t ny, size_t nz,
+		PeReal dx, PeReal dy, PeReal dz,
+		PeReal *v, PeReal hbar, PeReal mass, PeReal e,
+		PeReal alpha)
+	{
+		PeReal lambda = 2 * PI / (sqrt(2 * e * mass) / hbar);
+		PeReal betax = dx / (alpha * lambda);
+		PeReal betay = dy / (alpha * lambda);
+		PeReal betaz = dz / (alpha * lambda);
+		for (size_t i = 0; i < nx; ++i) {
+			for (size_t j = 0; j < ny; ++j) {
+				for (size_t k = 0; k < nz; ++k) {
+					PeReal xx;
+					PeReal yy;
+					PeReal zz;
+
+					if (i < nx / 2) {
+						xx = i * betax;
+					} else {
+						xx = (nx - i)*betax;
+					}
+
+					if (j < ny / 2) {
+						yy = j * betay;
+					} else {
+						yy = (ny - j) * betay;
+					}
+
+					if (k < nz / 2) {
+						zz = k * betaz;
+					} else {
+						zz = (nz - k) * betaz;
+					}
+
+					v[(i*ny + j)*nz + k] = -e * (exp(-xx * xx) + exp(-yy * yy) + exp(-zz * zz));
+				}
+			}
+		}
+
+	}
+
 };
 
 
@@ -198,6 +266,28 @@ struct BornSerise {
 			PerburbationUtility::Green02D(psik, hbar, mass, e, epsilon, nx, ny, dx, dy);
 		};
 		Update(nx*ny, psi0x, deltaPsix, deltaPsik, V, G0, X2K, K2X);
+	}
+
+	template<class F1, class F2>
+	void Update3D(size_t nx, size_t ny, size_t nz,
+		PeComp const *psi0x,
+		PeComp *deltaPsix,
+		PeComp *deltaPsik,
+		PeReal const *V,
+		PeReal epsilon,
+		PeReal e,
+		PeReal mass,
+		PeReal hbar,
+		PeReal dx,
+		PeReal dy,
+		PeReal dz,
+		F1 const &X2K,
+		F2 const &K2X)
+	{
+		auto G0 = [&](PeComp *psik) {
+			PerburbationUtility::Green03D(psik, hbar, mass, e, epsilon, nx, ny, nz, dx, dy, dz);
+		};
+		Update(nx*ny*nz, psi0x, deltaPsix, deltaPsik, V, G0, X2K, K2X);
 	}
 
 };
@@ -348,6 +438,34 @@ struct PreconditionalBornSerise {
 	{
 		auto G0 = [&](PeComp *psik) {
 			PerburbationUtility::Green02D(psik, hbar, mass, e, epsilon, nx, ny, dx, dy);
+		};
+		Update(nx * ny, psi0x, deltaPsix, deltaPsik, reV, imV, tmp, epsilon, G0, X2K, K2X, slow, preconditioner);
+	}
+
+	template<class F1, class F2>
+	void Update3D(size_t nx, size_t ny, size_t nz,
+		PeComp const *psi0x,
+		PeComp *deltaPsix,
+		PeComp *deltaPsik,
+		PeReal const *reV,
+		PeReal const *imV,
+		PeComp *tmp,
+		PeReal epsilon,
+		PeReal e,
+		PeReal mass,
+		PeReal hbar,
+		PeReal dx,
+		PeReal dy,
+		PeReal dz,
+		F1 const &X2K,
+		F2 const &K2X,
+		PeReal const slow,
+		BornSerisePreconditioner preconditioner)
+	{
+		auto G0 = [&](PeComp *psik) {
+			PerburbationUtility::Green03D(psik, hbar, mass, e, epsilon,
+				nx, ny, nz,
+				dx, dy, dz);
 		};
 		Update(nx * ny, psi0x, deltaPsix, deltaPsik, reV, imV, tmp, epsilon, G0, X2K, K2X, slow, preconditioner);
 	}

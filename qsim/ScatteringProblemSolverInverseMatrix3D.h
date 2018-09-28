@@ -31,11 +31,6 @@ struct ScatteringProblemSolverInverseMatrix3D : ScatteringSolver3DImpl {
 
 	void Compute() override;
 
-	Real ComputeXSection(Real cosx, Real cosy, Real cosz) override;
-	// npsi = number of sampling points for psi
-	// ntheta = number of sampling points for theta
-	Real ComputeTotalXSection(Int npsi, Int ntheta) override;
-
 	void InitEMinusH();
 	SparseMatrixSolver fMatrixSolver;
 	int const fOrder;

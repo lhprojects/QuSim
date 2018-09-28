@@ -170,10 +170,10 @@ struct ScatteringSolver3DImpl : ScatteringSolverImpl {
 	// cosx = cos(psi)
 	// cosy = sin(psi)
 	// cosz = cos(theta)
-	virtual Real ComputeXSection(Real cosx, Real cosy, Real cosz) = 0;
+	virtual Real ComputeXSection(Real cosx, Real cosy, Real cosz);
 	// npsi = number of sampling points for psi
 	// ntheta = number of sampling points for theta
-	virtual Real ComputeTotalXSection(Int npsi, Int ntheta) = 0;
+	virtual Real ComputeTotalXSection(Int npsi, Int ntheta);
 
 	size_t const fNx;
 	size_t const fNy;
@@ -192,8 +192,12 @@ struct ScatteringSolver3DImpl : ScatteringSolverImpl {
 	Complex const FV;
 
 	Eigen::VectorXd const fV;
+	bool fVComputeInTime;
 	Eigen::VectorXcd const fPsi0X;
+	bool fPsi0XComputeInTime;
 	Eigen::VectorXcd fPsiX;
+	static const bool fLastPsiXRecord = false;
+	std::vector<Complex> fLastPsiX;
 private:
 	void InitPotential();
 };
