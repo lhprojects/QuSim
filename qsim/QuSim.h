@@ -107,19 +107,19 @@ struct Options {
 
 	inline Options &VellekoopPreconditioner()
 	{
-		SetBool("preconditioner", "Vellekoop");
+		SetString("preconditioner", "Vellekoop");
 		return *this;
 	}
 
 	inline Options &Hao1Preconditioner()
 	{
-		SetBool("preconditioner", "Hao1");
+		SetString("preconditioner", "Hao1");
 		return *this;
 	}
 
 	inline Options &Hao2Preconditioner()
 	{
-		SetBool("preconditioner", "Hao2");
+		SetString("preconditioner", "Hao2");
 		return *this;
 	}
 

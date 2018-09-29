@@ -5,8 +5,8 @@
 void PerturbationOptions::Init(OptionsImpl const & opts)
 {
 
-	const_cast<bool&>(fPreconditional) = opts.GetBool("preconditional");
-	{
+	const_cast<bool&>(fPreconditional) = opts.GetBool("preconditional", false);
+	if(fPreconditional) {
 		BornSerisePreconditioner precer = BornSerisePreconditioner::Vellekoop;
 
 		std::string pre;

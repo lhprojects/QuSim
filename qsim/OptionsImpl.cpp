@@ -54,8 +54,11 @@ void OptionsImpl::SetString(char const *k, char const *v)
 bool OptionsImpl::GetBool(char const *k) const
 {
 	auto it = fOpts.find(k);
-	if (it == fOpts.end() || it->second.fType != OptionType::Bool) {
-		throw std::runtime_error("value not set");
+	if (it == fOpts.end()) {
+		std::string info = std::string("key not found: ") + k;
+		throw std::runtime_error(info.c_str());
+	} else if(it->second.fType != OptionType::Bool) {
+		throw std::runtime_error("value type error: ");
 	}
 	return it->second.fBool;
 }

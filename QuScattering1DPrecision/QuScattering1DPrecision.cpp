@@ -315,6 +315,13 @@ void testNaiveBornSerise(Real p, int n = 100)
 int main()
 {
 
+
+	test0(0.1);
+	test0(1);
+	test10();
+	test1();
+	test1d5();
+
 	testNaiveBornSerise(0.4);
 	testPerburbation();
 
@@ -332,12 +339,5 @@ int main()
 	testPerburbativeConditioner("Hao2", 5, 500);
 
 
-
-
-	test0(0.1);
-	test0(1);
-	test10();
-	test1();
-	test1d5();
 }
 

@@ -121,7 +121,7 @@ void testPerburbationConverge(Real v0, int n = 100)
 	QuPerturbation2D perp0;
 	{
 		Options opts;
-		opts.Preconditional(true).Order(1);
+		opts.Preconditional(false).Order(1);
 		//opts["slow"] = "0.5";
 		//opts["fft_lib"] = "FFTW";
 		perp0.init(vf, -150, 150, 1000, -150, 150, 1000,
@@ -228,8 +228,6 @@ void testTotalXSection()
 
 int main()
 {
-	testPerburbationConverge(0.2, 1000);
-	testPerburbationConverge(0.6, 2000);
 	testInverseAndPerburbation();
 	testInvMatVsBorn();
 	testBorn();
@@ -237,4 +235,6 @@ int main()
 
 	testTotalXSection();
 
+	testPerburbationConverge(0.2, 1000);
+	testPerburbationConverge(0.6, 2000);
 }
