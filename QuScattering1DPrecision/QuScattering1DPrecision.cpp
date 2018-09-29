@@ -7,10 +7,12 @@ void test0(double p)
 	printf("Test inverse matrix method V(x)=%lf exp(-x*x)\n", p);
 	auto f = [&](Real x) { return p * exp(-x * x); };
 	Solver1D solver;
-	std::map<std::string, std::string> small;
-	small["small_round_error"] = "1";
+
+	Options small;
+	small.SmallRoundError(true);
+
 	solver.init(f, -10, 10, 20000, 0.5, 1, I,
-		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, std::map<std::string, std::string>());
+		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, Options());
 	solver.Compute();
 
 	if (p == 1) {
@@ -24,12 +26,10 @@ void test0(double p)
 		double x1 = 150;
 		size_t n = 500 + 500 * i;
 
-		std::map<std::string, std::string> space_o2;
-		space_o2["space_order"] = "2";
-		std::map<std::string, std::string> space_o4;
-		space_o4["space_order"] = "4";
-		std::map<std::string, std::string> space_o6;
-		space_o6["space_order"] = "6";
+
+		Options space_o2 = Options().SpaceOrder(2);
+		Options space_o4 = Options().SpaceOrder(4);
+		Options space_o6 = Options().SpaceOrder(6);
 
 		QuScatteringInverseMatrix1D inv1;
 		inv1.init(f, x0, x1, n, 0.5, 1,
@@ -70,24 +70,17 @@ void test10()
 		double x1 = 150;
 		size_t n = 500 + 500 * i;
 
-		std::map<std::string, std::string> opt1;
-		opt1["space_order"] = "6";
-		opt1["matrix_solver"] = "LU";
+		Options opt1;
+		opt1.SpaceOrder(6).MatrixSolverLU();
 
-		std::map<std::string, std::string> opt2;
-		opt2["space_order"] = "6";
-		opt2["matrix_solver"] = "BiCGSTAB";
-		opt2["preconditioner"] = "DiagonalPreconditioner";
+		Options opt2;
+		opt2.SpaceOrder(6).MatrixSolverBiCGSTAB().DiagonalPreconditioner();
 
-		std::map<std::string, std::string> opt3;
-		opt3["space_order"] = "6";
-		opt3["matrix_solver"] = "BiCGSTAB";
-		opt3["preconditioner"] = "IdentityPreconditioner";
+		Options opt3;
+		opt3.SpaceOrder(6).MatrixSolverBiCGSTAB().IncompleteLUTPreconditioner();
 
-		std::map<std::string, std::string> opt4;
-		opt4["space_order"] = "6";
-		opt4["matrix_solver"] = "BiCGSTAB";
-		opt4["preconditioner"] = "IncompleteLUT";
+		Options opt4;
+		opt3.SpaceOrder(6).MatrixSolverBiCGSTAB().IncompleteLUTPreconditioner();
 
 		QuScatteringInverseMatrix1D inv1;
 		inv1.init(FunctorWrapper("1*exp(-x*x)"), x0, x1, n, 0.5, 1,
@@ -126,12 +119,12 @@ void test1()
 	printf("Test R T calculation\n");
 	Solver1D solver;
 	solver.init(FunctorWrapper("0.000001*exp(-x*x)"), -10, 10, 20000, 0.5, 1, I,
-		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, std::map<std::string, std::string>());
+		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, Options());
 	solver.Compute();
 
 	QuPerturbation1D per;
 	per.init(FunctorWrapper("exp(-x*x)"), -50, 50, 20000, 0.5, 0.001,
-		1, SolverMethod::BornSerise, 1, 1, std::map<std::string, std::string>());
+		1, SolverMethod::BornSerise, 1, 1, Options());
 
 	per.Compute();
 	printf("    R %g (Exact %g)\n", per.GetR(), solver.GetR()/(0.000001*0.000001));
@@ -144,16 +137,16 @@ void test1d5()
 	printf("Test perburbation 1 order correction\n");
 	Solver1D solver;
 	solver.init(FunctorWrapper("0.1*exp(-x*x)"), -10, 10, 20000, 0.5, 1, I,
-		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, std::map<std::string, std::string>());
+		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, Options());
 	solver.Compute();
 
 	for (int i = 0; i < 10; ++i) {
 		QuPerturbation1D per;
-		char b[10];
-		sprintf(b, "%d", i);
 
-		std::map<std::string, std::string> opts;
-		opts["order"] = b;
+
+		Options opts;
+		opts.Order(i);
+
 		per.init(FunctorWrapper("0.1*exp(-x*x)"), -1000, 1000, 20000, 0.5, 0.01,
 			1, SolverMethod::BornSerise, 1, 1, opts);
 
@@ -190,48 +183,41 @@ void testPerburbation()
 		auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
 		Solver1D solver;
 		solver.init(vfunc, -10, 10, 20000, 0.5, 1, I,
-			SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, std::map<std::string, std::string>());
+			SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, Options());
 		solver.Compute();
 
 		QuPerturbation1D per1;
 		per1.init(vfunc, -5000, 5000, 200000, 0.5, 0.002,
-			1, SolverMethod::BornSerise, 1, 1, std::map<std::string, std::string>());
+			1, SolverMethod::BornSerise, 1, 1, Options());
 		per1.Compute();
 
+
 		QuPerturbation1D per2;
-		std::map<std::string, std::string> o2;
-		o2["order"] = "2";
+		Options o2 = Options().Order(2);
 		per2.init(vfunc, -5000, 5000, 200000, 0.5, 0.002,
 			1, SolverMethod::BornSerise, 1, 1, o2);
 		per2.Compute();
 
 		QuPerturbation1D per3;
-		std::map<std::string, std::string> o3;
-		o3["order"] = "10";
+		Options o3 = Options().Order(10);
 		per3.init(vfunc, -5000, 5000, 200000, 0.5, 0.002,
 			1, SolverMethod::BornSerise, 1, 1, o3);
 		per3.Compute();
 
 		QuPerturbation1D per4;
-		std::map<std::string, std::string> o4;
-		o4["order"] = "3";
-		o4["split_n"] = "3";
+		Options o4 = Options().Order(3).SplitN(3);
 		per4.init(vfunc, -5000, 5000, 200000, 0.5, 0.002,
 			1, SolverMethod::BornSerise, 1, 1, o4);
 		per4.Compute();
 
 		QuPerturbation1D per5;
-		std::map<std::string, std::string> o5;
-		o5["order"] = "5";
-		o5["preconditional"] = "1";
+		Options o5 = Options().Order(5).Preconditional(true);
 		per5.init(vfunc, -100, 100, 2000, 0.5, 0.51,
 			1, SolverMethod::BornSerise, 1, 1, o5);
 		per5.Compute();
 
 		QuPerturbation1D per6;
-		std::map<std::string, std::string> o6;
-		o6["order"] = "20";
-		o6["preconditional"] = "1";
+		Options o6 = Options().Order(20).Preconditional(true);;
 		per6.init(vfunc, -100, 100, 2000, 0.5, 0.51,
 			1, SolverMethod::BornSerise, 1, 1, o6);
 		per6.Compute();
@@ -249,8 +235,6 @@ void testPerburbativeConditioner(char const *name, Real p, int n = 100)
 	printf("%6s | %8s\n",
 		"Order", name);
 
-	char order[10];
-	sprintf(order, "%d", 10);
 
 	Real v0 = p;
 	auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
@@ -258,8 +242,7 @@ void testPerburbativeConditioner(char const *name, Real p, int n = 100)
 	Solver1D solver;
 	{
 
-		std::map<std::string, std::string> opts;
-		opts["small_round_error"] = "1";
+		Options opts = Options().SmallRoundError(true);
 		solver.init(vfunc, -10, 10, 2000, 0.5, 1, I,
 			SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, opts);
 		solver.Compute();
@@ -268,13 +251,10 @@ void testPerburbativeConditioner(char const *name, Real p, int n = 100)
 	QuPerturbation1D per3[9];
 	{
 		for (int i = 0; i < 9; ++i) {
-			char b[10];
-			sprintf(b, "%lf", 0.2 + 0.1*i);
-			std::map<std::string, std::string> opts;
-			opts["preconditional"] = "1";
-			opts["order"] = order;
-			opts["preconditioner"] = name;
-			opts["slow"] = b;
+
+
+			Options opts = Options().Preconditional(true).Order(10).Slow(0.2 + 0.1*i);
+			opts.SetString("preconditioner", name);
 			per3[i].init(vfunc, -150, 150, 10000, 0.5, 0,
 				1, SolverMethod::BornSerise, 1, 1, opts);
 		}
@@ -300,25 +280,22 @@ void testNaiveBornSerise(Real p, int n = 100)
 	printf("Test NaiveBornSerise %lf\n", p);
 	printf("%6s\n", "Order");
 
-	char order[10];
-	sprintf(order, "%d", 1);
-
 	Real v0 = p;
 	auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
 
 	Solver1D solver;
 	{
 
-		std::map<std::string, std::string> opts;
-		opts["small_round_error"] = "1";
+		Options opts = Options().SmallRoundError(true);
+
 		solver.init(vfunc, -10, 10, 2000, 0.5, 1, I,
 			SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, opts);
 		solver.Compute();
 	}
 
 	QuPerturbation1D per1;
-	std::map<std::string, std::string> opts;
-	opts["order"] = order;
+	Options opts;
+	opts.Order(1);
 	per1.init(vfunc, -5000, 5000, 200000, 0.5, 0.002,
 		1, SolverMethod::BornSerise, 1, 1, opts);
 

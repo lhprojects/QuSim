@@ -3,23 +3,14 @@
 void ScatteringProblemSolverInverseMatrix3D::InitScatteringSolver3D(std::function<Complex(Real, Real, Real)> const & v,
 	Real x0, Real x1, size_t nx, Real y0, Real y1, size_t ny, Real z0, Real z1, size_t nz,
 	Real en, Real directionx, Real directiony, Real directionz,
-	SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
 {
 
 	ScatteringSolver3DImpl::InitScatteringSolver3D(v, x0, x1, nx, y0, y1, ny, z0, z1, nz, en,
 		directionx, directiony, directionz, met, mass, hbar, opts);
 
 
-	{
-		int order = 2;
-		auto it = opts.find("space_order");
-		if (it != opts.end()) {
-			if (sscanf(it->second.c_str(), "%d", &order) < 1) {
-				throw std::runtime_error("can't parse space order");
-			}
-		}
-		const_cast<int&>(fOrder) = order;
-	}
+	const_cast<int&>(fOrder) = (int)opts.GetInt("space_order", 2);
 
 	fMatrixSolver.Init(opts);
 

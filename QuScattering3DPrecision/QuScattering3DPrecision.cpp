@@ -14,13 +14,13 @@ double born(double mass, double hbar, double p,
 
 void testPerturbationConverge()
 {
-	std::map<std::string, std::string> opts;
 	QuPerturbation3D solver;
 
 	Real p = 1;
 	Real e = p * p / 2;
 
-	opts["order"] = "1";
+	Options opts;
+	opts.Order(1);
 	solver.init([](Real x, Real y, Real z) { return 0.01*exp(-(x * x + y * y + z * z)); },
 		-100, 100, 400, -100, 100, 400, -100, 100, 400,
 		e, 0,
@@ -43,7 +43,7 @@ void testPerturbationConverge()
 
 void test0()
 {
-	std::map<std::string, std::string> opts;
+	Options opts;
 	QuScatteringInverseMatrix3D solver;
 	Real p = 1;
 	Real e = p * p / 2;
@@ -68,10 +68,8 @@ void test0()
 
 void test1()
 {
-	std::map<std::string, std::string> opts;
-	opts["matrix_solver"] = "BiCGSTAB";
-	//opts["preconditioner"] = "DiagonalPreconditioner";
-	opts["preconditioner"] = "IdentityPreconditioner";
+	Options opts;
+	opts.MatrixSolverBiCGSTAB().IdentityPreconditioner();
 	QuScatteringInverseMatrix3D solver;
 	Real p = 1;
 	Real e = p * p / 2;

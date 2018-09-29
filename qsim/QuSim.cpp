@@ -23,6 +23,8 @@
 #include "Cal.h"
 #include "View.h"
 
+#include "OptionsImpl.h"
+
 using std::abs;
 
 #define DELETE(x) if(x) { delete x; x = nullptr; }
@@ -85,12 +87,12 @@ void Evolver1D::init(std::function<Complex(Real)> const &psi, bool force_normali
 	std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
 	Real mass, Real hbar,
-	std::map<std::string, std::string> const &opts)
+	Options const &opts)
 {
 	if (solver == SolverMethod::SplittingMethodO2 || solver == SolverMethod::SplittingMethodO4) {
-		auto it = opts.find("fft_lib");
-		if (it != opts.end() && it->second == "cuda") {
-			fImpl = CreateSplittingMethod1DCUDA(opts);
+
+		if (opts.fOpts->GetString("fft_lib", "") == "cuda") {
+			fImpl = CreateSplittingMethod1DCUDA(*opts.fOpts);
 		} else {
 			fImpl = new SplittingMethod();
 		}
@@ -109,7 +111,7 @@ void Evolver1D::init(std::function<Complex(Real)> const &psi, bool force_normali
 	static_cast<EvolverImpl1D*>(fImpl)->initSystem1D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, n, b, solver,
-		mass, hbar, opts);
+		mass, hbar, *opts.fOpts);
 }
 
 Evolver1D::Evolver1D() {
@@ -168,19 +170,18 @@ void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_n
 	Real y0, Real y1, size_t ny,
 	BoundaryCondition b, SolverMethod solver,
 	Real mass, Real hbar,
-	std::map<std::string, std::string> const &opts)
+	Options const &opts)
 {
 	if (solver == SolverMethod::SplittingMethodO2) {
-		auto it = opts.find("fft_lib");
-		if (it != opts.end() && it->second == "cuda") {
-			fImpl = CreateSplittingMethod2DCUDA(opts);
+
+		if (opts.fOpts->GetString("fft_lib", "") == "cuda") {
+			fImpl = CreateSplittingMethod2DCUDA(*opts.fOpts);
 		} else {
 			fImpl = new SplittingMethod2D();
 		}
 	} else if (solver == SolverMethod::SplittingMethodO4) {
-		auto it = opts.find("fft_lib");
-		if (it != opts.end() && it->second == "cuda") {
-			fImpl = CreateSplittingMethod2DCUDA(opts);
+		if (opts.fOpts->GetString("fft_lib", "") == "cuda") {
+			fImpl = CreateSplittingMethod2DCUDA(*opts.fOpts);
 		} else {
 			fImpl = new SplittingMethod2D();
 		}
@@ -197,7 +198,7 @@ void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_n
 		vs, x0, x1, nx,
 		y0, y1, ny,
 		b, solver,
-		mass, hbar, opts);
+		mass, hbar, *opts.fOpts);
 
 }
 
@@ -347,13 +348,14 @@ void Solver1D::init(std::function<Complex(Real)> const & v,
 	Complex initPsi,
 	Complex initPsiPrime, SolverMethod met,
 	Real mass, Real hbar,
-	std::map<std::string, std::string> const &opts)
+	Options const &opts)
 {
-	if (opts.find("complex_potential") != opts.end() && opts.find("complex_potential")->second != "0")
+	if (opts.fOpts->GetBool("complex_potential", false))
 		fImpl = new ComplexPotentialIVPSolver1DImpl();
 	else
 		fImpl = new SolverImpl1D();
-	static_cast<SolverImpl1D*>(fImpl)->initSystem1D(v, x0, x1, n, en, initPsi, initPsiPrime, met, mass, hbar, opts);
+	static_cast<SolverImpl1D*>(fImpl)->initSystem1D(v, x0, x1, n, en, initPsi,
+		initPsiPrime, met, mass, hbar, *opts.fOpts);
 }
 
 VectorView<Complex> Solver1D::GetPsi()
@@ -478,11 +480,12 @@ Real QuScatteringProblemSolver1D::GetR()
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 /*                    QuScatteringInverseMatrix1D                          */
 void QuScatteringInverseMatrix1D::init(std::function<Complex(Real)> const & v, Real x0, Real x1, size_t n, Real en, 
-	Real direction, SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	Real direction, SolverMethod met, Real mass, Real hbar, Options const & opts)
 {
 
 	fImpl = new ScatteringProblemSolverInverseMatrix1D();
-	static_cast<ScatteringProblemSolverInverseMatrix1D*>(fImpl)->InitScatteringSolver1D(v, x0, x1, n, en, direction, met, mass, hbar, opts);
+	static_cast<ScatteringProblemSolverInverseMatrix1D*>(fImpl)->InitScatteringSolver1D(v, x0, x1,
+		n, en, direction, met, mass, hbar, *opts.fOpts);
 
 }
 /*                    QuScatteringInverseMatrix1D                          */
@@ -499,10 +502,11 @@ QuPerturbation1D::QuPerturbation1D()
 }
 
 void QuPerturbation1D::init(std::function<Complex(Real)> const & v, Real x0, Real x1, size_t n, Real en, Real epsilon,
-	Real direction, SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	Real direction, SolverMethod met, Real mass, Real hbar, Options const & opts)
 {
 	fImpl = new QuPerturbation1DImpl();
-	static_cast<QuPerturbation1DImpl*>(fImpl)->InitPerturbation1D(v, x0, x1, n, en, epsilon, direction, met, mass, hbar, opts);
+	static_cast<QuPerturbation1DImpl*>(fImpl)->InitPerturbation1D(v, x0, x1, n,
+		en, epsilon, direction, met, mass, hbar, *opts.fOpts);
 }
 
 
@@ -595,25 +599,25 @@ Real QuScatteringProblemSolver2D::ComputeTotalXSection(Int n)
 void QuScatteringInverseMatrix2D::init(std::function<Complex(Real, Real)> const & v, Real x0,
 	Real x1, size_t nx, Real y0, Real y1, size_t ny,
 	Real en, Real directionx, Real directiony, SolverMethod met, Real mass, 
-	Real hbar, std::map<std::string, std::string> const & opts)
+	Real hbar, Options const & opts)
 {
 	fImpl = new ScatteringProblemSolverInverseMatrix2D();
 	static_cast<ScatteringProblemSolverInverseMatrix2D*>(fImpl)->InitScatteringSolver2D(v, x0, x1,
 		nx, y0, y1, ny,
-		en, directionx, directiony, met, mass, hbar, opts);
+		en, directionx, directiony, met, mass, hbar, *opts.fOpts);
 }
 
 
 void QuPerturbation2D::init(std::function<Complex(Real, Real)> const & v, Real x0, Real x1, size_t nx, 
 	Real y0, Real y1, size_t ny, Real en, Real epsilon,
 	Real directionx, Real directiony, SolverMethod met, Real mass,
-	Real hbar, std::map<std::string, std::string> const & opts)
+	Real hbar, Options const & opts)
 {
 	fImpl = new QuPerturbation2DImpl();
 	static_cast<QuPerturbation2DImpl*>(fImpl)->InitPerturbation2D(v, x0, x1,
 		nx, y0, y1, ny,
 		en, epsilon,
-		directionx, directiony, met, mass, hbar, opts);
+		directionx, directiony, met, mass, hbar, *opts.fOpts);
 }
 
 MatrixView<Real> QuPerturbation2D::GetVabsb()
@@ -654,7 +658,7 @@ Real QuScatteringProblemSolver3D::ComputeTotalXSection(Int npsi, Int ntheta)
 void QuScatteringInverseMatrix3D::init(std::function<Complex(Real, Real, Real)> const & v,
 	Real x0, Real x1, size_t nx, Real y0, Real y1, size_t ny, Real z0, Real z1, size_t nz,
 	Real en, Real directionx, Real directiony, Real directionz,
-	SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	SolverMethod met, Real mass, Real hbar, Options const & opts)
 {
 	fImpl = new ScatteringProblemSolverInverseMatrix3D();
 	static_cast<ScatteringProblemSolverInverseMatrix3D*>(fImpl)->InitScatteringSolver3D(v,
@@ -662,7 +666,7 @@ void QuScatteringInverseMatrix3D::init(std::function<Complex(Real, Real, Real)> 
 		y0, y1, ny,
 		z0, z1, nz,
 		en, directionx, directiony, directionz,
-		SolverMethod::MatrixInverse, mass, hbar, opts);
+		SolverMethod::MatrixInverse, mass, hbar, *opts.fOpts);
 
 }
 
@@ -672,7 +676,7 @@ void QuPerturbation3D::init(std::function<Complex(Real, Real, Real)> const & v,
 	Real z0, Real z1, size_t nz,
 	Real en, Real epsilon,
 	Real directionx, Real directiony, Real directionz,
-	SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	SolverMethod met, Real mass, Real hbar, Options const & opts)
 {
 	fImpl = new QuPerturbation3DImpl();
 	static_cast<QuPerturbation3DImpl*>(fImpl)->InitPerturbation3D(v,
@@ -681,6 +685,76 @@ void QuPerturbation3D::init(std::function<Complex(Real, Real, Real)> const & v,
 		z0, z1, nz,
 		en, epsilon,
 		directionx, directiony, directionz,
-		SolverMethod::BornSerise, mass, hbar, opts);
+		SolverMethod::BornSerise, mass, hbar, *opts.fOpts);
 }
 
+
+
+
+
+Options::Options()
+{
+	fOpts = new OptionsImpl();
+}
+
+Options::Options(Options const &r)
+{
+	fOpts = new OptionsImpl(*r.fOpts);
+}
+
+Options & Options::operator=(Options const &r)
+{
+	if(fOpts) delete fOpts;
+	fOpts = new OptionsImpl(*r.fOpts);
+	return *this;
+}
+
+Options::~Options()
+{
+	if(fOpts) delete fOpts;
+}
+
+Real Options::GetReal(char const *key)
+{
+	return fOpts->GetReal(key);
+}
+
+Complex Options::GetComplex(char const *key)
+{
+	return fOpts->GetComplex(key);
+}
+
+Int Options::GetInt(char const *key)
+{
+	return fOpts->GetInt(key);
+}
+
+char const * Options::GetString(char const *key)
+{
+	return fOpts->GetString(key).c_str();
+}
+
+void Options::SetBool(char const *key, bool v)
+{
+	fOpts->SetBool(key, v);
+}
+
+void Options::SetReal(char const *key, Real v)
+{
+	fOpts->SetReal(key, v);
+}
+
+void Options::SetComplex(char const *key, Complex v)
+{
+	fOpts->SetComplex(key, v);
+}
+
+void Options::SetInt(char const *key, Int v)
+{
+	fOpts->SetInt(key, v);
+}
+
+void Options::SetString(char const *key, char const * v)
+{
+	fOpts->SetString(key, v);
+}

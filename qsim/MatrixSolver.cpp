@@ -1,14 +1,16 @@
 #include "MatrixSolver.h"
+#include "OptionsImpl.h"
 
-void SparseMatrixSolver::Init(std::map<std::string, std::string> const & opts)
+void SparseMatrixSolver::Init(OptionsImpl const & opts)
 {
 	{
 		MatrixSolverMethod solver = MatrixSolverMethod::LU;
-		auto it = opts.find("matrix_solver");
-		if (it != opts.end()) {
-			if (it->second == "LU") {
+		std::string mat;
+
+		if (opts.Get("matrix_solver", mat)) {
+			if (mat == "LU") {
 				solver = MatrixSolverMethod::LU;
-			} else if (it->second == "BiCGSTAB") {
+			} else if (mat == "BiCGSTAB") {
 				solver = MatrixSolverMethod::BiCGSTAB;
 			} else {
 				throw std::runtime_error("can't parse solver");
@@ -19,13 +21,14 @@ void SparseMatrixSolver::Init(std::map<std::string, std::string> const & opts)
 
 	{
 		Preconditioner prc = Preconditioner::DiagonalPreconditioner;
-		auto it = opts.find("preconditioner");
-		if (it != opts.end()) {
-			if (it->second == "DiagonalPreconditioner") {
+
+		std::string prec_str;
+		if (opts.Get("preconditioner", prec_str)) {
+			if (prec_str == "DiagonalPreconditioner") {
 				prc = Preconditioner::DiagonalPreconditioner;
-			} else if (it->second == "IdentityPreconditioner") {
+			} else if (prec_str == "IdentityPreconditioner") {
 				prc = Preconditioner::IdentityPreconditioner;
-			} else if (it->second == "IncompleteLUT") {
+			} else if (prec_str == "IncompleteLUT") {
 				prc = Preconditioner::IncompleteLUT;
 			} else {
 				throw std::runtime_error("can't parse preconditioner");

@@ -5,22 +5,22 @@
 struct Test {
 	SolverMethod met;
 	char const *name;
-	std::map<std::string, std::string> opts;
+	Options opts;
 };
 
 int main()
 {
-	std::map<std::string, std::string> smal_round_err;
-	smal_round_err["small_round_error"] = "0";
+	Options smal_round_err;
+	smal_round_err.SmallRoundError(true);
 
 	Test tests[] = {
-		{ SolverMethod::ImplicitMidpointMethod , "midpoint", std::map<std::string, std::string>() },
+		{ SolverMethod::ImplicitMidpointMethod , "midpoint", Options() },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint-", smal_round_err },
-	{ SolverMethod::ExplicitRungeKuttaO4Classical , "rk4", std::map<std::string, std::string>() },
+	{ SolverMethod::ExplicitRungeKuttaO4Classical , "rk4", Options() },
 	{ SolverMethod::ExplicitRungeKuttaO4Classical , "rk4-", smal_round_err },
-	{ SolverMethod::GaussLegendreO4 , "glo4", std::map<std::string, std::string>() },
+	{ SolverMethod::GaussLegendreO4 , "glo4", Options() },
 	{ SolverMethod::GaussLegendreO4 , "glo4-", smal_round_err },
-	{ SolverMethod::ExplicitRungeKuttaO6Luther1967 , "rko6", std::map<std::string, std::string>() },
+	{ SolverMethod::ExplicitRungeKuttaO6Luther1967 , "rko6", Options() },
 	{ SolverMethod::ExplicitRungeKuttaO6Luther1967 , "rko6-", smal_round_err },
 	};
 

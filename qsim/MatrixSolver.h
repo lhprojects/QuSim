@@ -20,7 +20,7 @@ enum class MatrixSolverMethod {
 struct SparseMatrixSolver {
 
 	SparseMatrixSolver();
-	void Init(std::map<std::string, std::string> const &opts);
+	void Init(OptionsImpl const &opts);
 	void Solve(Eigen::SparseMatrix<Complex> const & m,
 		Eigen::VectorXcd const &x,
 		Eigen::VectorXcd &v1);

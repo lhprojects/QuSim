@@ -1,28 +1,21 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "PerturbationOptions.h"
+#include "OptionsImpl.h"
 
-void PerturbationOptions::Init(std::map<std::string, std::string> const & opts)
+void PerturbationOptions::Init(OptionsImpl const & opts)
 {
 
-	{
-		bool prec = false;
-		auto it = opts.find("preconditional");
-		if (it != opts.end()) {
-			prec = it->second != "0";
-		}
-		const_cast<bool&>(fPreconditional) = prec;
-
-	}
-
+	const_cast<bool&>(fPreconditional) = opts.GetBool("preconditional");
 	{
 		BornSerisePreconditioner precer = BornSerisePreconditioner::Vellekoop;
-		auto it = opts.find("preconditioner");
-		if (it != opts.end()) {
-			if (it->second == "Vellekoop") {
+
+		std::string pre;
+		if (opts.Get("preconditioner", pre)) {
+			if (pre == "Vellekoop") {
 				precer = BornSerisePreconditioner::Vellekoop;
-			} else if (it->second == "Hao1") {
+			} else if (pre == "Hao1") {
 				precer = BornSerisePreconditioner::Hao1;
-			} else if (it->second == "Hao2") {
+			} else if (pre == "Hao2") {
 				precer = BornSerisePreconditioner::Hao2;
 			} else {
 				throw std::runtime_error("Unknown preconditioner");
@@ -31,19 +24,6 @@ void PerturbationOptions::Init(std::map<std::string, std::string> const & opts)
 		const_cast<BornSerisePreconditioner&>(fPreconditioner) = precer;
 
 	}
-
-	{
-
-		auto it = opts.find("slow");
-		Real slow = 1;
-		if (it != opts.end()) {
-			if (sscanf(it->second.c_str(), "%lf", &slow) < 1) {
-				throw std::runtime_error("parse slow factor error");
-			}
-
-		}
-		const_cast<Real&>(fSlow) = slow;
-
-	}
+	const_cast<Real&>(fSlow) = opts.GetReal("slow", 1);
 
 }

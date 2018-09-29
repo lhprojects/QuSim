@@ -26,7 +26,7 @@ struct ScatteringProblemSolverInverseMatrix3D : ScatteringSolver3DImpl {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		OptionsImpl const &opts);
 
 
 	void Compute() override;

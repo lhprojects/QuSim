@@ -4,7 +4,7 @@
 void EvolverImpl::initSystem(bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	BoundaryCondition b,
-	SolverMethod solver,Real mass, Real hbar, std::map<std::string, std::string> const &opts)
+	SolverMethod solver,Real mass, Real hbar, OptionsImpl const &opts)
 {
 	fStep = 0;
 
@@ -18,7 +18,7 @@ void EvolverImpl::initSystem(bool force_normalization,
 	fHbar = hbar;
 
 	fSolverMethod = solver;
-	const_cast< std::map<std::string, std::string> &>(fOpts) = opts;
+	const_cast< OptionsImpl &>(fOpts) = opts;
 }
 
 
@@ -88,7 +88,7 @@ void EvolverImpl1D::initSystem1D(std::function<Complex(Real)> const &psi, bool f
 	Complex dt, bool force_normalization_each_step,
 	std::function<Complex(Real)> const &v, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
-	Real mass, Real hbar, std::map<std::string, std::string> const &opts)
+	Real mass, Real hbar, OptionsImpl const &opts)
 {
 
 	initSystem(force_normalization,
@@ -159,7 +159,7 @@ void EvolverImpl2D::initSystem2D(std::function<Complex(Real, Real)> const &psi,
 	std::function<Complex(Real, Real)> const &v, Real x0, Real x1, size_t nx,
 	Real y0, Real y1, size_t ny,
 	BoundaryCondition b,
-	SolverMethod solver, Real mass, Real hbar, std::map<std::string, std::string> const &opts)
+	SolverMethod solver, Real mass, Real hbar, OptionsImpl const &opts)
 {
 	initSystem(force_normalization, dt, force_normalization_each_step,
 		b, solver, mass, hbar, opts);

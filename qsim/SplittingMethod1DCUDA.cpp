@@ -15,7 +15,7 @@ struct SplittingMethod1DCUDA : EvolverImpl1D {
 		Complex dt, bool force_normalization_each_step,
 		std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t nx,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar, std::map<std::string, std::string> const &opts) 
+		Real mass, Real hbar, OptionsImpl const &opts) 
 	{
 		EvolverImpl1D::initSystem1D(psi, force_normalization,
 			dt, force_normalization_each_step,
@@ -54,7 +54,7 @@ struct SplittingMethod1DCUDA : EvolverImpl1D {
 
 
 
-EvolverImpl *CreateSplittingMethod1DCUDA(std::map<std::string, std::string> const &opts)
+EvolverImpl *CreateSplittingMethod1DCUDA(OptionsImpl const &opts)
 {
 #ifdef USE_CUDA
 	//return new SplittingMethod2DCUDAImpl<cuComplex>();

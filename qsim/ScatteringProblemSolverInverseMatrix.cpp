@@ -2,20 +2,11 @@
 #include "ScatteringProblemSolverInverseMatrix.h"
 void ScatteringProblemSolverInverseMatrix1D::InitScatteringSolver1D(std::function<Complex(Real)> const & v,
 	Real x0, Real x1, size_t n, Real en, Real direction, SolverMethod met,
-	Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	Real mass, Real hbar, OptionsImpl const & opts)
 {
 	ScatteringSolver1DImpl::InitScatteringSolver1D(v, x0, x1, n, en, direction, met, mass, hbar, opts);
 
-	{
-		int order = 2;
-		auto it = opts.find("space_order");
-		if (it != opts.end()) {
-			if (sscanf(it->second.c_str(), "%d", &order) < 1) {
-				throw std::runtime_error("can't parse space order");
-			}
-		}
-		const_cast<int&>(fOrder) = order;
-	}
+	const_cast<int&>(fOrder) = (int)opts.GetInt("space_order", 2);
 
 	fMatrixSolver.Init(opts);
 

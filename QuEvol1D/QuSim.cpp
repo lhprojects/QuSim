@@ -584,7 +584,7 @@ void InitialASystem1D(Evolver1D &syst)
 		Calculator cal(psiStr.data());
 		deltaT = cal.Evaluate();
 	}
-	std::map<std::string, std::string> opts;
+	Options opts;
 #ifdef USE_CUDA
 	opts["fft_lib"] = "cuda";
 	opts["batch"] = "5";

@@ -15,7 +15,7 @@ struct EigenMethod : EvolverImpl1D {
 		std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar,
-		std::map<std::string, std::string> const &opts) override;
+		OptionsImpl const &opts) override;
 
 	Eigen::MatrixXd fH;
 	Eigen::SelfAdjointEigenSolver< Eigen::MatrixXd > fSolver;

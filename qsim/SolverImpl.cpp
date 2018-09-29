@@ -11,14 +11,11 @@ void SolverImpl1D::initSystem1D(std::function<Complex(Real)> const & v,
 	Real en, Complex initPsi, Complex initPsiPrime,
 	SolverMethod met,
 	Real mass, Real hbar,
-	std::map<std::string, std::string> const &opts)
+	OptionsImpl const &opts)
 {
 	initSystem(en, mass, hbar, met, opts);
 
-	fSmallRoundError = true;
-	if (opts.find("small_round_error") != opts.end() && opts.find("small_round_error")->second == "0") {
-		fSmallRoundError = false;
-	}
+	fSmallRoundError = opts.GetBool("small_round_error", true);
 	fNPoints = n;
 	fNBins = n - 1;
 	fX0 = x0;

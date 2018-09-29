@@ -6,6 +6,7 @@
 #include "eigen/Eigen/Dense"
 #include <functional>
 #include "Linear.h"
+#include "OptionsImpl.h"
 
 struct EvolverImpl
 {
@@ -21,7 +22,7 @@ struct EvolverImpl
 	bool fFN;
 	UInt fStep;
 
-	std::map<std::string, std::string> const fOpts;
+	OptionsImpl const fOpts;
 
 	// init fPsi
 	// init fV
@@ -29,7 +30,7 @@ struct EvolverImpl
 	void initSystem(bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar, std::map<std::string, std::string> const &opts);
+		Real mass, Real hbar, OptionsImpl const &opts);
 
 	virtual void step() = 0;
 	virtual Real PotEn() = 0;
@@ -80,7 +81,7 @@ struct EvolverImpl1D : EvolverImpl {
 		Complex dt, bool force_normalization_each_step,
 		std::function<Complex(Real)> const &v, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar, std::map<std::string, std::string> const &opts);
+		Real mass, Real hbar, OptionsImpl const &opts);
 
 	virtual Real CalPotEn();
 	virtual Real CalKinEn();
@@ -220,7 +221,7 @@ struct EvolverImpl2D : EvolverImpl {
 		std::function<Complex(Real, Real)> const &v, Real x0, Real x1, size_t nx,
 		Real y0, Real y1, size_t ny,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar, std::map<std::string, std::string> const &opts);
+		Real mass, Real hbar, OptionsImpl const &opts);
 	virtual Real CalPotEn() const;
 	virtual Real CalKinEn() const;
 	// update fPsi

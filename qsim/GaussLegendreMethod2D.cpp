@@ -6,7 +6,7 @@ void GaussLegendreMethod2D::initSystem2D(std::function<Complex(Real, Real)> cons
 	std::function<Complex(Real, Real)> const & vs, Real x0, Real x1, size_t nx,
 	Real y0, Real y1, size_t ny, BoundaryCondition b,
 	SolverMethod solver, Real mass, Real hbar,
-	std::map<std::string, std::string> const & opts)
+	OptionsImpl const & opts)
 {
 	EvolverImpl2D::initSystem2D(psi, force_normalization, dt, force_normalization_each_step,
 		vs, x0, x1, nx,
@@ -21,10 +21,12 @@ void GaussLegendreMethod2D::initSystem2D(std::function<Complex(Real, Real)> cons
 	fh.resize(fNx*fNy, fNx*fNy); // = H Dt / hbar
 
 	bool space_O2 = false;
-	if (fOpts.find("space_O2") != fOpts.end()) {
-		space_O2 = fOpts.find("space_O2")->second != "0";
-	} else if (SolverMethod::ImplicitMidpointMethod == fSolverMethod) {
-		space_O2 = true;
+	if (!fOpts.Get("space_O2", space_O2)) {
+		if (SolverMethod::ImplicitMidpointMethod == fSolverMethod) {
+			space_O2 = true;
+		} else {
+			space_O2 = false;
+		}
 	}
 
 	Complex hdt = fDt;

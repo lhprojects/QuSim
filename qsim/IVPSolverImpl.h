@@ -2,6 +2,7 @@
 
 #include "QuSim.h"
 #include "Linear.h"
+#include "OptionsImpl.h"
 
 struct IVPSolverImpl {
 
@@ -13,11 +14,11 @@ struct IVPSolverImpl {
 		Real mass,
 		Real hbar,
 		SolverMethod met,
-		std::map<std::string, std::string> const &opts);
+		OptionsImpl const &opts);
 
 	virtual void Compute() = 0;
 
-	std::map<std::string, std::string> fOpts;
+	OptionsImpl fOpts;
 	Real const fE;
 	Real const fMass;
 	Real const fHbar;
@@ -40,7 +41,7 @@ struct IVPSolver1DImpl : IVPSolverImpl {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		OptionsImpl const &opts);
 
 	virtual void Compute() = 0;
 

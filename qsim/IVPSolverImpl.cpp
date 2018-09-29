@@ -9,11 +9,11 @@ void IVPSolverImpl::initSystem(
 	Real mass,
 	Real hbar,
 	SolverMethod met,
-	std::map<std::string, std::string> const &opts)
+	OptionsImpl const &opts)
 {
 	const_cast<Real&>(fE) = en;
 	const_cast<Real&>(fMass) = mass;
 	const_cast<Real&>(fHbar) = hbar;
 	const_cast<SolverMethod&>(fMethod) = met;
-	const_cast<std::map<std::string, std::string>&>(fOpts) = opts;
+	const_cast<OptionsImpl&>(fOpts) = opts;
 }

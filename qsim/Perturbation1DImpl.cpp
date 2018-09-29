@@ -4,7 +4,7 @@
 void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const & v,
 	Real x0, Real x1, size_t n, Real en, Real epsilon, Real direction,
 	SolverMethod met, Real mass, Real hbar,
-	std::map<std::string, std::string> const & opts)
+	OptionsImpl const & opts)
 {
 	InitScatteringSolver1D(v, x0, x1, n, en, direction, met, mass, hbar, opts);
 
@@ -20,29 +20,8 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 
 	if (fMet == SolverMethod::BornSerise) {
 
-		{
-			int the_order = 0;
-			auto it = opts.find("order");
-			if (it != opts.end()) {
-				auto &order = it->second;
-				if (sscanf(order.c_str(), "%d", &the_order) < 1) {
-					throw std::runtime_error("not valid order");
-				}
-			}
-			const_cast<int&>(fOrder) = the_order;
-		}
-
-		{
-			int the_split = 0;
-			auto it = fOpts.find("split_n");
-			if (it != fOpts.end()) {
-				auto &split = it->second;
-				if (sscanf(split.c_str(), "%d", &the_split) < 1) {
-					throw std::runtime_error("not valid split");
-				}
-			}
-			const_cast<int&>(fSplit) = the_split;
-		}
+		const_cast<int&>(fOrder) = opts.GetInt("order", 0);
+		const_cast<int&>(fSplit) = opts.GetInt("split_n", 0);
 
 		fPerturbationOptions.Init(opts);
 		if (fPerturbationOptions.fPreconditional) {

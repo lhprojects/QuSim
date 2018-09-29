@@ -10,18 +10,21 @@ struct FourierTransformOptions {
 	FourierTransformOptions() : fLib() {
 	}
 
-	void Init(std::map<std::string, std::string> const &opts)
+	void Init(OptionsImpl const &opts)
 	{
 		{
 			FourierTransformLibrary lib = FourierTransformLibrary::KISS;
-			auto it = opts.find("fft_lib");
-			if (it != opts.end()) {
-				if (it->second == "kiss") {
+			std::string lib_str;
+
+			if (opts.Get("fft_lib", lib_str)) {
+				if (lib_str == "kiss") {
 					lib = FourierTransformLibrary::KISS;
-				} else if (it->second == "FFTW") {
+				} else if (lib_str == "FFTW") {
 					lib = FourierTransformLibrary::FFTW;
-				} else if (it->second == "cuda") {
+				} else if (lib_str == "cuda") {
 					lib = FourierTransformLibrary::CUDA;
+				} else {
+					throw std::runtime_error("unkown lib");
 				}
 			}
 			const_cast<FourierTransformLibrary&>(fLib) = lib;

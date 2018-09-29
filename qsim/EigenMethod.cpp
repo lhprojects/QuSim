@@ -9,7 +9,7 @@ void EigenMethod::initSystem1D(std::function<Complex(Real)> const &psi, bool for
 	std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t n,
 	BoundaryCondition b, SolverMethod solver,
 	Real mass, Real hbar,
-	std::map<std::string, std::string> const &opts)
+	OptionsImpl const &opts)
 {
 	EvolverImpl1D::initSystem1D(psi, force_normalization,
 		dt, force_normalization_each_step,

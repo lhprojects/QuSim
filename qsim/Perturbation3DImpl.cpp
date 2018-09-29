@@ -8,7 +8,7 @@ void QuPerturbation3DImpl::InitPerturbation3D(std::function<Complex(Real, Real, 
 	Real en, Real epsilon,
 	Real directionx, Real directiony, Real directionz,
 	SolverMethod met,
-	Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	Real mass, Real hbar, OptionsImpl const & opts)
 {
 	ScatteringSolver3DImpl::InitScatteringSolver3D(v,
 		x0, x1, nx,
@@ -30,17 +30,7 @@ void QuPerturbation3DImpl::InitPerturbation3D(std::function<Complex(Real, Real, 
 
 	if (fMet == SolverMethod::BornSerise) {
 
-		{
-			int the_order = 0;
-			auto it = opts.find("order");
-			if (it != opts.end()) {
-				auto &order = it->second;
-				if (sscanf(order.c_str(), "%d", &the_order) < 1) {
-					throw std::runtime_error("not valid order");
-				}
-			}
-			const_cast<int&>(fOrder) = the_order;
-		}
+		const_cast<int&>(fOrder) = (int)opts.GetInt("order", 0);
 
 		fPerturbationOptions.Init(opts);
 		if (fPerturbationOptions.fPreconditional) {

@@ -13,6 +13,6 @@ struct PerturbationOptions {
 	PerturbationOptions() : fSlow(), fPreconditional(), fPreconditioner() {
 	}
 
-	void Init(std::map<std::string, std::string> const &opts);
+	void Init(OptionsImpl const &opts);
 };
 

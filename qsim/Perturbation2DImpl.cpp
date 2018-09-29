@@ -4,7 +4,7 @@
 void QuPerturbation2DImpl::InitPerturbation2D(std::function<Complex(Real, Real)> const & v, Real x0,
 	Real x1, size_t nx, Real y0, Real y1, size_t ny, Real en, Real epsilon,
 	Real directionx, Real directiony, SolverMethod met,
-	Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	Real mass, Real hbar, OptionsImpl const & opts)
 {
 	ScatteringSolver2DImpl::InitScatteringSolver2D(v, x0, x1, nx, y0, y1, ny,
 		en, directionx, directiony,
@@ -22,17 +22,7 @@ void QuPerturbation2DImpl::InitPerturbation2D(std::function<Complex(Real, Real)>
 
 	if (fMet == SolverMethod::BornSerise) {
 
-		{
-			int the_order = 0;
-			auto it = opts.find("order");
-			if (it != opts.end()) {
-				auto &order = it->second;
-				if (sscanf(order.c_str(), "%d", &the_order) < 1) {
-					throw std::runtime_error("not valid order");
-				}
-			}
-			const_cast<int&>(fOrder) = the_order;
-		}
+		const_cast<int&>(fOrder) = (int)opts.GetInt("order");
 
 		fPerturbationOptions.Init(opts);
 		if (fPerturbationOptions.fPreconditional) {

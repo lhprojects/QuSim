@@ -1,7 +1,6 @@
 #pragma once
 
 #include <complex>
-#include <map>
 #include <functional>
 #include <assert.h>
 
@@ -96,6 +95,138 @@ using Int = int64_t;
 using UInt = uint64_t;
 static constexpr Complex I = Complex(0, 1);
 static constexpr Real Pi = 3.141592653589793238462643383279502884197169399375;
+
+struct OptionsImpl;
+struct Options {
+
+	inline Options &Order(Int n)
+	{
+		SetInt("order", n);
+		return *this;
+	}
+
+	inline Options &VellekoopPreconditioner()
+	{
+		SetBool("preconditioner", "Vellekoop");
+		return *this;
+	}
+
+	inline Options &Hao1Preconditioner()
+	{
+		SetBool("preconditioner", "Hao1");
+		return *this;
+	}
+
+	inline Options &Hao2Preconditioner()
+	{
+		SetBool("preconditioner", "Hao2");
+		return *this;
+	}
+
+	inline Options &Preconditional(bool v)
+	{
+		SetBool("preconditional", v);
+		return *this;
+	}
+
+	inline Options &Slow(Real v)
+	{
+		SetReal("slow", v);
+		return *this;
+	}
+
+	inline Options &SplitN(Int n)
+	{
+		SetInt("split_n", n);
+		return *this;
+	}
+
+	inline Options &SpaceOrder(Int n)
+	{
+		SetInt("sapce_order", n);
+		return *this;
+	}
+
+	inline Options &FFTW()
+	{
+		SetString("fft_lib", "FFTW");
+		return *this;
+	}
+
+	inline Options &Cuda()
+	{
+		SetString("fft_lib", "cuda");
+		return *this;
+	}
+
+	inline Options &Batch(Int n)
+	{
+		SetInt("batch", n);
+		return *this;
+	}
+
+	inline Options &CudaPrecisionSingle()
+	{
+		SetString("cuda_precision", "single");
+		return *this;
+	}
+
+	inline Options &SmallRoundError(bool v)
+	{
+		SetBool("small_round_error", v);
+		return *this;
+	}
+
+	inline Options &MatrixSolverBiCGSTAB()
+	{
+		SetString("matrix_solver", "BiCGSTAB");
+		return *this;
+	}
+
+	inline Options &MatrixSolverLU()
+	{
+		SetString("matrix_solver", "LU");
+		return *this;
+	}
+
+	inline Options &DiagonalPreconditioner()
+	{
+		SetString("preconditioner", "DiagonalPreconditioner");
+		return *this;
+	}
+
+
+	inline Options &IdentityPreconditioner()
+	{
+		SetString("preconditioner", "IdentityPreconditioner");
+		return *this;
+	}
+
+	inline Options &IncompleteLUTPreconditioner()
+	{
+		SetString("preconditioner", "IncompleteLUT");
+		return *this;
+	}
+
+	EXPORT_FUNC Options();
+	EXPORT_FUNC Options(Options const &);
+	EXPORT_FUNC Options& operator=(Options const &);
+	EXPORT_FUNC ~Options();
+
+	EXPORT_FUNC Int GetInt(char const *);
+	EXPORT_FUNC Real GetReal(char const *);
+	EXPORT_FUNC Complex GetComplex(char const *);
+	EXPORT_FUNC char const *GetString(char const *);
+
+	EXPORT_FUNC void SetBool(char const *, bool v);
+	EXPORT_FUNC void SetReal(char const *, Real v);
+	EXPORT_FUNC void SetComplex(char const *, Complex v);
+	EXPORT_FUNC void SetInt(char const *, Int v);
+	EXPORT_FUNC void SetString(char const *, char const *v);
+
+	OptionsImpl *fOpts;
+};
+
 
 inline Real abs2(Complex const &c)
 {
@@ -194,7 +325,7 @@ struct EXPORT_STRUCT Evolver1D : Evolver {
 		std::function<Complex(Real)> const &v, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar,
-		std::map<std::string, std::string> const &opts);
+		Options const &opts);
 
 	VectorView<Complex> GetPsi();
 	VectorView<Real> GetV();
@@ -216,7 +347,7 @@ struct EXPORT_STRUCT Evolver2D : Evolver
 		Real y0, Real y1, size_t ny,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar,
-		std::map<std::string, std::string> const &opts);
+		Options const &opts);
 
 	MatrixView<Complex> GetPsi();
 	MatrixView<Real> GetV();
@@ -253,7 +384,7 @@ struct EXPORT_STRUCT Solver1D : Solver {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		Options const &opts);
 
 	VectorView<Complex> GetPsi();
 	VectorView<Real> GetV();
@@ -308,7 +439,7 @@ struct EXPORT_STRUCT QuScatteringInverseMatrix1D : QuScatteringProblemSolver1D {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		Options const &opts);
 
 };
 
@@ -327,7 +458,7 @@ struct EXPORT_STRUCT QuPerturbation1D : QuScatteringProblemSolver1D {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		Options const &opts);
 
 	Real GetMaxEnergy();
 	Real GetMaxMomentum();
@@ -366,7 +497,7 @@ struct EXPORT_STRUCT QuScatteringInverseMatrix2D : QuScatteringProblemSolver2D {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		Options const &opts);
 
 };
 
@@ -387,7 +518,7 @@ struct EXPORT_STRUCT QuPerturbation2D : QuScatteringProblemSolver2D {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		Options const &opts);
 
 	MatrixView<Real> GetVabsb();
 	Real GetDeltaPsiNorm();
@@ -423,7 +554,7 @@ struct EXPORT_STRUCT QuScatteringInverseMatrix3D : QuScatteringProblemSolver3D {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		Options const &opts);
 
 };
 
@@ -449,6 +580,6 @@ struct EXPORT_STRUCT QuPerturbation3D : QuScatteringProblemSolver3D {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		Options const &opts);
 
 };

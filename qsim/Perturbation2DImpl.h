@@ -28,7 +28,7 @@ struct QuPerturbation2DImpl : ScatteringSolver2DImpl {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		OptionsImpl const &opts);
 
 
 	void Compute() override;

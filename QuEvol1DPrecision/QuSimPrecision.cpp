@@ -6,7 +6,7 @@
 struct Test {
 	SolverMethod met;
 	char const *name;
-	std::map<std::string, std::string> opts;
+	Options opts;
 };
 
 void test_tunneling()
@@ -16,20 +16,20 @@ void test_tunneling()
 	printf("Inital wave function: C*gauss(x, -20, 5)*exp(I*x)\n");
 	printf("Potential: exp(-x*x)\n");
 
-	std::map<std::string, std::string> space_O2;
-	space_O2["space_O2"] = "1";
+	Options space_O2;
+	space_O2.SetBool("space_O2", true);
 
-	std::map<std::string, std::string> space_O4;
-	space_O4["space_O2"] = "0";
+	Options space_O4;
+	space_O4.SetBool("space_O2", false);
 
 	Test tests[] = {
-		{ SolverMethod::SplittingMethodO2 , "splitO2", std::map<std::string, std::string>() },
-	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },
-	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", std::map<std::string, std::string>() },
+		{ SolverMethod::SplittingMethodO2 , "splitO2", Options() },
+	{ SolverMethod::SplittingMethodO4 , "splitO4", Options() },
+	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", Options() },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO4", space_O4 },
 	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO2", space_O2 },
-	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", std::map<std::string, std::string>() },
-	{ SolverMethod::Eigen , "eigen", std::map<std::string, std::string>() },
+	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", Options() },
+	{ SolverMethod::Eigen , "eigen", Options() },
 	};
 
 	int dims[] = {
@@ -53,7 +53,7 @@ void test_tunneling()
 		Evolver1D syst;
 		syst.init(FunctorWrapper("gauss(x, -20, 5)*exp(I*x)"), true, 5E-3, false, FunctorWrapper("exp(-x*x)"),
 			-100, 100, 8000, BoundaryCondition::Period, SolverMethod::SplittingMethodO4, 1, 1,
-			std::map<std::string, std::string>());
+			Options());
 		for (; syst.Time() < 64;) {
 			syst.step();
 		}
@@ -64,7 +64,7 @@ void test_tunneling()
 		Evolver1D syst;
 		syst.init(FunctorWrapper("gauss(x, -20, 5)*exp(I*x)"), true, 5E-3, false, FunctorWrapper("exp(-x*x)"),
 			-100, 100, 8000, BoundaryCondition::Period, SolverMethod::GaussLegendreO6, 1, 1,
-			std::map<std::string, std::string>());
+			Options());
 		for (; syst.Time() < 64;) {
 			syst.step();
 		}
@@ -122,21 +122,17 @@ void test_speed()
 	printf("Inital wave function: C*gauss(x, 0, 5)*exp(I*x)\n");
 	printf("Potential: 0\n");
 
-	std::map<std::string, std::string> space_O2;
-	space_O2["space_O2"] = "1";
+	Options space_O2;
+	space_O2.SetBool("space_O2", true);
 
-	std::map<std::string, std::string> space_O4;
-	space_O4["space_O2"] = "0";
+	Options space_O4;
+	space_O4.SetBool("space_O2", false);
 
-	std::map<std::string, std::string> fftw;
-	fftw["fft_lib"] = "FFTW";
+	Options fftw = Options().FFTW();
 
-	std::map<std::string, std::string> cuda;
-	cuda["fft_lib"] = "cuda";
+	Options cuda = Options().Cuda();
 
-	std::map<std::string, std::string> cuda_single;
-	cuda_single["fft_lib"] = "cuda";
-	cuda_single["cuda_precision"] = "single";
+	Options cuda_single = Options().Cuda().CudaPrecisionSingle();
 
 	Test tests[] = {
 	
@@ -145,13 +141,13 @@ void test_speed()
 	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
 	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda_single", cuda_single },
 #endif
-	{ SolverMethod::SplittingMethodO2 , "splitO2+kiss", std::map<std::string, std::string>() },
-	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },
-	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", std::map<std::string, std::string>() },
+	{ SolverMethod::SplittingMethodO2 , "splitO2+kiss", Options() },
+	{ SolverMethod::SplittingMethodO4 , "splitO4", Options() },
+	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", Options() },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO4", space_O4 },
 	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO2", space_O2 },
-	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", std::map<std::string, std::string>() },
-	{ SolverMethod::Eigen , "eigen", std::map<std::string, std::string>() },
+	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", Options() },
+	{ SolverMethod::Eigen , "eigen", Options() },
 	};
 
 	int dims[] = {

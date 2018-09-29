@@ -6,32 +6,29 @@
 struct Test {
 	SolverMethod met;
 	char const *name;
-	std::map<std::string, std::string> opts;
+	Options opts;
 };
 
 int main()
 {
 
-	std::map<std::string, std::string> space_O2;
-	space_O2["space_O2"] = "1";
+	Options space_O2;
+	space_O2.SetBool("space_O2", true);
 
-	std::map<std::string, std::string> space_O4;
-	space_O4["space_O2"] = "0";
+	Options space_O4;
+	space_O2.SetBool("space_O2", false);
 
-	std::map<std::string, std::string> fftw;
-	fftw["fft_lib"] = "FFTW";
+	Options fftw;
+	fftw.FFTW();
 
-	std::map<std::string, std::string> cuda;
-	cuda["fft_lib"] = "cuda";
+	Options cuda;
+	cuda.Cuda();
 
-	std::map<std::string, std::string> cuda_10;
-	cuda_10["fft_lib"] = "cuda";
-	cuda_10["batch"] = "10";
+	Options cuda_10;
+	cuda_10.Cuda().Batch(10);
 
-	std::map<std::string, std::string> cuda_10_single;
-	cuda_10_single["fft_lib"] = "cuda";
-	cuda_10_single["batch"] = "10";
-	cuda_10_single["cuda_precision"] = "single";
+	Options cuda_10_single;
+	cuda_10_single.Cuda().Batch(10).CudaPrecisionSingle();
 
 	Test tests[] = {
 #ifdef USE_CUDA
@@ -41,13 +38,13 @@ int main()
 #endif
 #if 1
 	{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
-	{ SolverMethod::SplittingMethodO2 , "splitO2", std::map<std::string, std::string>() },
-	{ SolverMethod::SplittingMethodO4 , "splitO4", std::map<std::string, std::string>() },
-	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", std::map<std::string, std::string>() },
+	{ SolverMethod::SplittingMethodO2 , "splitO2", Options() },
+	{ SolverMethod::SplittingMethodO4 , "splitO4", Options() },
+	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", Options() },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO4", space_O4 },
-	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", std::map<std::string, std::string>() },
+	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", Options() },
 	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO2", space_O2 },
-	{ SolverMethod::GaussLegendreO6 , "gaussO6+spaceO4", std::map<std::string, std::string>() },
+	{ SolverMethod::GaussLegendreO6 , "gaussO6+spaceO4", Options() },
 #endif
 	};
 
@@ -80,9 +77,10 @@ int main()
 
 			int dim = dims[j];
 			int iter = 5000000 * 10 / (dim*dim);
-			if (tests[i].opts.count("batch") != 0) {
-				iter /= 10;
-			}
+
+			int batch = i < 2 ? 10 : 1;
+			iter /= batch;
+
 			if (iter < 2) iter = 2;
 
 			auto t0 = std::chrono::system_clock::now();

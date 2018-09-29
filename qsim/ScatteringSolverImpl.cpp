@@ -2,7 +2,7 @@
 
 void ScatteringSolver1DImpl::InitScatteringSolver1D(std::function<Complex(Real)> const & v,
 	Real x0, Real x1, size_t n, Real en, Real direction,
-	SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
 {
 	InitScatteringSolver(en, met, mass, hbar, opts);
 
@@ -41,7 +41,7 @@ void ScatteringSolver2DImpl::InitScatteringSolver2D(std::function<Complex(Real, 
 	Real en,
 	Real directionx,
 	Real directiony,
-	SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
 {
 	InitScatteringSolver(en, met, mass, hbar, opts);
 
@@ -138,7 +138,7 @@ void ScatteringSolver3DImpl::InitScatteringSolver3D(std::function<Complex(Real, 
 	Real y0, Real y1, size_t ny, Real z0, Real z1, size_t nz,
 	Real en,
 	Real directionx, Real directiony, Real directionz,
-	SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
 {
 	InitScatteringSolver(en, met, mass, hbar, opts);
 

@@ -2,4 +2,4 @@
 
 #include "EvolverImpl.h"
 
-EvolverImpl *CreateSplittingMethod1DCUDA(std::map<std::string, std::string> const &opts);
+EvolverImpl *CreateSplittingMethod1DCUDA(OptionsImpl const &opts);

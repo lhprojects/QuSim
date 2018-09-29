@@ -19,7 +19,7 @@ struct SolverImpl1D : IVPSolverImpl {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		OptionsImpl const &opts);
 
 	void MainLoop();
 	void MainLoopSamllRoundError();

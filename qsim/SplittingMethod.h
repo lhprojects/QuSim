@@ -30,7 +30,7 @@ struct SplittingMethod : EvolverImpl1D {
 		Complex dt, bool force_normalization_each_step,
 		std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar, std::map<std::string, std::string> const &opts) override;
+		Real mass, Real hbar, OptionsImpl const &opts) override;
 
 	void update_psi() override;
 	Real CalKinEn() override;

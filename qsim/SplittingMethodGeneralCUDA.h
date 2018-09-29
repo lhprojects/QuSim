@@ -49,7 +49,7 @@ struct SplittingMethodGeneralCUDAImpl {
 		Real const *fV,
 		Real x0, Real x1, size_t nx, Real y0, Real y1, size_t ny,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar, std::map<std::string, std::string> const & opts);
+		Real mass, Real hbar, OptionsImpl const & opts);
 
 	void update_psi();
 	Real CalKinEn() const;
@@ -134,7 +134,7 @@ void SplittingMethodGeneralCUDAImpl<Scalar>::initSystem2D(EvolverImpl *evolver2d
 	Real const *fV,
 	Real x0, Real x1, size_t nx, Real y0, Real y1, size_t ny,
 	BoundaryCondition b, SolverMethod solver,
-	Real mass, Real hbar, std::map<std::string, std::string> const & opts)
+	Real mass, Real hbar, OptionsImpl const & opts)
 {
 	fEvolver = evolver2d;
 	fNx = nx;

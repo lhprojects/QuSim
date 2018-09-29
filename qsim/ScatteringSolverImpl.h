@@ -2,6 +2,7 @@
 
 #include "QuSim.h"
 #include "Linear.h"
+#include "OptionsImpl.h"
 #include "eigen/Eigen/Dense"
 
 struct ScatteringSolverImpl {
@@ -9,14 +10,14 @@ struct ScatteringSolverImpl {
 	ScatteringSolverImpl() : fHbar(0), fMass(0), fE(0), fMet(), fOpts(), fK0() { }
 	virtual ~ScatteringSolverImpl() { }
 
-	void InitScatteringSolver(Real en, SolverMethod met, Real mass, Real hbar, std::map<std::string, std::string> const &opts)
+	void InitScatteringSolver(Real en, SolverMethod met, Real mass, Real hbar, OptionsImpl const &opts)
 	{
 		
 		const_cast<Real&>(fE) = en;
 		const_cast<SolverMethod&>(fMet) = met;
 		const_cast<Real&>(fMass) = mass;
 		const_cast<Real&>(fHbar) = hbar;
-		const_cast<std::map<std::string, std::string>&>(fOpts) = opts;
+		const_cast<OptionsImpl&>(fOpts) = opts;
 		const_cast<Real&>(fK0) = sqrt(2 * fMass * fE) / fHbar;
 	}
 	virtual void Compute() = 0;
@@ -28,7 +29,7 @@ struct ScatteringSolverImpl {
 	SolverMethod const fMet;
 	Real const fMass;
 	Real const fHbar;
-	std::map<std::string, std::string> const fOpts;
+	OptionsImpl const fOpts;
 };
 
 struct ScatteringSolver1DImpl : ScatteringSolverImpl {
@@ -45,7 +46,7 @@ struct ScatteringSolver1DImpl : ScatteringSolverImpl {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		OptionsImpl const &opts);
 
 	Real GetX(ptrdiff_t i) const { return fX0 + fDx * i; }
 
@@ -84,7 +85,7 @@ struct ScatteringSolver2DImpl : ScatteringSolverImpl {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		OptionsImpl const &opts);
 
 	Real GetX(ptrdiff_t i) const { return fX0 + fDx * i; }
 	Real GetY(ptrdiff_t i) const { return fY0 + fDy * i; }
@@ -146,7 +147,7 @@ struct ScatteringSolver3DImpl : ScatteringSolverImpl {
 		SolverMethod met,
 		Real mass,
 		Real hbar,
-		std::map<std::string, std::string> const &opts);
+		OptionsImpl const &opts);
 
 	Real GetX(ptrdiff_t i) const { return fX0 + fDx * i; }
 	Real GetY(ptrdiff_t i) const { return fY0 + fDy * i; }

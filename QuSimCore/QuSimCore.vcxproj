@@ -288,6 +288,7 @@
     <ClCompile Include="..\qsim\GaussLegendreMethod2D.cpp" />
     <ClCompile Include="..\qsim\IVPSolverImpl.cpp" />
     <ClCompile Include="..\qsim\MatrixSolver.cpp" />
+    <ClCompile Include="..\qsim\OptionsImpl.cpp" />
     <ClCompile Include="..\qsim\Perturbation1DImpl.cpp" />
     <ClCompile Include="..\qsim\Perturbation2DImpl.cpp" />
     <ClCompile Include="..\qsim\Perturbation3DImpl.cpp" />
@@ -319,6 +320,7 @@
     <ClInclude Include="..\qsim\Linear.h" />
     <ClInclude Include="..\qsim\Matrix2.h" />
     <ClInclude Include="..\qsim\MatrixSolver.h" />
+    <ClInclude Include="..\qsim\OptionsImpl.h" />
     <ClInclude Include="..\qsim\Perburbation.h" />
     <ClInclude Include="..\qsim\Perturbation2DImpl.h" />
     <ClInclude Include="..\qsim\Perturbation3DImpl.h" />
