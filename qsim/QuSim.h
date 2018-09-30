@@ -143,7 +143,7 @@ struct Options {
 
 	inline Options &SpaceOrder(Int n)
 	{
-		SetInt("sapce_order", n);
+		SetInt("space_order", n);
 		return *this;
 	}
 
