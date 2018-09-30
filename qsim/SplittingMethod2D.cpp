@@ -49,7 +49,7 @@ void SplittingMethod2D::update_psi()
 		ExpV(fPsi, fTVPsi, 0.5);
 		//Copy(fPsi, fVTVPsi);
 		//double x2 = Norm2();
-	} else {
+	} else if(SolverMethod::SplittingMethodO4 == fSolverMethod) {
 
 		Real tpow1t = pow(2, 1 / 3.0);
 		Real c1 = 1 / (2 * (2 - tpow1t));
@@ -62,26 +62,32 @@ void SplittingMethod2D::update_psi()
 		ExpV(fVPsi, fTVPsi, c2);
 		ExpT(fTVPsi, fVPsi, fD1);
 		ExpV(fPsi, fTVPsi, c1);
+	} else {
+		throw std::runtime_error("unspported method");
 	}
 
 }
 
 void SplittingMethod2D::initExpV()
 {
-	fExpV0Dot5Dt.resize(fNy, fNx);
+	if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
+		fExpV0Dot5Dt.resize(fNy, fNx);
 
-	Complex f = -1.0 / fHbar * fDt * 0.5;
-	for (size_t i = 0; i < fNx*fNy; ++i) {
-		fExpV0Dot5Dt.data()[i] = exp(f*fV.data()[i] * I);
+		Complex f = -1.0 / fHbar * fDt * 0.5;
+		for (size_t i = 0; i < fNx*fNy; ++i) {
+			fExpV0Dot5Dt.data()[i] = exp(f*fV.data()[i] * I);
+		}
 	}
-
 }
 
 void SplittingMethod2D::initExpT()
 {
-	fExpTD1Dt.resize(fNy, fNx);
-	fExpTD2Dt.resize(fNy, fNx);
-	fExpTDt.resize(fNy, fNx);
+	if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
+		fExpTDt.resize(fNy, fNx);
+	} else if (SolverMethod::SplittingMethodO4 == fSolverMethod) {
+		fExpTD1Dt.resize(fNy, fNx);
+		fExpTD2Dt.resize(fNy, fNx);
+	}
 
 	Real tpow1t = pow(2, 1 / 3.0);
 	fD1 = 1 / (2 - tpow1t);
@@ -95,9 +101,14 @@ void SplittingMethod2D::initExpT()
 			Real ky = jj * 2 * Pi / (fDy * fNy);
 
 			Real t = fHbar * (kx*kx + ky * ky) / (2 * fMass);
-			fExpTD1Dt(j, i) = exp(-I * (t * fDt* fD1));
-			fExpTD2Dt(j, i) = exp(-I * (t * fDt* fD2));
-			fExpTDt(j, i) = exp(-I * (t * fDt* 1.0));
+
+			if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
+				fExpTDt(j, i) = exp(-I * (t * fDt* 1.0));
+			} else if (SolverMethod::SplittingMethodO4 == fSolverMethod) {
+				fExpTD1Dt(j, i) = exp(-I * (t * fDt* fD1));
+				fExpTD2Dt(j, i) = exp(-I * (t * fDt* fD2));
+			}
+
 		}
 	}
 
