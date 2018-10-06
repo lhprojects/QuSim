@@ -1,0 +1,333 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Struct Name="Evolver1D" Collapsed="true">
+    <Position X="8.5" Y="18" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAQAAAAAAAAECAAAAAAAIAABAQQAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Evolver2D" Collapsed="true">
+    <Position X="11.5" Y="18" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAACAAAAAAAAAAAAAAAAAAAAgAAAAAIAABAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Evolver" Collapsed="true">
+    <Position X="10.5" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAEAQACgAgAAAAAAAAAAgAIAAAAAgAAAAAQA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EvolverImpl" Collapsed="true">
+    <Position X="12" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAQAAAAAEAQBCQAAACAQQQQABAgAAAAAAAAIAAACQA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\EvolverImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EvolverImpl1D" Collapsed="true">
+    <Position X="7.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIQAgABAEAQUCAAABJABUCAAwIkAgQAAAAAAFACSAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\EvolverImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EvolverImpl2D" Collapsed="true">
+    <Position X="17.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAgABAEAQECAAABBABQAAAAIkAAQQAAACAHACSAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\EvolverImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="GaussLegendreMethod" Collapsed="true">
+    <Position X="3.25" Y="4.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAEAAAAAAAAAAAAQAgAAAAAAABABACA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\GaussLegendreMethod.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="GaussLegendreMethod2D" Collapsed="true">
+    <Position X="14" Y="4.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAEAAAAAAADAAAAQAAAQAAEAABADAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\GaussLegendreMethod2D.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SplittingMethod" Collapsed="true">
+    <Position X="9.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAACADQACQAAIAAAAAAAIgBAAGAAALACAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\SplittingMethod.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SplittingMethod1DCUDA&lt;Scalar&gt;" Collapsed="true">
+    <Position X="6" Y="4.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAgAgAAAAAAABAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\SplittingMethod1DCUDA.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SplittingMethod2D" Collapsed="true">
+    <Position X="17" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAwCAECQAAAQAAQAEAAABQAGgAALACAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\SplittingMethod2D.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SplittingMethod2DCUDA&lt;Scalar&gt;" Collapsed="true">
+    <Position X="19.5" Y="4.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAgAAAQAAAAABACAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\SplittingMethod2DCUDA.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="FFTWFourierTransform" Collapsed="true">
+    <Position X="2.5" Y="18" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAYEAAAAAAAAIAAAAAAAQAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\FourierTransform.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="FFTWFourierTransform2D" Collapsed="true">
+    <Position X="17.25" Y="15" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>BCAAIEAAAAAAAAAAAAAAAAQAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\FourierTransform.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="FFTWFourierTransform3D" Collapsed="true">
+    <Position X="7.5" Y="15" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>BEAAIEAAAAAAAAAAAAAAAAQAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\FourierTransform.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="FourierTransform" Collapsed="true">
+    <Position X="4.25" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAQAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\FourierTransform.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="FourierTransform2D" Collapsed="true">
+    <Position X="16.25" Y="13.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQCAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\FourierTransform.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="FourierTransform3D" Collapsed="true">
+    <Position X="9.25" Y="13.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQCAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\FourierTransform.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="KissFourierTransform" Collapsed="true">
+    <Position X="5.25" Y="18" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAEE=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\FourierTransform.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="KissFourierTransform3D" Collapsed="true">
+    <Position X="10.5" Y="15" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAECAAGAgAABAAAQAAACABAAAQAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\FourierTransform.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="KissFourierTransform2D" Collapsed="true">
+    <Position X="14.5" Y="15" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAECAAGAgAABAAAQAAACACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\FourierTransform.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuPerturbation1D" Collapsed="true">
+    <Position X="15.25" Y="12.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QAEAAAEAAAQAAAAAAAAAAAAgAAAAABIAAQBAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuPerturbation1DImpl" Collapsed="true">
+    <Position X="7.25" Y="8.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QEEAAAEAAAQAAAAAAACEAAAgAAAgAEBABShAAAAgAEA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\Perturbation1DImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuPerturbation2D" Collapsed="true">
+    <Position X="6.5" Y="12.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAIAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuPerturbation2DImpl" Collapsed="true">
+    <Position X="14" Y="8.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QEAAAAEAAQAAAAAAAACEAAAAAAAgAABABCAAAAAgAEA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\Perturbation2DImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuPerturbation3D" Collapsed="true">
+    <Position X="9.25" Y="12.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuPerturbation3DImpl" Collapsed="true">
+    <Position X="20.75" Y="8.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QEAAAAEAAAAAAAAAAAiEAAAAAAAgAABABCAAAAAgAEA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\Perturbation3DImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuScatteringInverseMatrix1D" Collapsed="true">
+    <Position X="18" Y="12.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuScatteringInverseMatrix2D" Collapsed="true">
+    <Position X="3.25" Y="12.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuScatteringInverseMatrix3D" Collapsed="true">
+    <Position X="12" Y="12.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuScatteringProblemSolver" Collapsed="true">
+    <Position X="10.75" Y="9.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAgAAQAAAAAAAAAAAAAIBAAgAAAAAQA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuScatteringProblemSolver2D" Collapsed="true">
+    <Position X="4.5" Y="11" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAEAAAAAAAABAAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuScatteringProblemSolver3D" Collapsed="true">
+    <Position X="10.5" Y="11" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAEAAAAAAAABAAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ScatteringProblemSolverInverseMatrix1D" Collapsed="true">
+    <Position X="3.25" Y="8.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAEAAAAIAAAAAEAAAAAAAAAAAQAAAAAAAAAIA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\ScatteringProblemSolverInverseMatrix.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ScatteringProblemSolverInverseMatrix3D" Collapsed="true">
+    <Position X="16.75" Y="8.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAEAAAAIAAAAAEAAAAAAAAAAAEAAAAAAAAQIA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\ScatteringProblemSolverInverseMatrix3D.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ScatteringSolver1DImpl" Collapsed="true">
+    <Position X="5.25" Y="7" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAJAAAAAAAAABAABQAAACIEAgAAQAQAAAAAAII=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\ScatteringSolverImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ScatteringSolverImpl" Collapsed="true">
+    <Position X="12.25" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AUAAAAgAAAAgAAAAAACAAAAQAAAAAggIAAAAoAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\ScatteringSolverImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Solver" Collapsed="true">
+    <Position X="15.5" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAgAAAAAAAAIAAAAAAAAAAAgAAAAAAg=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Solver1D" Collapsed="true">
+    <Position X="15.5" Y="18" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAECIAAAAAQAAAAAAAAQAAAAAAAAAAIABBRBQAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SolverImpl1D" Collapsed="true">
+    <Position X="2.5" Y="15" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEACKQABAEAAAAAAADAIkQAIAAIEAgAAAAQAAAAAKAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\SolverImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EigenMethod" Collapsed="true">
+    <Position X="11.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEACQIAAAAAIAAAAAAAAAAgAgAAAAABiAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\EigenMethod.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="IVPSolver1DImpl" Collapsed="true">
+    <Position X="4.75" Y="15" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEACIAgBAEAAAAAAADQAAQAAAAIAAgAAAAQAAAAAKAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\IVPSolverImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="IVPSolverImpl" Collapsed="true">
+    <Position X="3.75" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEABAAggAAAAAAAAAACAAAQQAAAAAAAAAgAAIAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\IVPSolverImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="QuScatteringProblemSolver1D" Collapsed="true">
+    <Position X="16.5" Y="11" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAQAAAAAAAAAAAAABQBAAAAAAA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\QuSim.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ScatteringProblemSolverInverseMatrix2D" Collapsed="true">
+    <Position X="10" Y="8.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAEAAAAIAAAAAEAAAAAAAAAAAIAAAAAAAAAIA=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\ScatteringProblemSolverInverseMatrix2D.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ScatteringSolver2DImpl" Collapsed="true">
+    <Position X="12" Y="7" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAMAACAAAAABxAABQCAACIEAABAYAACAAAQAII=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\ScatteringSolverImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ScatteringSolver3DImpl" Collapsed="true">
+    <Position X="18.75" Y="7" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAACAgAMAAQAAACABxAABQAgACIEAQAAZAECAAAQAII=</HashCode>
+      <FileName>D:\projects\QuSim\qsim\ScatteringSolverImpl.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>
