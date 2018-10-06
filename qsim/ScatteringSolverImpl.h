@@ -95,10 +95,10 @@ struct ScatteringSolver2DImpl : ScatteringSolverImpl {
 	ptrdiff_t IdxFold(ptrdiff_t iy, ptrdiff_t ix) const
 	{
 		if (iy < 0) iy += fNy;
-		else if (iy >= fNy) iy -= fNy;
+		else if (iy >= (ptrdiff_t)fNy) iy -= fNy;
 
 		if (ix < 0) ix += fNx;
-		else if (ix >= fNx) ix -= fNx;
+		else if (ix >= (ptrdiff_t)fNx) ix -= fNx;
 
 		return Idx(iy, ix);
 	}
@@ -157,13 +157,13 @@ struct ScatteringSolver3DImpl : ScatteringSolverImpl {
 
 	ptrdiff_t IdxFold(ptrdiff_t iz, ptrdiff_t iy, ptrdiff_t ix) const {
 		if (iz < 0) iz += fNz;
-		else if (iz >= fNz) iz -= fNz;
+		else if (iz >= (ptrdiff_t)fNz) iz -= fNz;
 
 		if (iy < 0) iy += fNy;
-		else if (iy >= fNy) iy -= fNy;
+		else if (iy >= (ptrdiff_t)fNy) iy -= fNy;
 
 		if (ix < 0) ix += fNx;
-		else if (ix >= fNx) ix -= fNx;
+		else if (ix >= (ptrdiff_t)fNx) ix -= fNx;
 
 		return Idx(iz, iy, ix);
 	}

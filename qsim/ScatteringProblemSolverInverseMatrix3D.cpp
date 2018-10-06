@@ -67,59 +67,59 @@ void ScatteringProblemSolverInverseMatrix3D::InitEMinusH()
 					Real const tz = 1. / (2 * fMass)*fHbar*fHbar / (fDz*fDz);
 					if (fOrder <= 2) {
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i), -2 * (tx + ty + tz) + dig));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i), -2 * (tx + ty + tz) + dig));
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i - 1), tx));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i + 1), tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i - 1), tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i + 1), tx));
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j - 1, i), ty));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j + 1, i), ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j - 1, i), ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j + 1, i), ty));
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k - 1, j, i), tz));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k + 1, j, i), tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k - 1, j, i), tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k + 1, j, i), tz));
 
 					} else if (fOrder <= 4) {
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i), -30. / 12 * (tx + ty + tz) + dig));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i), -30. / 12 * (tx + ty + tz) + dig));
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i - 1), 16. / 12 * tx));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i + 1), 16. / 12 * tx));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i - 2), -1. / 12 * tx));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i + 2), -1. / 12 * tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i - 1), 16. / 12 * tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i + 1), 16. / 12 * tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i - 2), -1. / 12 * tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i + 2), -1. / 12 * tx));
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j - 1, i), 16. / 12 * ty));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j + 1, i), 16. / 12 * ty));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j - 2, i), -1. / 12 * ty));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j + 2, i), -1. / 12 * ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j - 1, i), 16. / 12 * ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j + 1, i), 16. / 12 * ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j - 2, i), -1. / 12 * ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j + 2, i), -1. / 12 * ty));
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k - 1, j, i), 16. / 12 * tz));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k + 1, j, i), 16. / 12 * tz));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k - 2, j, i), -1. / 12 * tz));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k + 2, j, i), -1. / 12 * tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k - 1, j, i), 16. / 12 * tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k + 1, j, i), 16. / 12 * tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k - 2, j, i), -1. / 12 * tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k + 2, j, i), -1. / 12 * tz));
 					} else if (fOrder <= 6) {
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i), -490. / 180 * (tx + ty + tz) + dig));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i), -490. / 180 * (tx + ty + tz) + dig));
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i - 1), 270. / 180 * tx));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i + 1), 270. / 180 * tx));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i - 2), -27. / 180 * tx));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i + 2), -27. / 180 * tx));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i - 3), 2. / 180 * tx));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j, i + 3), 2. / 180 * tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i - 1), 270. / 180 * tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i + 1), 270. / 180 * tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i - 2), -27. / 180 * tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i + 2), -27. / 180 * tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i - 3), 2. / 180 * tx));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j, i + 3), 2. / 180 * tx));
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j - 1, i), 270. / 180 * ty));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j + 1, i), 270. / 180 * ty));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j - 2, i), -27. / 180 * ty));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j + 2, i), -27. / 180 * ty));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j - 3, i), 2. / 180 * ty));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k, j + 3, i), 2. / 180 * ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j - 1, i), 270. / 180 * ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j + 1, i), 270. / 180 * ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j - 2, i), -27. / 180 * ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j + 2, i), -27. / 180 * ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j - 3, i), 2. / 180 * ty));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k, j + 3, i), 2. / 180 * ty));
 
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k - 1, j, i), 270. / 180 * tz));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k + 1, j, i), 270. / 180 * tz));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k - 2, j, i), -27. / 180 * tz));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k + 2, j, i), -27. / 180 * tz));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k - 3, j, i), 2. / 180 * tz));
-						elems.push_back(Eigen::Triplet<Complex>(Idx(k, j, i), IdxFold(k + 3, j, i), 2. / 180 * tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k - 1, j, i), 270. / 180 * tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k + 1, j, i), 270. / 180 * tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k - 2, j, i), -27. / 180 * tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k + 2, j, i), -27. / 180 * tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k - 3, j, i), 2. / 180 * tz));
+						elems.push_back(Eigen::Triplet<Complex>((int)Idx(k, j, i), (int)IdxFold(k + 3, j, i), 2. / 180 * tz));
 
 					} else {
 						throw std::runtime_error("too higher order");
