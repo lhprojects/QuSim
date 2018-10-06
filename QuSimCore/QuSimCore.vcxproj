@@ -293,7 +293,7 @@
     <ClCompile Include="..\qsim\Perturbation2DImpl.cpp" />
     <ClCompile Include="..\qsim\Perturbation3DImpl.cpp" />
     <ClCompile Include="..\qsim\PerturbationOptions.cpp" />
-    <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix.cpp" />
+    <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix1D.cpp" />
     <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix2D.cpp" />
     <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix3D.cpp" />
     <ClCompile Include="..\qsim\ScatteringSolverImpl.cpp" />

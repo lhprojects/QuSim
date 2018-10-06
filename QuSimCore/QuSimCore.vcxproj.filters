@@ -66,9 +66,6 @@
     <ClCompile Include="..\qsim\ScatteringSolverImpl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\qsim\MatrixSolver.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -88,6 +85,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\qsim\OptionsImpl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix1D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
