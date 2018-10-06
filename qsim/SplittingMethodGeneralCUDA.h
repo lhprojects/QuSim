@@ -58,11 +58,6 @@ struct SplittingMethodGeneralCUDAImpl {
 
 };
 
-template<class Scalar>
-struct SplittingMethod2DCUDAImpl : Evolver2D {
-
-};
-
 inline cufftResult fftExec(cufftHandle plan,
 	cufftComplex *idata,
 	cufftComplex *odata,
