@@ -60,9 +60,15 @@ struct SplittingMethod2DCUDA : EvolverImpl2D {
 EvolverImpl2D *CreateSplittingMethod2DCUDA(OptionsImpl const &opts)
 {
 #ifdef USE_CUDA
-	//return new SplittingMethod2DCUDAImpl<cuComplex>();
-	if (opts.find("cuda_precision") != opts.end() && opts.find("cuda_precision")->second == "single") {
-		return new SplittingMethod2DCUDA<cuComplex>();
+	std::string prec;
+	if (opts.Get("cuda_precision", prec)) {
+		if (prec == "single") {
+			return new SplittingMethod2DCUDA<cuComplex>();
+		} else if (prec == "double") {
+			return new SplittingMethod2DCUDA<cuDoubleComplex>();
+		} else {
+			throw std::runtime_error("unkown precision");
+		}
 	} else {
 		return new SplittingMethod2DCUDA<cuDoubleComplex>();
 	}

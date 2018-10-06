@@ -137,18 +137,7 @@ void SplittingMethodGeneralCUDAImpl<Scalar>::initSystem2D(EvolverImpl *evolver2d
 	fSolverMethod = solver;
 	fPsi = psi;
 
-	fBatch = 1;
-	{
-		auto it = opts.find("batch");
-		if (it != opts.end()) {
-			auto x = it->second;
-			int d;
-			if (sscanf(x.c_str(), "%d", &d) < 0) {
-				throw std::runtime_error("batch parse error");
-			}
-			fBatch = d;
-		}
-	}
+	fBatch = opts.GetInt("batch", 1);
 
 	check_err(cudaMalloc((void**)&fTmp1, nx*ny * sizeof(Scalar)));
 	check_err(cudaMalloc((void**)&fTmp2, nx*ny * sizeof(Scalar)));

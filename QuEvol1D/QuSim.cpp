@@ -586,8 +586,7 @@ void InitialASystem1D(Evolver1D &syst)
 	}
 	Options opts;
 #ifdef USE_CUDA
-	opts["fft_lib"] = "cuda";
-	opts["batch"] = "5";
+	opts.Cuda().Batch(5);
 #endif
 	syst.init(FunctorWrapper(psi.c_str()), fn, deltaT, fnes, FunctorWrapper(pot.c_str()),
 		x0, x1, n, bc, sl, mass, hbar, opts);
