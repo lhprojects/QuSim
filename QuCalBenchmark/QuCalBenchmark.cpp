@@ -26,7 +26,7 @@ void test(char const *expr, std::function<CCom(CCom x, CCom y)> const &func)
 		//printf("%f\n", c);
 		auto t1 = std::chrono::high_resolution_clock::now();
 		auto d = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0);
-		printf("%f MCLPS\n", 1.0 * niter / d.count());
+		printf("Cal: %f MCLPS\n", 1.0 * niter / d.count());
 
 	}
 
@@ -39,13 +39,14 @@ void test(char const *expr, std::function<CCom(CCom x, CCom y)> const &func)
 		//printf("%f\n", c);
 		auto t1 = std::chrono::high_resolution_clock::now();
 		auto d = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0);
-		printf("%f MCLPS\n", 1.0*niter / d.count());
+		printf("Native Code: %f MCLPS\n", 1.0*niter / d.count());
 
 	}
 
 }
 int main()
 {
+	printf("MCLPS = Million call per second\n");
 	test("x*x+y*y", [](CCom x, CCom y) {return x * x + y * y; });
 	test("sqrt(x*x+y*y)", [](CCom x, CCom y) {return sqrt(x * x + y * y); });
 	test("exp(I*y)*exp(I*x)", [&](CCom x, CCom y) {return exp(CCom(0,1)*y)*exp(CCom(0, 1)*x); });
