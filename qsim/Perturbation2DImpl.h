@@ -6,7 +6,7 @@
 #include "Linear.h"
 #include "Perburbation.h"
 #include "PerturbationOptions.h"
-
+#include <memory>
 
 struct QuPerturbation2DImpl : ScatteringSolver2DImpl {
 

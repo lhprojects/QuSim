@@ -7,6 +7,7 @@
 #include "Perburbation.h"
 #include "PerturbationOptions.h"
 
+#include <memory>
 
 struct QuPerturbation3DImpl : ScatteringSolver3DImpl {
 
