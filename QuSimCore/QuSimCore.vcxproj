@@ -341,6 +341,9 @@
     <ClInclude Include="..\qsim\View.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CudaUtility\CudaUtility.vcxproj">
+      <Project>{aa7233c8-071c-481a-abe0-008e0ab52d58}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\fftw-3.3.2\fftw-3.3-libs\libfftw-3.3\libfftw-3.3.vcxproj">
       <Project>{ea3dcc95-2423-4ea0-a508-7a427b4c0594}</Project>
     </ProjectReference>
