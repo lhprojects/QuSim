@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="源文件\CUDA">
+      <UniqueIdentifier>{96f08599-235e-4570-93c8-e92a33cab2ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\qsim\TestCal.cpp">
@@ -46,12 +49,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\qsim\FourierTransform.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\SplittingMethod2DCUDA.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\SplittingMethod1DCUDA.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\qsim\Perturbation1DImpl.cpp">
@@ -89,6 +86,12 @@
     </ClCompile>
     <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix1D.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qsim\SplittingMethod2DCUDA.cpp">
+      <Filter>源文件\CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qsim\SplittingMethod1DCUDA.cpp">
+      <Filter>源文件\CUDA</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
