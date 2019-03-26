@@ -193,7 +193,7 @@ struct EvolverImpl2D : EvolverImpl {
 	std::function<Complex(Real, Real)> fPsi0Func;
 	// col major
 	// y major
-	Eigen::MatrixXcd fLastLastPsi;
+	//Eigen::MatrixXcd fLastLastPsi;
 	Eigen::MatrixXcd fLastPsi;
 	Eigen::MatrixXcd fPsi;
 

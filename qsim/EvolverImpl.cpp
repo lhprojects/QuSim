@@ -176,7 +176,7 @@ void EvolverImpl2D::initSystem2D(std::function<Complex(Real, Real)> const &psi,
 
 	initPsi();
 	fLastPsi = fPsi;
-	fLastLastPsi = fLastPsi;
+	//fLastLastPsi = fLastPsi;
 
 	initPotential();
 	//Real x = Norm2();
@@ -222,7 +222,7 @@ void EvolverImpl2D::initPotential()
 void EvolverImpl2D::step()
 {
 	//Real y = Norm2();
-	fLastLastPsi = fLastPsi;
+	//fLastLastPsi = fLastPsi;
 	fLastPsi = fPsi;
 
 	//Real x = Norm2();
@@ -242,9 +242,9 @@ Real EvolverImpl2D::EnPartialT()
 	Real norm2 = 0;
 	for (size_t i = 0; i < fNx; ++i) {
 		for (size_t j = 0; j < fNy; ++j) {
-			Complex dpsidt = (fPsi(j, i) - fLastLastPsi(j, i)) / (2.0*fDt);
-			pot += (I * fHbar * conj(fPsi(j, i)) * dpsidt).real();
-			norm2 += abs2(fPsi(j, i));
+			Complex dpsidt = (fPsi(j, i) - fLastPsi(j, i)) / fDt;
+			pot += (I * fHbar * 0.5*conj(fPsi(j, i) + fLastPsi(j, i)) * dpsidt).real();
+			norm2 += abs2(0.5*(fLastPsi(j, i) + fPsi(j, i)));
 		}
 	}
 	return pot / norm2;
