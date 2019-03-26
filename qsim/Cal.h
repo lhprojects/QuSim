@@ -4,6 +4,7 @@
 #include <map>
 #include <complex>
 #include <vector>
+#include <memory>
 
 typedef std::complex<double> CCom;
 
