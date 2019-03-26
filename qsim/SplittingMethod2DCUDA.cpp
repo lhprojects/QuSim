@@ -29,7 +29,7 @@ struct SplittingMethod2DCUDA : EvolverImpl2D {
 
 	void step() override
 	{
-		fLastLastPsi = fLastPsi;
+		//fLastLastPsi = fLastPsi;
 		fLastPsi = fPsi;
 
 		//Real x = Norm2();
