@@ -49,8 +49,8 @@ int main()
 	};
 
 	int dims[] = {
-		800,
-		1600,
+		200,
+		400,
 	};
 
 	printf("%-30s ", "");
@@ -71,22 +71,28 @@ int main()
 			Evolver2D syst;
 			syst.init([](Real x, Real y) { return exp(I*x)*exp(-x * x)*exp(-y * y); }, true, 0.01, false,
 				[](Real x, Real y) { return exp(-x * x); },
-				-10, 10, dims[j],-10, 10, dims[j], BoundaryCondition::Period, tests[i].met, 1, 1,
+				-10, 10, dims[j], -10, 10, dims[j], BoundaryCondition::Period, tests[i].met, 1, 1,
 				tests[i].opts);
 
 			int dim = dims[j];
-			int iter = 5000000 * 10 / (dim*dim);
+			int iter = 1;
 
-			int batch = i < 2 ? 10 : 1;
-			iter /= batch;
+			//int batch = i < 2 ? 10 : 1;
+			//iter /= batch;
 
-			if (iter < 2) iter = 2;
+			//if (iter < 2) iter = 2;
 
 			auto t0 = std::chrono::system_clock::now();
-			for (int it = 0; it < iter; ++it) {
-				syst.step();
-			}
 			auto t1 = std::chrono::system_clock::now();
+			for (;;) {
+				for (int it = 0; it < iter; ++it) {
+					syst.step();
+				}
+				t1 = std::chrono::system_clock::now();
+				if (std::chrono::duration_cast<std::chrono::seconds>(t1 - t0).count() > 1) {
+					break;
+				}
+			}
 
 			auto d = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0);
 			printf("%13.2f ", (dim*dim*syst.Time()/0.01) / (1E-6*d.count())*1E-6);

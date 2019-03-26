@@ -20,6 +20,7 @@ void test0(double p)
 		printf("solver error %.2E\n", solver.GetR() - R);
 	}
 
+	printf("method bins | O2 O4 O6\n");
 	for (int i = 0; i < 10; ++i) {
 
 		double x0 = -150;
@@ -47,11 +48,11 @@ void test0(double p)
 		inv3.Compute();
 
 		auto geti = [&](double x) -> size_t {  return (size_t)((x - x0) / (x1 - x0) * n); };
-		printf("%5d | %10.2E %10.2E %10.2E\n", (int)n,
+		printf("|psi|  %5d | %10.2E %10.2E %10.2E\n", (int)n,
 			abs2(inv1.GetPsi()[geti(-10)]) - solver.GetR(),
 			abs2(inv2.GetPsi()[geti(-10)]) - solver.GetR(),
 			abs2(inv3.GetPsi()[geti(-10)]) - solver.GetR());
-		printf("%5d | %10.2E %10.2E %10.2E\n", (int)n,
+		printf("GetR() %5d | %10.2E %10.2E %10.2E\n", (int)n,
 			inv1.GetR() - solver.GetR(),
 			inv2.GetR() - solver.GetR(),
 			inv3.GetR() - solver.GetR());
@@ -64,6 +65,7 @@ void test10()
 	printf("Test inverse matrix method\n");
 	double R = 1 - 0.1355284179587569045304922;
 
+	printf("method bins | LU   DiagonalPre  IncompleteLUTPre  IncompleteLUTPre\n");
 	for (int i = 0; i < 10; ++i) {
 
 		double x0 = -150;
@@ -104,7 +106,7 @@ void test10()
 
 
 		auto geti = [&](double x) -> size_t {  return (size_t)((x - x0) / (x1 - x0) * n); };
-		printf("%10.2E %10.2E %10.2E %10.2E\n",
+		printf("|psi|  %10.2E %10.2E %10.2E %10.2E\n",
 			abs2(inv1.GetPsi()[geti(-10)]) - R,
 			abs2(inv2.GetPsi()[geti(-10)]) - R,
 			abs2(inv3.GetPsi()[geti(-10)]) - R,
@@ -113,10 +115,10 @@ void test10()
 }
 
 
-void test1()
+void TestBornSeriseDefault()
 {
 
-	printf("Test R T calculation\n");
+	printf("Test BornSerise Default\n");
 	Solver1D solver;
 	solver.init(FunctorWrapper("0.000001*exp(-x*x)"), -10, 10, 20000, 0.5, 1, I,
 		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, Options());
@@ -131,10 +133,10 @@ void test1()
 
 }
 
-void test1d5()
+void TestBornSeriseUpToO5()
 {
 
-	printf("Test perburbation 1 order correction\n");
+	printf("Test BornSerise\n");
 	Solver1D solver;
 	solver.init(FunctorWrapper("0.1*exp(-x*x)"), -10, 10, 20000, 0.5, 1, I,
 		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, Options());
@@ -173,10 +175,49 @@ void test1d5()
 
 }
 
+
+void testNaiveBornSerise(Real p, int n = 100)
+{
+	printf("Test NaiveBornSerise %lf\n", p);
+	printf("%6s\n", "Order");
+
+	Real v0 = p;
+	auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
+
+	Solver1D solver;
+	{
+
+		Options opts = Options().SmallRoundError(true);
+
+		solver.init(vfunc, -10, 10, 2000, 0.5, 1, I,
+			SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, opts);
+		solver.Compute();
+	}
+
+	QuPerturbation1D per1;
+	Options opts;
+	opts.Order(1);
+	per1.init(vfunc, -5000, 5000, 200000, 0.5, 0.002,
+		1, SolverMethod::BornSerise, 1, 1, opts);
+
+
+	for (int i = 0; i < n; ++i) {
+
+		printf("%6d | ", i);
+
+		per1.Compute();
+		printf(" %8.3E %8.3E", per1.GetR(), solver.GetR());
+		printf("\n");
+
+	}
+
+}
+
+
 void testPerburbation()
 {
 	printf("%10s | %10s %10s %10s %10s %10s %10s | %10s\n",
-		    "V0", "RO1", "RO2", "RO10", "RO3N3", "RP5", "RP20", "Exact");
+		    "V0", "O1", "O2", "O10", "O3N3", "O5P", "O20P", "Exact");
 	for (int i = 0; i < 10; ++i) {
 
 		Real v0 = 0.05 + 0.1*i;
@@ -275,43 +316,6 @@ void testPerburbativeConditioner(char const *name, Real p, int n = 100)
 }
 
 
-void testNaiveBornSerise(Real p, int n = 100)
-{
-	printf("Test NaiveBornSerise %lf\n", p);
-	printf("%6s\n", "Order");
-
-	Real v0 = p;
-	auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
-
-	Solver1D solver;
-	{
-
-		Options opts = Options().SmallRoundError(true);
-
-		solver.init(vfunc, -10, 10, 2000, 0.5, 1, I,
-			SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, opts);
-		solver.Compute();
-	}
-
-	QuPerturbation1D per1;
-	Options opts;
-	opts.Order(1);
-	per1.init(vfunc, -5000, 5000, 200000, 0.5, 0.002,
-		1, SolverMethod::BornSerise, 1, 1, opts);
-
-
-	for (int i = 0; i < n; ++i) {
-
-		printf("%6d | ", i);
-
-		per1.Compute();
-		printf(" %8.3E %8.3E", per1.GetR(), solver.GetR());
-		printf("\n");
-
-	}
-
-}
-
 int main()
 {
 
@@ -319,10 +323,10 @@ int main()
 	test0(0.1);
 	test0(1);
 	test10();
-	test1();
-	test1d5();
+	TestBornSeriseDefault();
+	TestBornSeriseUpToO5();
+	//testNaiveBornSerise(0.4);
 
-	testNaiveBornSerise(0.4);
 	testPerburbation();
 
 	testPerburbativeConditioner("Vellekoop", 0.5);
