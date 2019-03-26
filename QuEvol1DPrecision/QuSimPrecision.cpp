@@ -37,8 +37,8 @@ void test_tunneling()
 		2000,
 		3000,
 		4000,
-		5000,
-		6000,
+		//5000,
+		//6000,
 	};
 
 	double times[] = {
@@ -85,7 +85,9 @@ void test_tunneling()
 		printf("\n");
 
 
-		for (int j = 0; j < sizeof(dims) / sizeof(int); ++j) {
+		int n = sizeof(dims) / sizeof(int);
+		if (tests[i].met == SolverMethod::Eigen) n = 1;
+		for (int j = 0; j < n; ++j) {
 			int dim = dims[j];
 
 			printf("%-10d ", dim);
@@ -155,8 +157,8 @@ void test_speed()
 		2000,
 		3000,
 		4000,
-		5000,
-		6000,
+		//5000,
+		//6000,
 	};
 
 	double times[] = {
@@ -180,7 +182,9 @@ void test_speed()
 		printf("\n");
 
 
-		for (int j = 0; j < sizeof(dims) / sizeof(int); ++j) {
+		int n = sizeof(dims) / sizeof(int);
+		if (tests[i].met == SolverMethod::Eigen) n = 1;
+		for (int j = 0; j < n; ++j) {
 			int dim = dims[j];
 
 			printf("%-10d ", dim);
