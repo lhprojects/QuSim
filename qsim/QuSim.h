@@ -473,7 +473,10 @@ struct EXPORT_STRUCT QuPerturbation1D : QuScatteringProblemSolver1D {
 
 struct EXPORT_STRUCT QuScatteringProblemSolver2D : QuScatteringProblemSolver {
 
+	MatrixView<Complex> GetPsi0();
+	// scattering part of wave function
 	MatrixView<Complex> GetPsi();
+
 	MatrixView<Real> GetV();
 
 	Real ComputeXSection(Real cosx, Real cosy);
