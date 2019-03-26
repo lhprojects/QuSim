@@ -4,3 +4,11 @@ Release
 Debug
 *.user
 .vs
+
+release0.2
+*.aux
+*.bbl
+*.blg
+*.log
+*.synctex.gz
+*.tex.bak
