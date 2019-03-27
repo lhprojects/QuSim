@@ -576,6 +576,11 @@ Complex Calculator::Evaluate()
 	return fImpl->Val();
 }
 
+MatrixView<Complex> QuScatteringProblemSolver2D::GetPsi0()
+{
+	return View(static_cast<ScatteringSolver2DImpl*>(fImpl)->fPsi0X);
+}
+
 MatrixView<Complex> QuScatteringProblemSolver2D::GetPsi()
 {
 	return View(static_cast<ScatteringSolver2DImpl*>(fImpl)->fPsiX);
