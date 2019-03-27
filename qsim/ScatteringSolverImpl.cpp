@@ -80,7 +80,7 @@ void ScatteringSolver2DImpl::InitPotential()
 	for (size_t i = 0; i < fNx; ++i) {
 		for (size_t j = 0; j < fNy; ++j) {
 			Real x = GetX(i);
-			Real y = GetX(j);
+			Real y = GetY(j);
 			Complex com = fVFunc(x, y);
 			const_cast<Eigen::MatrixXd&>(fV)(j, i) = com.real();
 		}
