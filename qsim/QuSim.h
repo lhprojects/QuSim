@@ -46,10 +46,14 @@ struct MatrixView {
 	T const *data() const { return fData; }
 	T const & operator[](size_t i) const { assert(i < size()); return fData[i]; }
 	T const & operator()(size_t i) const { assert(i < size()); return fData[i]; }
-	T const & operator()(size_t i, size_t j) const {
-		assert(i < fRows );
-		assert(j < fCols);
-		return fData[i + j*fCols];
+	// data stored col major
+	// first is the row (represent y)
+	// second is the col (represent x)
+
+	T const & operator()(size_t row, size_t col) const {
+		assert(row < fRows );
+		assert(col < fCols);
+		return fData[row + col*fRows];
 	}
 private:
 	T const * const fData;
