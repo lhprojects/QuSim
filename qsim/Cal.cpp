@@ -648,7 +648,7 @@ CCom Cal::RunPseudoCode()
 			stack[0] = log(stack[0]);
 			break;
 		case CALE_ATANH:
-			stack[0] = atan(stack[0]);
+			stack[0] = atanh(stack[0]);
 			break;
 		case CALE_SIN:
 			stack[0] = sin(stack[0]);
