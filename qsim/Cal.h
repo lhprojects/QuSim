@@ -29,6 +29,26 @@ struct CalExpr;
 //   // `SetVarVal` and `GetVarVal` itself is expensive, However reseting value by the reference from GetVarVal is cheap
 //   // The first call of `Val` after `SetVarVal` or `constructor` may be expensive
 //   // you must call SetVarVal before you call GetVarVal
+
+//  support functions or operators:
+//  a ? b : c  =  if a != 0 then a else b)
+//     a || b  =  if a != 0 || b != 0 then 1 else 0
+//     a && b  =  if a != 0 && b != 0 then 1 else 0
+//      a > b  =  if real(a) > real(b) then 1 else 0
+//     a >= b  =  if real(a) >= real(b) then 1 else 0
+//      a < b  =  if real(a) < real(b) then 1 else 0
+//     a <= b  =  if real(a) <= real(b) then 1 else 0
+//     a == b  =  if a == b then 1 else 0
+//     + - * /
+//      a ^ b  =  power(a, b)
+//      exp tanh sinh log atanh
+//      sin cos tan asin acos atan
+//       sign  =  if Re x > 0  then 1 else 0
+//       abs   =  sqrt((Re x)^2 + (Im x)^2)   
+//         -a (unitary)
+//       sqrt
+//     guass(x, mu, sigma)
+
 struct Cal {
 
 	// Codes are stil not avaliable
