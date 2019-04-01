@@ -394,7 +394,9 @@ struct PreconditionalBornSerise {
 		K2X(deltaPsik, tmp);
 		if (preconditioner == BornSerisePreconditioner::Identity) {
 			for (size_t i = 0; i < n; ++i) {
-				deltaPsix[i] = tmp[i];
+				PeReal gamma = slow;
+				PeReal oneMinusGamma = 1 - slow;
+				deltaPsix[i] = gamma * tmp[i] + oneMinusGamma * deltaPsix[i];
 			}
 		} else if (preconditioner == BornSerisePreconditioner::Vellekoop) {
 			for (size_t i = 0; i < n; ++i) {
