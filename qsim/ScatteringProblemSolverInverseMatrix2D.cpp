@@ -45,7 +45,10 @@ void ScatteringProblemSolverInverseMatrix2D::InitScatteringSolver2D(std::functio
 				{
 
 					if (3 * lambda * 3 * 2 > fNx *fDx || 3 * lambda * 3 * 2 > fNy *fDy) {
-						throw std::runtime_error("too small size of to fill absorbtion layer");
+						char buf[1024];
+						sprintf(buf, "%s: lambda: %f; absorbtion layer thickness*2: %f; space size: %f*%f\n",
+							"no enough room to fill absorbtion layer", lambda, 18 * lambda, fNx*fDx, fNy*fDy);
+						throw std::runtime_error(buf);
 					}
 					Real xx;
 					Real yy;
