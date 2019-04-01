@@ -304,6 +304,7 @@ struct PreconditionalBornSerise {
 	void GetEpsilon(PeReal &epsilon, BornSerisePreconditioner pre, size_t n, PeReal const *reV, PeReal const *imV)
 	{
 
+		PeReal minEpsilon = 0;
 		if (pre == BornSerisePreconditioner::Identity) {
 			PeReal A = 0;
 			PeReal A2 = 0;
@@ -316,21 +317,22 @@ struct PreconditionalBornSerise {
 			A2 /= n;
 			V2 /= n;
 			A /= n;
+
+			minEpsilon = 0.5*(A2 + V2) / (-A);
 			//input > 0.5 (A2 + V2) / (-A) 
-			epsilon = (A2 + V2) / (-A);
+			//epsilon = (A2 + V2) / (-A);
 			//printf("%f %f %f\n", A2, V2, epsilon);
 			//printf("%f\n", 1 - A*A/(A2+V2));
 		}
 		else {
-			PeReal minEpsilon = 0;
 			for (int i = 0; i < n; ++i) {
 				if (abs(PeComp(reV[i], imV[i])) > minEpsilon) {
 					minEpsilon = abs(PeComp(reV[i], imV[i]));
 				}
 			}
-			if (epsilon < minEpsilon) {
-				epsilon = minEpsilon;
-			}
+		}
+		if (epsilon < minEpsilon) {
+			epsilon = 2 * minEpsilon;
 		}
 	}
 
