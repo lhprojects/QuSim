@@ -14,7 +14,7 @@ double born(double mass, double hbar, double p, double v0, double alpha, double 
 
 void testBorn()
 {
-	printf("test Born\n");
+	printf("Test Born @ first order\n");
 	Options opts;
 	QuScatteringInverseMatrix2D solver;
 	solver.init([](Real x, Real y) { return 0.001*exp(-x * x - y * y); }, -100, 100, 300, -100, 100, 300,
@@ -106,16 +106,18 @@ void testInverseAndPerburbation()
 
 void testPerburbationConverge(Real v0, int n = 100)
 {
-	printf("test Perburbation Convege v0 = %lf\n", v0);
+	printf("Test Perburbation Convege v0 = %lf\n", v0);
 	auto vf = [&](Real x, Real y) { return v0*exp(-x * x - y * y); };
 
+	Real ref;
 	QuScatteringInverseMatrix2D solver;
 	{
 		Options opts;
-		opts.Order(4);
-		solver.init(vf, -100, 100, 500, -100, 100, 500,
+		opts.Order(2);
+		solver.init(vf, -150, 150, 500, -150, 150, 500,
 			0.5, 1, 0, SolverMethod::MatrixInverse, 1, 1, opts);
 		//solver.Compute();
+		ref = born(1, 1, 1, v0, 1, 0);
 	}
 
 	QuPerturbation2D perp0;
@@ -124,7 +126,7 @@ void testPerburbationConverge(Real v0, int n = 100)
 		opts.Preconditional(false).Order(1);
 		//opts["slow"] = "0.5";
 		//opts["fft_lib"] = "FFTW";
-		perp0.init(vf, -150, 150, 1000, -150, 150, 1000,
+		perp0.init(vf, -150, 150, 500, -150, 150, 500,
 			0.5, 0.005, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
 	}
 
@@ -134,7 +136,7 @@ void testPerburbationConverge(Real v0, int n = 100)
 		opts.Preconditional(true).VellekoopPreconditioner().Order(1);
 		//opts["slow"] = "0.5";
 		//opts["fft_lib"] = "FFTW";
-		perp1.init(vf, -150, 150, 1000, -150, 150, 1000,
+		perp1.init(vf, -150, 150, 500, -150, 150, 500,
 			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
 	}
 
@@ -144,29 +146,29 @@ void testPerburbationConverge(Real v0, int n = 100)
 		opts.Preconditional(true).Hao1Preconditioner().Order(1);
 		//opts["slow"] = "0.5";
 		//opts["fft_lib"] = "FFTW";
-		perp2.init(vf, -150, 150, 1000, -150, 150, 1000,
+		perp2.init(vf, -150, 150, 500, -150, 150, 500,
 			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
 	}
 
 	QuPerturbation2D perp3;
 	{
 		Options opts;
-		opts.Preconditional(true).Hao2Preconditioner().Order(1);
+		opts.Preconditional(true).BornIdentityPreconditioner().Order(1);
 		//opts["slow"] = "0.5";
 		//opts["fft_lib"] = "FFTW";
-		perp3.init(vf, -150, 150, 1000, -150, 150, 1000,
+		perp3.init(vf, -150, 150, 500, -150, 150, 500,
 			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
 	}
 
 
-	printf("%5s | %16s %16s %16s %16s\n", "order", "inv.mat.", "born", "Vellekoop", "Hao1", "Hao2");
+	printf("%5s | %16s %16s %16s %16s %16s\n", "order", "inv.mat.", "Naive", "Vellekoop", "Hao1", "Hao2");
 	for (int i = 0; i < n; ++i) {
 		Real theta = 0;
 		Real cosx = cos(theta);
 		Real cosy = sin(theta);
-		printf("%5d | %16.10E %16.10E %16.10E %16.10E %16.10E | %6.2E %6.2E %6.2E %6.2E\n",
+		printf("%5d | %18.13E %18.14E %18.13E %18.13E %18.13E | %6.2E %6.2E %6.2E %6.2E\n",
 			i,
-			5.92704E-2,
+			ref,
 			perp0.ComputeXSection(cosx, cosy),
 			perp1.ComputeXSection(cosx, cosy),
 			perp2.ComputeXSection(cosx, cosy),
@@ -185,10 +187,10 @@ void testPerburbationConverge(Real v0, int n = 100)
 
 }
 
-void testInvMatVsBorn()
+void testInvMatVsBornAnalForDifferentPotential()
 {
 
-	printf("Compare inverse matrix x section with born\n");
+	printf("Compare inverse matrix x section with born.anal. for different potential\n");
 	printf("%10s | %10s %10s\n", "v0", "inv.mat", "born");
 	for (int i = 0; i < 10; ++i) {
 		Real v0 = 0.1 + 0.1 * i;
@@ -205,16 +207,15 @@ void testInvMatVsBorn()
 
 }
 
-void testTotalXSection()
+void TestTotalXSectionConvergeWithNumberOfSamplingPoints()
 {
-	printf("test total x section converge");
+	printf("Test total x section converge with number of smapling points");
 	Options opts;
 	QuScatteringInverseMatrix2D solver;
 	solver.init([](Real x, Real y) { return 1 * exp(-x * x - y * y); }, -100, 100, 300, -100, 100, 300,
 		0.5, 1, 0, SolverMethod::MatrixInverse, 1, 1, opts);
 	solver.Compute();
 
-	printf("Test Total X section\n");
 	printf("%2s %8s", "N", "Err.\n");
 	Real ref = solver.ComputeTotalXSection(1000);
 	for (int i = 0; i < 20; ++i) {
@@ -228,13 +229,14 @@ void testTotalXSection()
 
 int main()
 {
-	testInverseAndPerburbation();
-	testInvMatVsBorn();
-	testBorn();
-
-
-	testTotalXSection();
-
-	testPerburbationConverge(0.2, 1000);
+	testPerburbationConverge(1, 2000);
 	testPerburbationConverge(0.6, 2000);
+	testPerburbationConverge(0.2, 1000);
+
+	testBorn();
+	testInvMatVsBornAnalForDifferentPotential();
+	testInverseAndPerburbation();
+
+	TestTotalXSectionConvergeWithNumberOfSamplingPoints();
+
 }

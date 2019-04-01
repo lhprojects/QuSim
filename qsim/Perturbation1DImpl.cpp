@@ -35,8 +35,10 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 				fHbar, mass, fE, 4.0);
 
 			PreconditionalBornSerise pbs;
-			Real minEpsilon = pbs.GetMinEpsilon(fNx, fV.data(), fVasb.data());
-			const_cast<Real&>(fEpsilon) = (epsilon < minEpsilon ? minEpsilon : epsilon);
+
+			pbs.GetEpsilon(epsilon, fPerturbationOptions.fPreconditioner,
+				fNx, fV.data(), fVasb.data());
+			const_cast<Real&>(fEpsilon) = epsilon;
 		}
 
 	}

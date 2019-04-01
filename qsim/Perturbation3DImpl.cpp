@@ -55,8 +55,9 @@ void QuPerturbation3DImpl::InitPerturbation3D(std::function<Complex(Real, Real, 
 			}
 
 			PreconditionalBornSerise pbs;
-			Real minEpsilon = pbs.GetMinEpsilon(fNx*fNy, fV.data(), fVasb.data());
-			const_cast<Real&>(fEpsilon) = (epsilon < minEpsilon ? minEpsilon : epsilon);
+			pbs.GetEpsilon(epsilon, fPerturbationOptions.fPreconditioner,
+				fNx*fNy, fV.data(), fVasb.data());
+			const_cast<Real&>(fEpsilon) = epsilon;
 
 			ftmp1.resize(fNx*fNy*fNz);
 		}

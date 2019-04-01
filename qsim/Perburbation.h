@@ -293,6 +293,7 @@ struct BornSerise {
 };
 
 enum class BornSerisePreconditioner {
+	Identity,
 	Vellekoop,
 	Hao1,
 	Hao2,
@@ -300,15 +301,37 @@ enum class BornSerisePreconditioner {
 
 struct PreconditionalBornSerise {
 
-	PeReal GetMinEpsilon(size_t n, PeReal const *reV, PeReal const *imV)
+	void GetEpsilon(PeReal &epsilon, BornSerisePreconditioner pre, size_t n, PeReal const *reV, PeReal const *imV)
 	{
-		PeReal minEpsilon = 0;
-		for (int i = 0; i < n; ++i) {
-			if (abs(PeComp(reV[i], imV[i])) > minEpsilon) {
-				minEpsilon = abs(PeComp(reV[i], imV[i]));
+
+		if (pre == BornSerisePreconditioner::Identity) {
+			PeReal A = 0;
+			PeReal A2 = 0;
+			PeReal V2 = 0;
+			for (int i = 0; i < n; ++i) {
+				A += imV[i];
+				A2 += imV[i] * imV[i];
+				V2 += reV[i] * reV[i];
+			}
+			A2 /= n;
+			V2 /= n;
+			A /= n;
+			//input > 0.5 (A2 + V2) / (-A) 
+			epsilon = (A2 + V2) / (-A);
+			//printf("%f %f %f\n", A2, V2, epsilon);
+			//printf("%f\n", 1 - A*A/(A2+V2));
+		}
+		else {
+			PeReal minEpsilon = 0;
+			for (int i = 0; i < n; ++i) {
+				if (abs(PeComp(reV[i], imV[i])) > minEpsilon) {
+					minEpsilon = abs(PeComp(reV[i], imV[i]));
+				}
+			}
+			if (epsilon < minEpsilon) {
+				epsilon = minEpsilon;
 			}
 		}
-		return minEpsilon;
 	}
 
 	// S = V psi0
@@ -369,7 +392,11 @@ struct PreconditionalBornSerise {
 		X2K(tmp, deltaPsik);
 		G0(deltaPsik);
 		K2X(deltaPsik, tmp);
-		if (preconditioner == BornSerisePreconditioner::Vellekoop) {
+		if (preconditioner == BornSerisePreconditioner::Identity) {
+			for (size_t i = 0; i < n; ++i) {
+				deltaPsix[i] = tmp[i];
+			}
+		} else if (preconditioner == BornSerisePreconditioner::Vellekoop) {
 			for (size_t i = 0; i < n; ++i) {
 				PeComp delta = ITime(reV[i], imV[i]) / epsilon;
 				PeComp gamma = slow * (PeReal(1) - delta);

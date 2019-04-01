@@ -17,7 +17,10 @@ void PerturbationOptions::Init(OptionsImpl const & opts)
 				precer = BornSerisePreconditioner::Hao1;
 			} else if (pre == "Hao2") {
 				precer = BornSerisePreconditioner::Hao2;
-			} else {
+			} else if (pre == "BornIndentity") {
+				precer = BornSerisePreconditioner::Identity;
+			}
+			else {
 				throw std::runtime_error("Unknown preconditioner");
 			}
 		}

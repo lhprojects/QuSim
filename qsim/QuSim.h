@@ -121,6 +121,12 @@ struct Options {
 		return *this;
 	}
 
+	inline Options &BornIdentityPreconditioner()
+	{
+		SetString("preconditioner", "BornIndentity");
+		return *this;
+	}
+
 	inline Options &Hao2Preconditioner()
 	{
 		SetString("preconditioner", "Hao2");

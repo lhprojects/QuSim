@@ -38,13 +38,13 @@ void QuPerturbation2DImpl::InitPerturbation2D(std::function<Complex(Real, Real)>
 				}
 				PerburbationUtility::GaussAsbLayer2D(fNx, fNy, fDx, fDy,
 					fVasb.data(),
-					fHbar, mass, fE, 4.0);
+					fHbar, mass, fE, 3.0);
 
 			}
 
 			PreconditionalBornSerise pbs;
-			Real minEpsilon = pbs.GetMinEpsilon(fNx*fNy, fV.data(), fVasb.data());
-			const_cast<Real&>(fEpsilon) = (epsilon < minEpsilon ? minEpsilon : epsilon);
+			pbs.GetEpsilon(epsilon, fPerturbationOptions.fPreconditioner, fNx*fNy, fV.data(), fVasb.data());
+			const_cast<Real&>(fEpsilon) = epsilon;
 
 			ftmp1.resize(fNx*fNy);
 		}
