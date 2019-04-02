@@ -113,11 +113,12 @@ void testPerburbationConverge(Real v0, int n = 100)
 	QuScatteringInverseMatrix2D solver;
 	{
 		Options opts;
-		opts.Order(2);
-		solver.init(vf, -150, 150, 500, -150, 150, 500,
+		opts.SpaceOrder(2);
+		solver.init(vf, -100, 100, 400, -100, 100, 400,
 			0.5, 1, 0, SolverMethod::MatrixInverse, 1, 1, opts);
-		//solver.Compute();
-		ref = born(1, 1, 1, v0, 1, 0);
+		solver.Compute();
+		ref = solver.ComputeXSection(1, 0);
+		//ref = born(1, 1, 1, v0, 1, 0);
 	}
 
 	QuPerturbation2D perp0;
@@ -126,7 +127,7 @@ void testPerburbationConverge(Real v0, int n = 100)
 		opts.Preconditional(false).Order(1);
 		//opts["slow"] = "0.5";
 		//opts["fft_lib"] = "FFTW";
-		perp0.init(vf, -150, 150, 500, -150, 150, 500,
+		perp0.init(vf, -150, 150, 1000, -150, 150, 1000,
 			0.5, 0.005, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
 	}
 
@@ -136,7 +137,7 @@ void testPerburbationConverge(Real v0, int n = 100)
 		opts.Preconditional(true).VellekoopPreconditioner().Order(1);
 		//opts["slow"] = "0.5";
 		//opts["fft_lib"] = "FFTW";
-		perp1.init(vf, -150, 150, 500, -150, 150, 500,
+		perp1.init(vf, -150, 150, 1000, -150, 150, 1000,
 			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
 	}
 
@@ -146,7 +147,7 @@ void testPerburbationConverge(Real v0, int n = 100)
 		opts.Preconditional(true).Hao1Preconditioner().Order(1);
 		//opts["slow"] = "0.5";
 		//opts["fft_lib"] = "FFTW";
-		perp2.init(vf, -150, 150, 500, -150, 150, 500,
+		perp2.init(vf, -150, 150, 1000, -150, 150, 1000,
 			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
 	}
 
@@ -156,7 +157,8 @@ void testPerburbationConverge(Real v0, int n = 100)
 		opts.Preconditional(true).BornIdentityPreconditioner().Order(1);
 		//opts["slow"] = "0.5";
 		//opts["fft_lib"] = "FFTW";
-		perp3.init(vf, -150, 150, 500, -150, 150, 500,
+		if (v0 > 1.5) opts.Slow(0.1);
+		perp3.init(vf, -150, 150, 1000, -150, 150, 1000,
 			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
 	}
 
@@ -179,7 +181,7 @@ void testPerburbationConverge(Real v0, int n = 100)
 			perp3.GetDeltaPsiNorm()
 
 		);
-		perp0.Compute();
+		if(v0 <= 1) perp0.Compute();
 		perp1.Compute();
 		perp2.Compute();
 		perp3.Compute();
@@ -229,9 +231,10 @@ void TestTotalXSectionConvergeWithNumberOfSamplingPoints()
 
 int main()
 {
-	testPerburbationConverge(1, 2000);
-	testPerburbationConverge(0.6, 2000);
-	testPerburbationConverge(0.2, 1000);
+	testPerburbationConverge(0.6);
+	testPerburbationConverge(1);
+	testPerburbationConverge(0.2);
+	testPerburbationConverge(2);
 
 	testBorn();
 	testInvMatVsBornAnalForDifferentPotential();
