@@ -194,6 +194,7 @@ struct EvolverImpl2D : EvolverImpl {
 	// col major
 	// y major
 	//Eigen::MatrixXcd fLastLastPsi;
+	UInt fLastStep;
 	Eigen::MatrixXcd fLastPsi;
 	Eigen::MatrixXcd fPsi;
 
