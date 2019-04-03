@@ -14,6 +14,11 @@ WW[h_]:=(1-1/2 I h - 1/12 h^2)/(1 + 1/2 I h - 1/12 h^2);
 Series[WW[h],{h, 0, 5}]
 Series[Exp[-I h],{h, 0, 5}]
 
+Simplify[(1- 1/12 (3 I-Sqrt[3])h)(1- 1/12 (3 I+Sqrt[3])h)]
+
+Plot[Abs[1 + 1/2 I h - 1/12 h^2],{h, 0, 3}]
+Plot[Abs[1- 1/12 (3 I-Sqrt[3])h],{h, -3, 3}]
+Plot[Abs[1- 1/12 (3 I+Sqrt[3])h],{h, -3, 3}]
 
 
 
