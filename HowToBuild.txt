@@ -1,4 +1,4 @@
-WITH CUDA
+WITHOUT CUDA
 1. Install Visual Studio 2017 or higher version, not tested, but visual studio 2015 should be also supported.
 2. Double click QuSim.sln
 
