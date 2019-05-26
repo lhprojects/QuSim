@@ -2,9 +2,12 @@ WITHOUT CUDA
 1. Install Visual Studio 2017 or higher version, not tested, but visual studio 2015 should be also supported.
 2. Double click QuSim.sln
 
+
 WITH CUDA
 1. Install Visual Studio 2017, 15.0 (version > 15.3 is not supported by CUDA 9.0)
 2. Install CUDA 9.0.
 3. Double click QuSim.sln
+4. Build project `CudaUtility`
+5. Build the other projects.
 
 If you have much experience of CUDA and Visual Studio. You can modify the project to support other Visual Studio and CUDA.
