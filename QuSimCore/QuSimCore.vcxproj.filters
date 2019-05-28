@@ -24,12 +24,6 @@
     <ClCompile Include="..\qsim\SplittingMethod2D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\qsim\SplittingMethod.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\qsim\GaussLegendreMethod.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\qsim\EigenMethod.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -93,18 +87,18 @@
     <ClCompile Include="..\qsim\SplittingMethod1DCUDA.cpp">
       <Filter>源文件\CUDA</Filter>
     </ClCompile>
+    <ClCompile Include="..\qsim\SplittingMethod1D.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qsim\GaussLegendreMethod1D.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qsim\SplittingMethod2D.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\qsim\SplittingMethod.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\qsim\kissfft.hh">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\qsim\GaussLegendreMethod.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\qsim\EigenMethod.h">
@@ -155,9 +149,6 @@
     <ClInclude Include="..\qsim\ComplexPotentialIVPSolver1DImpl.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\qsim\ScatteringSolverImpl.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -192,6 +183,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\qsim\OptionsImpl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\SplittingMethod1D.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix1D.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\qsim\GaussLegendreMethod1D.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

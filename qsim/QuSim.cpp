@@ -1,12 +1,12 @@
 
 #include "QuSim.h"
 #include "EvolverImpl.h"
-#include "SplittingMethod.h"
-#include "SplittingMethod1DCUDA.h"
-#include "EigenMethod.h"
-#include "GaussLegendreMethod.h"
+#include "SplittingMethod1D.h"
 #include "SplittingMethod2D.h"
+#include "EigenMethod.h"
+#include "SplittingMethod1DCUDA.h"
 #include "SplittingMethod2DCUDA.h"
+#include "GaussLegendreMethod1D.h"
 #include "GaussLegendreMethod2D.h"
 
 #include "IVPSolverImpl.h"
@@ -16,7 +16,7 @@
 #include "Perturbation1DImpl.h"
 #include "Perturbation2DImpl.h"
 #include "Perturbation3DImpl.h"
-#include "ScatteringProblemSolverInverseMatrix.h"
+#include "ScatteringProblemSolverInverseMatrix1D.h"
 #include "ScatteringProblemSolverInverseMatrix2D.h"
 #include "ScatteringProblemSolverInverseMatrix3D.h"
 
@@ -94,16 +94,16 @@ void Evolver1D::init(std::function<Complex(Real)> const &psi, bool force_normali
 		if (opts.fOpts->GetString("fft_lib", "") == "cuda") {
 			fImpl = CreateSplittingMethod1DCUDA(*opts.fOpts);
 		} else {
-			fImpl = new SplittingMethod();
+			fImpl = new SplittingMethod1D();
 		}
 	} else if(solver == SolverMethod::Eigen) {
 		fImpl = new EigenMethod();
 	} else if (solver == SolverMethod::ImplicitMidpointMethod) {
-		fImpl = new GaussLegendreMethod();
+		fImpl = new SplittingMethod1D();
 	} else if (solver == SolverMethod::GaussLegendreO4) {
-		fImpl = new GaussLegendreMethod();
+		fImpl = new SplittingMethod1D();
 	} else if (solver == SolverMethod::GaussLegendreO6) {
-		fImpl = new GaussLegendreMethod();
+		fImpl = new SplittingMethod1D();
 	} else {
 		throw std::runtime_error("unspported solver");
 	}

@@ -1,5 +1,5 @@
 #define  _CRT_SECURE_NO_WARNINGS
-#include "ScatteringProblemSolverInverseMatrix.h"
+#include "ScatteringProblemSolverInverseMatrix1D.h"
 void ScatteringProblemSolverInverseMatrix1D::InitScatteringSolver1D(std::function<Complex(Real)> const & v,
 	Real x0, Real x1, size_t n, Real en, Real direction, SolverMethod met,
 	Real mass, Real hbar, OptionsImpl const & opts)

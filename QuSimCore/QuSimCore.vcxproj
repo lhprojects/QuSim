@@ -283,7 +283,7 @@
     <ClCompile Include="..\qsim\ComplexPotentialIVPSolver1DImpl.cpp" />
     <ClCompile Include="..\qsim\EigenMethod.cpp" />
     <ClCompile Include="..\qsim\FourierTransform.cpp" />
-    <ClCompile Include="..\qsim\GaussLegendreMethod.cpp" />
+    <ClCompile Include="..\qsim\GaussLegendreMethod1D.cpp" />
     <ClCompile Include="..\qsim\GaussLegendreMethod2D.cpp" />
     <ClCompile Include="..\qsim\IVPSolverImpl.cpp" />
     <ClCompile Include="..\qsim\MatrixSolver.cpp" />
@@ -297,7 +297,7 @@
     <ClCompile Include="..\qsim\ScatteringProblemSolverInverseMatrix3D.cpp" />
     <ClCompile Include="..\qsim\ScatteringSolverImpl.cpp" />
     <ClCompile Include="..\qsim\SolverImpl.cpp" />
-    <ClCompile Include="..\qsim\SplittingMethod.cpp" />
+    <ClCompile Include="..\qsim\SplittingMethod1D.cpp" />
     <ClCompile Include="..\qsim\SplittingMethod2D.cpp" />
     <ClCompile Include="..\qsim\QuSim.cpp" />
     <ClCompile Include="..\qsim\EvolverImpl.cpp" />
@@ -312,7 +312,7 @@
     <ClInclude Include="..\qsim\EigenMethod.h" />
     <ClInclude Include="..\qsim\FourierTransform.h" />
     <ClInclude Include="..\qsim\FourierTransformOptions.h" />
-    <ClInclude Include="..\qsim\GaussLegendreMethod.h" />
+    <ClInclude Include="..\qsim\GaussLegendreMethod1D.h" />
     <ClInclude Include="..\qsim\GaussLegendreMethod2D.h" />
     <ClInclude Include="..\qsim\IVPSolverImpl.h" />
     <ClInclude Include="..\qsim\kissfft.hh" />
@@ -324,14 +324,14 @@
     <ClInclude Include="..\qsim\Perturbation2DImpl.h" />
     <ClInclude Include="..\qsim\Perturbation3DImpl.h" />
     <ClInclude Include="..\qsim\PerturbationOptions.h" />
+    <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix1D.h" />
     <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix2D.h" />
     <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix3D.h" />
     <ClInclude Include="..\qsim\ScatteringSolverImpl.h" />
     <ClInclude Include="..\qsim\Perturbation1DImpl.h" />
-    <ClInclude Include="..\qsim\ScatteringProblemSolverInverseMatrix.h" />
     <ClInclude Include="..\qsim\SolverImpl.h" />
     <ClInclude Include="..\qsim\SolverMainLoop.h" />
-    <ClInclude Include="..\qsim\SplittingMethod.h" />
+    <ClInclude Include="..\qsim\SplittingMethod1D.h" />
     <ClInclude Include="..\qsim\SplittingMethod2D.h" />
     <ClInclude Include="..\qsim\QuSim.h" />
     <ClInclude Include="..\qsim\EvolverImpl.h" />
