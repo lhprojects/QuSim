@@ -200,26 +200,27 @@ namespace PerburbationUtility {
 
 };
 
-
+// native born serise
 struct BornSerise {
 
-	// S = V psi0
-	// deltaPsi = psi - psi0
-	// ReV = Re(V)
-	// ImV = Im(V)
+
+	// (T + V - E) (deltaPsi + psi0) = 0 with scattering condition
+	// (E - T) deltaPsi = V (psi0 + deltaPsi)
+	// (E - T + i eps) deltaPsi = V (psi0 + deltaPsi) replace `with scattering condition` with `eps -> +0`
+	// deltaPsi = (E - T + i eps)^-1 V (psi0 + deltaPsi)
+	// deltaPsi = G0 V (psi0 + deltaPsi)
 	template<class F1, class F2, class F3>
-	void Update(size_t n,
-		PeComp const *psi0x,
-		PeComp *deltaPsix,
-		PeComp *deltaPsik,
-		PeReal const *V,
-		F1 const &G0,
-		F2 const &X2K,
-		F3 const &K2X)
+	void Update(size_t n,    //	   in: x dimension
+		PeComp const *psi0x, //	   in: psi0
+		PeComp *deltaPsix,   // inout: deltaPsi = psi - psi0
+		PeComp *deltaPsik,   //   out: deltaPsi
+		PeReal const *V,     //    in: real potential
+		F1 const &G0,        //    in: (E - T + i eps)^-1
+		F2 const &X2K,       //    in:
+		F3 const &K2X)       //    in:
 	{
 		using namespace PerburbationUtility;
 
-		// deltaPsi  =  G0 (V deltaPsi + S)
 		Add(psi0x, deltaPsix, n);
 		Mul(V, deltaPsix, n);
 		X2K(deltaPsix, deltaPsik);
@@ -228,18 +229,18 @@ struct BornSerise {
 	}
 
 	template<class F1, class F2>
-	void Update1D(size_t n,
-		PeComp const *psi0x,
-		PeComp *deltaPsix,
-		PeComp *deltaPsik,
-		PeReal const *V,
-		PeReal epsilon,
-		PeReal e,
-		PeReal mass,
-		PeReal hbar,
-		PeReal dx,
-		F1 const &X2K,
-		F2 const &K2X)
+	void Update1D(size_t n,    //    in:
+		PeComp const *psi0x,   //    in:
+		PeComp *deltaPsix,     // inout: psi - psi0, could be zeros
+		PeComp *deltaPsik,     //    out: 
+		PeReal const *V,       //    in: real potential
+		PeReal epsilon,        //    in: should be tiny
+		PeReal e,              //    in: energy
+		PeReal mass,           //    in: mass
+		PeReal hbar,           //    in: hbar
+		PeReal dx,             //    in: delta x
+		F1 const &X2K,         //    in:
+		F2 const &K2X)         //    in:
 	{
 		auto G0 = [&](PeComp *psik) {
 			PerburbationUtility::Green01D(psik, hbar, mass, e, epsilon, n, dx);
