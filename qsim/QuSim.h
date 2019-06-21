@@ -157,12 +157,6 @@ struct Options {
 		return *this;
 	}
 
-	inline Options &FFTW()
-	{
-		SetString("fft_lib", "FFTW");
-		return *this;
-	}
-
 	inline Options &Cuda()
 	{
 		SetString("fft_lib", "cuda");

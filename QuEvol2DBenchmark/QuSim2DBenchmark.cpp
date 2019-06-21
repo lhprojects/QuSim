@@ -18,9 +18,6 @@ int main()
 	Options space_O4;
 	space_O2.SetBool("space_O2", false);
 
-	Options fftw;
-	fftw.FFTW();
-
 	Options cuda;
 	cuda.Cuda();
 
@@ -37,7 +34,6 @@ int main()
 	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
 #endif
 #if 1
-	{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
 	{ SolverMethod::SplittingMethodO2 , "splitO2", Options() },
 	{ SolverMethod::SplittingMethodO4 , "splitO4", Options() },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", Options() },

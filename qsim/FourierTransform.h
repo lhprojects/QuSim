@@ -4,7 +4,6 @@
 
 enum class FourierTransformLibrary {
 	KISS,
-	FFTW,
 	CUDA,
 };
 

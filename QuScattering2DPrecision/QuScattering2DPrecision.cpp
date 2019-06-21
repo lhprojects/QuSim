@@ -126,7 +126,6 @@ void testPerburbationConverge(Real v0, int n = 100)
 		Options opts;
 		opts.Preconditional(false).Order(1);
 		//opts["slow"] = "0.5";
-		//opts["fft_lib"] = "FFTW";
 		perp0.init(vf, -150, 150, 1000, -150, 150, 1000,
 			0.5, 0.005, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
 	}
@@ -136,7 +135,6 @@ void testPerburbationConverge(Real v0, int n = 100)
 		Options opts;
 		opts.Preconditional(true).VellekoopPreconditioner().Order(1);
 		//opts["slow"] = "0.5";
-		//opts["fft_lib"] = "FFTW";
 		perp1.init(vf, -150, 150, 1000, -150, 150, 1000,
 			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
 	}
@@ -146,7 +144,6 @@ void testPerburbationConverge(Real v0, int n = 100)
 		Options opts;
 		opts.Preconditional(true).Hao1Preconditioner().Order(1);
 		//opts["slow"] = "0.5";
-		//opts["fft_lib"] = "FFTW";
 		perp2.init(vf, -150, 150, 1000, -150, 150, 1000,
 			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);
 	}
@@ -156,7 +153,6 @@ void testPerburbationConverge(Real v0, int n = 100)
 		Options opts;
 		opts.Preconditional(true).BornIdentityPreconditioner().Order(1);
 		//opts["slow"] = "0.5";
-		//opts["fft_lib"] = "FFTW";
 		if (v0 > 1.5) opts.Slow(0.1);
 		perp3.init(vf, -150, 150, 1000, -150, 150, 1000,
 			0.5, 0.0, 1, 0, SolverMethod::BornSerise, 1, 1, opts);

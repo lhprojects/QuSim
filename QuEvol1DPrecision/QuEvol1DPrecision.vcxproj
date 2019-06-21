@@ -31,7 +31,7 @@
     <ProjectGuid>{F7624FE8-0DE0-44AA-AA89-FC696CA5CB8E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>QuSimPrecision</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">

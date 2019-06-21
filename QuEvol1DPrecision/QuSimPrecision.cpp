@@ -130,7 +130,6 @@ void test_speed()
 	Options space_O4;
 	space_O4.SetBool("space_O2", false);
 
-	Options fftw = Options().FFTW();
 
 	Options cuda = Options().Cuda();
 
@@ -138,7 +137,6 @@ void test_speed()
 
 	Test tests[] = {
 	
-	{ SolverMethod::SplittingMethodO2 , "splitO2+fftw", fftw },
 #ifdef USE_CUDA
 	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
 	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda_single", cuda_single },

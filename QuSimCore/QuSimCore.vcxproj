@@ -341,11 +341,6 @@
     <ClInclude Include="..\qsim\View.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\fftw-3.3.2\fftw-3.3-libs\libfftw-3.3\libfftw-3.3.vcxproj">
-      <Project>{ea3dcc95-2423-4ea0-a508-7a427b4c0594}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
