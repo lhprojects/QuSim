@@ -1,7 +1,7 @@
 WITHOUT CUDA
 1. Install Visual Studio 2017 or higher version, not tested, but visual studio 2015 should be also supported.
 2. Double click QuSim.sln
-
+3. Unload project `CudaUtility` and `cuda9.0.prop` from project `QuSimCore`
 
 WITH CUDA
 1. Install Visual Studio 2017, 15.0 (version > 15.3 is not supported by CUDA 9.0)
