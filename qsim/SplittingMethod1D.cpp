@@ -168,6 +168,8 @@ void SplittingMethod1D::update_psi()
 		ExpV(fVPsi, fTVPsi, c2);
 		ExpT(fTVPsi, fVPsi, d1);
 		ExpV(fPsi, fTVPsi, c1);
+	} else {
+		throw std::runtime_error("unknown method");
 	}
 
 }

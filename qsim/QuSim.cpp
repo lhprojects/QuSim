@@ -96,14 +96,12 @@ void Evolver1D::init(std::function<Complex(Real)> const &psi, bool force_normali
 		} else {
 			fImpl = new SplittingMethod1D();
 		}
-	} else if(solver == SolverMethod::Eigen) {
+	} else if (solver == SolverMethod::Eigen) {
 		fImpl = new EigenMethod();
-	} else if (solver == SolverMethod::ImplicitMidpointMethod) {
-		fImpl = new SplittingMethod1D();
-	} else if (solver == SolverMethod::GaussLegendreO4) {
-		fImpl = new SplittingMethod1D();
-	} else if (solver == SolverMethod::GaussLegendreO6) {
-		fImpl = new SplittingMethod1D();
+	} else if (solver == SolverMethod::ImplicitMidpointMethod
+		|| solver == SolverMethod::GaussLegendreO4
+		|| solver == SolverMethod::GaussLegendreO6) {
+		fImpl = new GaussLegendreMethod1D();
 	} else {
 		throw std::runtime_error("unspported solver");
 	}
