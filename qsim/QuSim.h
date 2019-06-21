@@ -313,6 +313,7 @@ struct EXPORT_STRUCT Evolver {
 	Real PotEn();
 	Real KinEn();
 	Real EnPartialT();
+	SolverMethod GetMethod();
 
 	Evolver(Evolver const &) = delete;
 	Evolver const &operator=(Evolver const &) = delete;
@@ -367,6 +368,7 @@ struct EXPORT_STRUCT Solver {
 	~Solver();
 	Solver(Solver const &) = delete;
 	Solver const &operator=(Solver const &) = delete;
+	SolverMethod GetMethod();
 
 protected:
 	Solver();
@@ -410,6 +412,7 @@ struct EXPORT_STRUCT QuScatteringProblemSolver {
 	void Compute();
 	Real GetEnergy();
 	Real GetMomentum();
+	SolverMethod GetMethod();
 
 	QuScatteringProblemSolver(QuScatteringProblemSolver const &) = delete;
 	QuScatteringProblemSolver const &operator=(QuScatteringProblemSolver const &) = delete;

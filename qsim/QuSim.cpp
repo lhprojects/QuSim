@@ -69,6 +69,11 @@ Real Evolver::EnPartialT()
 	return fImpl->EnPartialT();
 }
 
+SolverMethod Evolver::GetMethod()
+{
+	return fImpl->fSolverMethod;
+}
+
 
 
 
@@ -339,6 +344,12 @@ Solver::~Solver()
 	DELETE(fImpl);
 }
 
+SolverMethod Solver::GetMethod()
+{
+	fImpl->fMethod;
+}
+
+
 
 void Solver1D::init(std::function<Complex(Real)> const & v,
 	Real x0, Real x1, size_t n,
@@ -437,6 +448,11 @@ Real QuScatteringProblemSolver::GetEnergy()
 Real QuScatteringProblemSolver::GetMomentum()
 {
 	return static_cast<ScatteringSolverImpl*>(fImpl)->GetMomentum();
+}
+
+SolverMethod QuScatteringProblemSolver::GetMethod()
+{
+	return fImpl->fMet;
 }
 
 
