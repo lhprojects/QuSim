@@ -346,7 +346,7 @@ Solver::~Solver()
 
 SolverMethod Solver::GetMethod()
 {
-	fImpl->fMethod;
+	return fImpl->fMethod;
 }
 
 
