@@ -22,7 +22,7 @@ void QuPerturbation2DImpl::InitPerturbation2D(std::function<Complex(Real, Real)>
 
 	if (fMet == SolverMethod::BornSerise) {
 
-		const_cast<int&>(fOrder) = (int)opts.GetInt("order", 0);
+		const_cast<int&>(fOrder) = (int)opts.GetInt("order", 1);
 
 		fPerturbationOptions.Init(opts);
 		if (fPerturbationOptions.fPreconditional) {
