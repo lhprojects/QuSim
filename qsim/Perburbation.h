@@ -200,7 +200,7 @@ namespace PerburbationUtility {
 
 };
 
-// native born serise
+// naive born serise
 struct BornSerise {
 
 
