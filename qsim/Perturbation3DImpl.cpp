@@ -54,7 +54,7 @@ void QuPerturbation3DImpl::InitPerturbation3D(std::function<Complex(Real, Real, 
 
 			}
 
-			PreconditionalBornSerise pbs;
+			PreconditionalBornSeries pbs;
 			pbs.GetEpsilon(epsilon, fPerturbationOptions.fPreconditioner,
 				fNx*fNy, fV.data(), fVasb.data());
 			const_cast<Real&>(fEpsilon) = epsilon;
@@ -95,7 +95,7 @@ void QuPerturbation3DImpl::Compute()
 
 	if (fPerturbationOptions.fPreconditional) { // Preconditional Born serise
 
-		PreconditionalBornSerise pbs;
+		PreconditionalBornSeries pbs;
 		for (int i = 0; i < fOrder; ++i) {
 			pbs.Update3D(fNx, fNy, fNz, fPsi0X.data(), fPsiX.data(), fPsiK.data(),
 				fV.data(), fVasb.data(), ftmp1.data(), fEpsilon, fE,
@@ -106,7 +106,7 @@ void QuPerturbation3DImpl::Compute()
 		}
 
 	} else { // naive born serise
-		BornSerise bs;
+		BornSeries bs;
 
 		for (int i = 0; i < fOrder; ++i) {
 			bs.Update3D(fNx, fNy, fNz, fPsi0X.data(), fPsiX.data(),

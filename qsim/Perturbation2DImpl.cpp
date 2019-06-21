@@ -42,7 +42,7 @@ void QuPerturbation2DImpl::InitPerturbation2D(std::function<Complex(Real, Real)>
 
 			}
 
-			PreconditionalBornSerise pbs;
+			PreconditionalBornSeries pbs;
 			pbs.GetEpsilon(epsilon, fPerturbationOptions.fPreconditioner, fNx*fNy, fV.data(), fVasb.data());
 			const_cast<Real&>(fEpsilon) = epsilon;
 
@@ -78,7 +78,7 @@ void QuPerturbation2DImpl::Compute()
 
 	if (fPerturbationOptions.fPreconditional) { // Preconditional Born serise
 
-		PreconditionalBornSerise pbs;
+		PreconditionalBornSeries pbs;
 		for (int i = 0; i < fOrder; ++i) {
 			pbs.Update2D(fNx, fNy, fPsi0X.data(), fPsiX.data(), fPsiK.data(),
 				fV.data(), fVasb.data(), ftmp1.data(), fEpsilon, fE,
@@ -89,7 +89,7 @@ void QuPerturbation2DImpl::Compute()
 		}
 
 	} else { // naive born serise
-		BornSerise bs;
+		BornSeries bs;
 
 		for (int i = 0; i < fOrder; ++i) {
 			bs.Update2D(fNx, fNy, fPsi0X.data(), fPsiX.data(),

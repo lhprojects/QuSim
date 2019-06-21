@@ -34,7 +34,7 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 			PerburbationUtility::GaussAsbLayer1D(fNx, fDx, fVasb.data(),
 				fHbar, mass, fE, 4.0);
 
-			PreconditionalBornSerise pbs;
+			PreconditionalBornSeries pbs;
 
 			pbs.GetEpsilon(epsilon, fPerturbationOptions.fPreconditioner,
 				fNx, fV.data(), fVasb.data());
@@ -171,7 +171,7 @@ void QuPerturbation1DImpl::Compute()
 
 		ftmp1.resize(fNx);
 
-		PreconditionalBornSerise pbs;
+		PreconditionalBornSeries pbs;
 		for (int i = 0; i < fOrder; ++i) {
 			pbs.Update1D(fNx, fPsi0X.data(), fPsiX.data(), fPsiK.data(),
 				fV.data(), fVasb.data(), ftmp1.data(), fEpsilon, fE,
@@ -181,7 +181,7 @@ void QuPerturbation1DImpl::Compute()
 		}
 
 	} else { // naive born serise
-		BornSerise bs;
+		BornSeries bs;
 
 		for (int i = 0; i < fOrder; ++i) {
 			bs.Update1D(fNx, fPsi0X.data(), fPsiX.data(),

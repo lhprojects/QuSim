@@ -200,8 +200,8 @@ namespace PerburbationUtility {
 
 };
 
-// naive born serise
-struct BornSerise {
+// naive born series
+struct BornSeries {
 
 
 	// (T + V - E) (deltaPsi + psi0) = 0 with scattering condition
@@ -300,7 +300,7 @@ enum class BornSerisePreconditioner {
 	Hao2,
 };
 
-struct PreconditionalBornSerise {
+struct PreconditionalBornSeries {
 
 	void GetEpsilon(PeReal &epsilon, BornSerisePreconditioner pre, size_t n, PeReal const *reV, PeReal const *imV)
 	{
