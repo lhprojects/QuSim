@@ -6,6 +6,7 @@ Debug
 .vs
 
 release0.2
+release0.3
 *.aux
 *.bbl
 *.blg
