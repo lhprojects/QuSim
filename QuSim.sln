@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuScattering3DPrecision", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CudaUtility", "CudaUtility\CudaUtility.vcxproj", "{AA7233C8-071C-481A-ABE0-008E0AB52D58}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuScattering1D", "QuScattering1D\QuScattering1D.vcxproj", "{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Dbg|x64 = Dbg|x64
@@ -233,6 +235,18 @@ Global
 		{AA7233C8-071C-481A-ABE0-008E0AB52D58}.RlsCUDAStRT|x64.ActiveCfg = ReleaseCUDAStRT|x64
 		{AA7233C8-071C-481A-ABE0-008E0AB52D58}.RlsCUDAStRT|x64.Build.0 = ReleaseCUDAStRT|x64
 		{AA7233C8-071C-481A-ABE0-008E0AB52D58}.RlsStRT|x64.ActiveCfg = Release|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.Dbg|x64.ActiveCfg = Debug|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.Dbg|x64.Build.0 = Debug|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.DbgCUDA|x64.ActiveCfg = Debug|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.DbgCUDA|x64.Build.0 = Debug|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.Rls|x64.ActiveCfg = Release|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.Rls|x64.Build.0 = Release|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.RlsCUDA|x64.ActiveCfg = Release|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.RlsCUDA|x64.Build.0 = Release|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.RlsCUDAStRT|x64.ActiveCfg = Release|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.RlsCUDAStRT|x64.Build.0 = Release|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.RlsStRT|x64.ActiveCfg = Release|x64
+		{3CFA4C4F-BE1D-4279-AF54-D2008B9AA08E}.RlsStRT|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
