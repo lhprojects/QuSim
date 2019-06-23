@@ -190,35 +190,6 @@ void QuPerturbation1DImpl::Compute()
 		}
 	}
 
-
-	// post calculation
-	if (0) {
-		// calculate in momentum space
-		Real r = 0;
-		Real t = 0;
-		for (size_t i = fNx / 2; i < fNx; ++i) {
-			r += abs2(fPsiK[i]);
-		}
-
-		for (size_t i = 0; i < fNx / 2; ++i) {
-			t += abs2(fPsiK[i]);
-		}
-
-		fR = r * fEpsilon / fE * fDx / fNx;
-		fT = t * fEpsilon / fE * fDx / fNx;
-
-	} else {
-		// calculate in real space
-		Complex r = 0;
-		Complex t = 0;
-		for (size_t i = 0; i < fNx; ++i) {
-			r += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(+I * fK0*GetX(i));
-			t += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(-I * fK0*GetX(i));
-		}
-		fR = abs2(r*fDx*fMass / (fHbar*fHbar*fK0 * I));
-		fT = abs2(t*fDx*fMass / (fHbar*fHbar*fK0 * I));
-
-	}
-
+	ComputeRT();
 }
 

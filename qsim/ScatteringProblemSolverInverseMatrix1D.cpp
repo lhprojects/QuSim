@@ -105,20 +105,6 @@ void ScatteringProblemSolverInverseMatrix1D::Compute()
 
 	for (size_t i = 0; i < fNx; ++i) fPsiX[i] = v1(i);
 
-	if (0) {
-		fR = abs2(fPsiX[fNx / 2 - fNx / 8]);
-		fT = abs2(fPsiX[fNx / 2 + fNx / 8]);
-
-	} else {
-		Complex r = 0;
-		Complex t = 0;
-		for (size_t i = 0; i < fNx; ++i) {
-			r += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(+I * fK0*GetX(i));
-			t += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(-I * fK0*GetX(i));
-		}
-		fR = abs2(r*fDx*fMass / (fHbar*fHbar*fK0 * I));
-		fT = abs2(t*fDx*fMass / (fHbar*fHbar*fK0 * I));
-
-	}
+	ComputeRT();
 
 }

@@ -49,7 +49,7 @@ struct ScatteringSolver1DImpl : ScatteringSolverImpl {
 		OptionsImpl const &opts);
 
 	Real GetX(ptrdiff_t i) const { return fX0 + fDx * i; }
-
+	void ComputeRT();
 
 	size_t const fNx;
 	Real const fX0;

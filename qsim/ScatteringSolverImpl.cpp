@@ -21,6 +21,18 @@ void ScatteringSolver1DImpl::InitScatteringSolver1D(std::function<Complex(Real)>
 	fPsiX.resize(fNx);
 }
 
+void ScatteringSolver1DImpl::ComputeRT() {
+	// calculate in real space
+	Complex r = 0;
+	Complex t = 0;
+	for (size_t i = 0; i < fNx; ++i) {
+		r += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(+I * fK0*GetX(i));
+		t += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(-I * fK0*GetX(i));
+	}
+	fR = abs2(r*fDx*fMass / (fHbar*fHbar*fK0 * I));
+	fT = abs2(t*fDx*fMass / (fHbar*fHbar*fK0 * I) + Complex(1, 0));
+}
+
 void ScatteringSolver1DImpl::InitPotential()
 {
 	const_cast<std::vector<Real>&>(fV).resize(fNx);
