@@ -160,7 +160,9 @@ struct WaveFunction1D : nana::panel<true> {
 				std::vector<Complex> psi(fSolver->GetPsi().begin(),
 					fSolver->GetPsi().end());
 				if (fAddInit) {
-					// humm... nothing to do yet
+					auto psi0 = fSolver->GetPsi0();
+					for (int i = 0; i < (int)psi0.size(); ++i)
+						psi[i] += psi0(i);
 				}
 				DrawPsi(g, psi);
 			}

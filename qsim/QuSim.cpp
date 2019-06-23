@@ -465,6 +465,11 @@ VectorView<Complex> QuScatteringProblemSolver1D::GetPsi()
 	return View(static_cast<ScatteringSolver1DImpl*>(fImpl)->fPsiX);
 }
 
+VectorView<Complex> QuScatteringProblemSolver1D::GetPsi0()
+{
+	return View(static_cast<ScatteringSolver1DImpl*>(fImpl)->fPsi0X);
+}
+
 VectorView<Real> QuScatteringProblemSolver1D::GetV()
 {
 	return View(static_cast<ScatteringSolver1DImpl*>(fImpl)->fV);

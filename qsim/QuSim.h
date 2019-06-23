@@ -426,6 +426,7 @@ protected:
 struct EXPORT_STRUCT QuScatteringProblemSolver1D : QuScatteringProblemSolver {
 
 	VectorView<Complex> GetPsi();
+	VectorView<Complex> GetPsi0();
 	VectorView<Real> GetV();
 
 	size_t GetNPoints();

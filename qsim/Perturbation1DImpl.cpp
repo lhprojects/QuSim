@@ -20,7 +20,7 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
 
 	if (fMet == SolverMethod::BornSerise) {
 
-		const_cast<int&>(fOrder) = (int)opts.GetInt("order", 0);
+		const_cast<int&>(fOrder) = (int)opts.GetInt("order", 1);
 		const_cast<int&>(fSplit) = (int)opts.GetInt("split_n", 0);
 
 		fPerturbationOptions.Init(opts);
