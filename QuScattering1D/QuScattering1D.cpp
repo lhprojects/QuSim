@@ -39,8 +39,10 @@ struct Button : nana::button {
 
 struct TextBox : nana::textbox {
 	TextBox(nana::form &fm, std::string const &caption) : nana::textbox(fm, caption) {
+		multi_lines(false);
 	}
 	TextBox(nana::form &fm) : nana::textbox(fm) {
+		multi_lines(false);
 	}
 
 	double GetDouble() {
@@ -279,6 +281,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	hbar.caption("1");
 	energy.caption("1");
 	dx.caption("1");
+
 	potential.caption("exp(-x*x)");
 
 	addInit.events().checked([&](nana::arg_checkbox const &check) {
