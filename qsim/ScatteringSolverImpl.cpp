@@ -29,11 +29,11 @@ void ScatteringSolver1DImpl::ComputeRT() {
 	Complex r = 0;
 	Complex t = 0;
 	for (size_t i = 0; i < fNx; ++i) {
-		r += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(+I * fK0*GetX(i));
-		t += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(-I * fK0*GetX(i));
+		r += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(I * (-fK0)*(-GetX(i)));
+		t += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(I * (+fK0)*(-GetX(i)));
 	}
-	fR = abs2(r*fDx*fMass / (fHbar*fHbar*fK0 * I));
-	fT = abs2(t*fDx*fMass / (fHbar*fHbar*fK0 * I) + Complex(1, 0));
+	fR = abs2(r*fDx*fMass / (fHbar*fHbar*std::abs(fK0) * I));
+	fT = abs2(t*fDx*fMass / (fHbar*fHbar*std::abs(fK0) * I) + Complex(1, 0));
 }
 
 void ScatteringSolver1DImpl::InitPotential()
