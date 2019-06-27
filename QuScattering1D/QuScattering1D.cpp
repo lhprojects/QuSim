@@ -171,7 +171,7 @@ struct WaveFunction1D : nana::panel<true> {
 
 };
 
-#if 0
+#if !defined(NDEBUG)
 int main()
 #else
 #include <Windows.h>

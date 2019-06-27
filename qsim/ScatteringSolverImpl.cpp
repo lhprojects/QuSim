@@ -10,7 +10,10 @@ void ScatteringSolver1DImpl::InitScatteringSolver1D(std::function<Complex(Real)>
 	const_cast<Real&>(fX0) = x0;
 	const_cast<Real&>(fDx) = (x1 - x0) / n;
 	const_cast<std::function<Complex(Real)>&>(fVFunc) = v;
-	const_cast<Real&>(fK0) = sqrt(2 * fMass * fE) / fHbar;
+	if (direction < 0) direction = -1;
+	else if (direction > 0) direction = 1;
+	const_cast<Real&>(fDirection) = direction;
+	const_cast<Real&>(fK0) = fDirection * sqrt(2 * fMass * fE) / fHbar;
 
 	InitPotential();
 
