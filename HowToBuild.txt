@@ -1,13 +1,33 @@
-WITHOUT CUDA
-1. Install Visual Studio 2017 or higher version, not tested, but visual studio 2015 should be also supported.
-2. Double click QuSim.sln
-3. Unload project `CudaUtility` and `cuda9.0.prop` from project `QuSimCore`
+1. Build nana
+(1). Install Visual Studio.
+The VS2017 will work. Not tested, but VS2015/VS2019 should also work.
 
-WITH CUDA
-1. Install Visual Studio 2017, 15.0 (version > 15.3 is not supported by CUDA 9.0)
-2. Install CUDA 9.0.
-3. Double click QuSim.sln
-4. Build project `CudaUtility`
-5. Build the other projects.
+(2). Open nana/build/VS2017/nana.sln
+Always use VS2017/nana.sln for all VS201X. It have been modified for this project. 
+You may need to change the SDK to the version you install.
+If you are using very new visual studio, for example, VS2017 15.9. You may need to remove NANA_FILESYSTEM_FORCE from the Property -> C/C++ -> Preprocessor -> Preprocessor Definitions.
 
+
+2. Build QuSim WITHOUT CUDA
+(1). Install Visual Studio
+The VS2017 will work. Not tested, but VS2015/VS2019 should also work.
+
+(2). Open QuSim.sln
+You may need to change the SDK to the version you install.
+
+
+2. Build QuSim WITH CUDA
+(1). Install Visual Studio 2017, 15.0
+version > 15.3 is not supported by CUDA 9.0
+
+(2). Install CUDA 9.0.
 If you have much experience of CUDA and Visual Studio. You can modify the project to support other Visual Studio and CUDA.
+
+(3). Open QuSim.sln
+You may need to change the SDK to the version you install.
+
+(4). Build project `CudaUtility`
+
+(5). Remove `cuda9.0.prop` from project `QuSimCore`
+
+(6). Build the other projects.
