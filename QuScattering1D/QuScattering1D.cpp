@@ -189,9 +189,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	nana::label energyLabel(fm, "Energy");
 	TextBox energy(fm);
 	nana::label dxLabel(fm, "DirectionX");
-	nana::label dyLabel(fm, "DirectionY");
 	TextBox dx(fm);
-	TextBox dy(fm);
 	nana::label potentialLabel(fm, "Potential");
 	TextBox potential(fm, "f(x)");
 	nana::label x0Label(fm, "x0");
@@ -250,7 +248,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	layout.field("l1") << energyLabel << energy;
 	layout.field("l1") ;
 	layout.field("l1") << dxLabel << dx;
-	layout.field("l1") << dyLabel << dy;
 	layout.field("l2") << potentialLabel << potential;
 	layout.field("l3") << x0Label << x0;
 	layout.field("l3") << x1Label << x1;
@@ -282,7 +279,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	hbar.caption("1");
 	energy.caption("1");
 	dx.caption("1");
-	dy.caption("0");
 	potential.caption("exp(-x*x)");
 
 	addInit.events().checked([&](nana::arg_checkbox const &check) {
