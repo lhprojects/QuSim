@@ -26,8 +26,8 @@ If you have much experience of CUDA and Visual Studio. You can modify the projec
 (3). Open QuSim.sln
 You may need to change the SDK to the version you install.
 
-(4). Build project `CudaUtility`
+(4). Build project `CudaUtility`.
 
-(5). Remove `cuda9.0.prop` from project `QuSimCore`
+(5). Add `cuda9.0.prop` to  Property Manager -> QuSimCore -> *CUDA|x64.
 
 (6). Build the other projects.
