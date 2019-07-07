@@ -74,7 +74,7 @@
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)\..\nana1.7.1\nana\build\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>nana_Debug_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>
       </EntryPointSymbol>
     </Link>

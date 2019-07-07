@@ -171,19 +171,21 @@ struct WaveFunction1D : nana::panel<true> {
 
 };
 
-#if 1
-int main()
-#else
+#if defined(_WIN32)
 #include <Windows.h>
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
+#else
+int main()
 #endif
 {
 	nana::form fm;
 	fm.caption("Scattering 1D");
 	fm.size(nana::size(1000, 600));
+	fm.bgcolor(nana::color(240, 240, 240));
+
 	//fm.bgcolor(nana::colors::white);
 	nana::label initWaveLabel(fm, "Intial Wave Function:");
 	nana::label energyLabel(fm, "Energy");
