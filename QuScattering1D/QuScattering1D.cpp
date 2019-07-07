@@ -33,7 +33,7 @@ std::string & trim(std::string & str)
 
 struct Button : nana::button {
 	Button(nana::form &fm, std::string const &caption) : nana::button(fm, caption) {
-		edge_effects(false);
+		//edge_effects(false);
 	}
 };
 
@@ -233,12 +233,14 @@ int main()
 
 
 	nana::place layout(fm);
-	char const *laystr = "vert gap=10 margin=[10,10,10,10]\
+	char const *laystr = "vert\
+<vert weight=180 gap=10 margin=[10,10,10,10]\
 <l1 weight=30 fit gap=5 arrange=[variable,variable,200,variable,100,variable,100]>\
 <l2 weight=30 fit gap=5 arrange=[variable,400]>\
 <l3 weight=30 fit gap=5 arrange=[variable,100,variable,100,variable,100,variable,100]>\
 <l4 weight=30 fit gap=5 arrange=[variable,variable,variable,120,120,110,variable,110,120]>\
 <l5 weight=30 fit gap=5 arrange=[variable,120,170,120]>\
+>\
 <l6>\
 ";
 	try {
