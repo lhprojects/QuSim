@@ -79,6 +79,10 @@ struct Mat2 {
 		return Mat2Identity<Scalar>();
 	}
 
+	Scalar Get11() const { return m11; }
+	Scalar Get12() const { return m12; }
+	Scalar Get21() const { return m21; }
+	Scalar Get22() const { return m22; }
 	Scalar m11;
 	Scalar m12;
 	Scalar m21;
@@ -97,6 +101,13 @@ struct AntiDiagonalMatrix2
 		m12 = v12;
 		m21 = v21;
 	}
+
+	Scalar Get11() { return Scalar(0); }
+	Scalar Get22() { return Scalar(0); }
+	Scalar Get12() { return m12; }
+	Scalar Get21() { return m21; }
+	AntiDiagonalMatrix2 &Set12(Scalar v) { m12 = v; return *this; }
+	AntiDiagonalMatrix2 &Set21(Scalar v) { m21 = v; return *this; }
 
 	Scalar &operator()(size_t i, size_t j)
 	{
@@ -208,6 +219,11 @@ inline Mat2<Scalar> operator+(Mat2<Scalar> const &l,
 	return Mat2<Scalar>(l.m11 + r.m11, l.m12, l.m21, l.m22 + r.m22);
 }
 
+
+
+
+
+
 template<class Scalar>
 inline AntiDiagonalMatrix2<Scalar> operator*(Scalar l,
 	AntiDiagonalMatrix2<Scalar> const &r)
@@ -220,6 +236,13 @@ inline DiagonalMatrix2<Scalar> operator*(AntiDiagonalMatrix2<Scalar> const &l,
 	AntiDiagonalMatrix2<Scalar> const &r)
 {
 	return DiagonalMatrix2<Scalar>(l.m12 * r.m21, l.m21 * r.m12);
+}
+
+template<class Scalar>
+inline DiagonalMatrix2<Scalar> operator*(Scalar l,
+	DiagonalMatrix2<Scalar> const &r)
+{
+	return DiagonalMatrix2<Scalar>(l * r.m11, l * r.m22);
 }
 
 template<class Scalar>
@@ -315,13 +338,13 @@ Mat2IdentityK<Scalar> operator*(Mat2Identity<Scalar> const &, Scalar k)
 
 
 template<class Scalar>
-Mat2<Scalar> operator+(Mat2<Scalar> const &m, Mat2<Scalar> const &r)
+inline Mat2<Scalar> operator+(Mat2<Scalar> const &m, Mat2<Scalar> const &r)
 {
 	return Mat2<Scalar>(m.m11 + r.m11, m.m12 + r.m12, m.m21 + r.m21, m.m22 + r.m22);
 }
 
 template<class Scalar>
-Mat2<Scalar> operator+(Mat2<Scalar> const &m, Mat2IdentityK<Scalar> const &k)
+inline Mat2<Scalar> operator+(Mat2<Scalar> const &m, Mat2IdentityK<Scalar> const &k)
 {
 	return Mat2<Scalar>(m.m11 + Scalar(k.k), m.m12, m.m21, m.m22 + Scalar(k.k));
 }
@@ -345,21 +368,39 @@ Mat2<Scalar> operator+(Mat2Identity<Scalar> const &, Mat2<Scalar> const &m)
 }
 
 template<class Scalar>
+DiagonalMatrix2<Scalar> operator+(Mat2Identity<Scalar> const &, DiagonalMatrix2<Scalar> const &m)
+{
+	return DiagonalMatrix2<Scalar>(Scalar(1) + m.m11, Scalar(1) + m.m22);
+}
+
+template<class Scalar>
 Mat2IdentityK<Scalar> operator+(Mat2IdentityK<Scalar> const &k1, Mat2IdentityK<Scalar> const &k2)
 {
-	return Mat2Identity<Scalar>(k1 + k2);
+	return Mat2IdentityK<Scalar>(k1 + k2);
 }
 
 template<class Scalar>
 Mat2IdentityK<Scalar> operator+(Mat2Identity<Scalar> const &, Mat2IdentityK<Scalar> const &k2)
 {
-	return Mat2Identity<Scalar>(Scalar(1) + k2);
+	return Mat2IdentityK<Scalar>(Scalar(1) + k2.k);
 }
 
 template<class Scalar>
-Mat2IdentityK<Scalar> operator+(Mat2IdentityK<Scalar> const &k1, Mat2Identity<Scalar> const &k2)
+inline Mat2IdentityK<Scalar> operator+(Mat2IdentityK<Scalar> const &k1, Mat2Identity<Scalar> const &)
 {
-	return Mat2Identity<Scalar>(k2 + Scalar(1));
+	return Mat2IdentityK<Scalar>(k1.k + Scalar(1));
+}
+
+template<class Scalar>
+Mat2<Scalar> operator+(DiagonalMatrix2<Scalar> const &m1, AntiDiagonalMatrix2<Scalar> const &m2)
+{
+	return Mat2<Scalar>(m1.m11, m2.m12, m2.m21, m2.m22);
+}
+
+template<class Scalar>
+Mat2<Scalar> operator+(AntiDiagonalMatrix2<Scalar> const &m1, DiagonalMatrix2<Scalar> const &m2)
+{
+	return Mat2<Scalar>(m2.m11, m1.m12, m1.m21, m2.m22);
 }
 
 
@@ -398,6 +439,12 @@ Mat2<Scalar> operator-(Mat2Identity<Scalar> const &, Mat2<Scalar> const &m)
 }
 
 template<class Scalar>
+Mat2<Scalar> operator-(Mat2<Scalar> const &m1, DiagonalMatrix2<Scalar> const &m2)
+{
+	return Mat2<Scalar>(m1.m11 - m2.m11, m1.m12, m1.m21, m1.m11 - m2.m22);
+}
+
+template<class Scalar>
 Mat2IdentityK<Scalar> operator-(Mat2IdentityK<Scalar> const &k1, Mat2IdentityK<Scalar> const &k2)
 {
 	return Mat2Identity<Scalar>(k1 - k2);
@@ -414,6 +461,19 @@ Mat2IdentityK<Scalar> operator-(Mat2IdentityK<Scalar> const &k1, Mat2Identity<Sc
 {
 	return Mat2Identity<Scalar>(k2 - Scalar(1));
 }
+
+template<class Scalar>
+DiagonalMatrix2<Scalar> operator-(Mat2IdentityK<Scalar> const &k1, DiagonalMatrix2<Scalar> const &m2)
+{
+	return DiagonalMatrix2<Scalar>(k1.k - m2.m11, k1.k - m2.m22);
+}
+
+template<class Scalar>
+Mat2<Scalar> operator-(DiagonalMatrix2<Scalar> const &m1, AntiDiagonalMatrix2<Scalar> const &m2)
+{
+	return Mat2<Scalar>(m1.m11, -m2.m12, -m2.m21, m1.m22);
+}
+
 
 
 #endif
