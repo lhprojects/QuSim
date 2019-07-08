@@ -34,7 +34,7 @@ struct ScatteringSolverImpl {
 
 struct ScatteringSolver1DImpl : ScatteringSolverImpl {
 
-	ScatteringSolver1DImpl() : fNx(0), fVFunc(), fX0(), fDx(), fK0(), fV(), fPsi0X() { }
+	ScatteringSolver1DImpl() : fNx(0), fVFunc(), fX0(), fDx(), fDirection(), fK0(), fV(), fPsi0X() { }
 
 	virtual void InitScatteringSolver1D(
 		std::function<Complex(Real)> const & v,
@@ -55,6 +55,7 @@ struct ScatteringSolver1DImpl : ScatteringSolverImpl {
 	Real const fX0;
 	Real const fDx;
 	std::function<Complex(Real)> const fVFunc;
+	Real const fDirection;
 	Real const fK0;
 	std::vector<Real> const fV;
 	PsiVector const fPsi0X;
