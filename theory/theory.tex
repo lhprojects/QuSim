@@ -316,46 +316,69 @@ $$
 $$
 This methods is unconditional stable
 
-\subsection{Gauss-Legendre methods}
+\subsection{Gauss-Legendre Methods}
 
 Gauss-Legendre methods are implicit Runge-Kutta methods.
 
- The Gauss-legendre method of order two is also called implicit midpoint method.
+Let's take the Gauss-legendre method of order two as an exmaple. The Gauss-legendre method of order two is also called implicit midpoint method.
 We don't decribe the details of Gauss-Legendre Methods. We only conclude some key points here.
+The $\psi(t+\Delta t)$ is given by
 $$
-k_1 = - I h(t_1) (1 + c_{11} k_1\Delta t + c_{12} k_2\Delta t)
+\psi(t+\Delta t) = (1+k_1\Delta t) \psi(t)
 $$
+where $k_1$ should be solved from the following equation
 $$
-k_2 = - I h(t_2) (1 + c_{21} k_1\Delta t + c_{22} k_2\Delta t)
+k_1 = - I h(t+1/2\Delta t) (1 + 1/2 k_1\Delta t)
 $$
+The solution is
 $$
-\psi(t+\Delta t) = (1+k_1\Delta t + k_2\Delta t) \psi(t)
+k_1 = ((-I h(t+1/2\Delta t))^{-1} - 1/2 \Delta t)^{-1}
 $$
-$k1$ is sovled as
+finally we have
 $$
-k_1 = A_1(1-c_{22} A_2\Delta t-c_{11}A_1\Delta t+(c_{22}c_{11}-c_{12}c_{21}) A_1A_2(\Delta t)^2)^{-1}(1+(-c_{22}+c_{12})A_2\Delta t)
-$$
-$$
-k_2 = A_2(1-c_{22}A_2\Delta t -c_{11}A_1\Delta t+(c_{22}c_{11}-c_{12}c_{21}) A_2A_1(\Delta t)^2)^{-1}(1+(-c_{11}+c_{21})A_1\Delta t)
-$$
-where $A_i=-Ih(t_i)$.
-
-
-When $h$ is time independent the evolution is simplified as:
-$$
-\psi(t + \Delta t) = (1 + 1/2 I \Delta t h)^{-1} (1 - 1/2 I \Delta t h) \psi(t)
-$$
-$$
-\psi(t + \Delta t) = \frac{1 - 1/2 I \Delta t h - 1/12 (\Delta t h)^2}{ 1 + 1/2 I \Delta t h - 1/12 (\Delta t h)^2} \psi(t)
-$$
-$$
-\psi(t + \Delta t) = \frac{1 - 1/2 I \Delta t h - 1/10 (\Delta t h)^2 + 1/120 I (\Delta t h)^3}{ 1 + 1/2 I \Delta t h - 1/10 (\Delta t h)^2 - 1/120 I (\Delta t h)^3} \psi(t)
+\psi(t+\Delta t) = \frac{1 - 1/2 I \Delta t h(t+1/2\Delta t)} {1 + 1/2 I \Delta t h(t+1/2\Delta t)} \psi(t)
 $$
 
-Order of two method.
-Stable unconditionally.
-The transform each step is unitary matrix, so that the probability and energy are conserved.
+When $h$ is time independent the evolution is simplified as
+$$
+\psi(t + \Delta t) = \frac{1 - 1/2 I \Delta t h} {1 + 1/2 I \Delta t h} \psi(t)
+$$
 
+With the result we can directly draw some conclusion
+
+\begin{itemize}
+  \item The transform of each step is unitary matrix, so that the probability and energy are conserved.
+  \item This is an order of two method.
+$$
+\frac{1 - 1/2 I \Delta t h} {1 + 1/2 I \Delta t h}
+= 1- I \Delta t h - 1/2(h\Delta t)^2+ 1/4 I(h\Delta t)^3 + O((h\Delta t)^4)
+$$
+\end{itemize}
+
+We can repeat the process for Gauss-legendre method of order of four or six. we have the following results
+\begin{align*}
+\psi(t + \Delta t) &= \frac{1 - 1/2 I \Delta t h - 1/12 (\Delta t h)^2}{ 1 + 1/2 I \Delta t h - 1/12 (\Delta t h)^2} \psi(t)\\
+&=(1 - I h \Delta t - 1/2 (h \Delta t)^2 + 1/6 (h \Delta t)^3 + 1/24(h \Delta t)^4 - 1/144(h \Delta t)^5 + O((h \Delta t)^6)\psi(t)
+\end{align*}
+
+\begin{align*}
+\psi(t + \Delta t) &= \frac{1 - 1/2 I \Delta t h - 1/10 (\Delta t h)^2 + 1/120 I (\Delta t h)^3}{ 1 + 1/2 I \Delta t h - 1/10 (\Delta t h)^2 - 1/120 I (\Delta t h)^3} \psi(t)\\
+&=(1 - I h \Delta t - 1/2 (h \Delta t)^2 + 1/6 I(h \Delta t)^3 + 1/24(h \Delta t)^4 - 1/120I(h \Delta t)^5\\
+&-1/720(h \Delta t)^6 + 1/4800I(h \Delta t)^7+ O((h \Delta t)^7)\psi(t)
+\end{align*}
+Note the exactly expansion is
+\begin{multline}
+\exp^{-Ih\Delta t} = 1 - I h \Delta t - 1/2 (h \Delta t)^2 + 1/6 I(h \Delta t)^3 + 1/24(h \Delta t)^4 - 1/120I(h \Delta t)^5\\
+-1/720(h \Delta t)^6 + 1/5040I(h \Delta t)^7+ O((h \Delta t)^7)
+\end{multline}
+The `GaussLegendreOrderFour.wl` and  `GaussLegendreOrderSix.wl` finish the detailed work.
+We may have alternative method, For example
+\begin{align*}
+&\frac{1 - 1/2 I \Delta t h - 1/12 (\Delta t h)^2}{ 1 + 1/2 I \Delta t h - 1/12 (\Delta t h)^2}\\
+&=\frac{(1-1/12(3I-\sqrt{3})h \Delta t)(1-1/12(3I+\sqrt{3})h \Delta t)}{(1-1/12(-3I-\sqrt{3})h \Delta t)(1-1/12(-3I+\sqrt{3})h \Delta t)}\\
+&=\frac{(1 - 1/2 I \Delta t h - 1/12 (\Delta t h)^2}{(1-1/12(-3I-\sqrt{3})h \Delta t)(1-1/12(-3I+\sqrt{3})h \Delta t)}
+\end{align*}
+The advantage is that, the $h^2$ term may introduce some problems, in the method later, we only need to inverse two matrix which are relative simple.
 
 \section{Perburbation}
 
