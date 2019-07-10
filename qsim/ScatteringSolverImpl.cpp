@@ -12,14 +12,14 @@ void ScatteringSolver1DImpl::InitScatteringSolver1D(std::function<Complex(Real)>
 	const_cast<std::function<Complex(Real)>&>(fVFunc) = v;
 	if (direction < 0) direction = -1;
 	else if (direction > 0) direction = 1;
-	const_cast<Real&>(fDirection) = direction;
-	const_cast<Real&>(fK0) = fDirection * sqrt(2 * fMass * fE) / fHbar;
+	const_cast<Real&>(fDirection) = direction > 0 ? 1 : -1;
+	const_cast<Real&>(fK0) = sqrt(2 * fMass * fE) / fHbar;
 
 	InitPotential();
 
 	const_cast<PsiVector&>(fPsi0X).resize(fNx);
 	for (size_t i = 0; i < fNx; ++i) {
-		const_cast<PsiVector&>(fPsi0X)[i] = exp(fK0 * GetX(i) * I);
+		const_cast<PsiVector&>(fPsi0X)[i] = exp(fDirection * fK0 * GetX(i) * I);
 	}
 	fPsiX.resize(fNx);
 }
@@ -29,8 +29,8 @@ void ScatteringSolver1DImpl::ComputeRT() {
 	Complex r = 0;
 	Complex t = 0;
 	for (size_t i = 0; i < fNx; ++i) {
-		r += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(I * (-fK0)*(-GetX(i)));
-		t += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(I * (+fK0)*(-GetX(i)));
+		r += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(I * (-fDirection*fK0)*(-GetX(i)));
+		t += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(I * (+fDirection*fK0)*(-GetX(i)));
 	}
 	fR = abs2(r*fDx*fMass / (fHbar*fHbar*std::abs(fK0) * I));
 	fT = abs2(t*fDx*fMass / (fHbar*fHbar*std::abs(fK0) * I) + Complex(1, 0));
