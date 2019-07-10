@@ -110,9 +110,6 @@ void SolverImpl1D:: LOOP_FUNC_NAME ()
 		Real const a21 = 1. / 4 + sqrt(3) / 6;
 		Real const a11 = 1. / 4;
 		Real const a22 = 1. / 4;
-		Real const BB = -a12 * fDx;
-		Real const CC = -a21 * fDx;
-		Real const FF = 1. / 16 * fDx*fDx - CC * BB;
 		Real const C2 = a22*a11 - a12*a21;
 
 		for (size_t i = 0; i < fNBins; ++i) {
