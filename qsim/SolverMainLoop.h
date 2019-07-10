@@ -124,8 +124,8 @@ void SolverImpl1D:: LOOP_FUNC_NAME ()
 			DiagonalMatrix2<Real> const A2A1(dx2a2, dx2a1);
 
 			AntiDiagonalMatrix2<Real> T = a11*A1 + a22*A2;
-			Matrix K1 = (Matrix::Identity() + C2 * A2A1 - T).inverse() * (A1 + (a12 - a22)*A2A1);
-			Matrix K2 = (Matrix::Identity() + C2 * A1A2 - T).inverse() * (A2 + (a21 - a11)*A1A2);
+			Matrix K1 = A1 * (Matrix::Identity() + C2 * A2A1 - T).inverse() * (Matrix::Identity() + (a12 - a22)*A2);
+			Matrix K2 = A2 * (Matrix::Identity() + C2 * A1A2 - T).inverse() * (Matrix::Identity() + (a21 - a11)*A1);
 
 			Matrix tr_mI = 0.5*(K1 + K2);
 			Matrix tr = Matrix::Identity() + tr_mI;
