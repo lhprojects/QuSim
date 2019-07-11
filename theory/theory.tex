@@ -5,15 +5,15 @@
     \usepackage{amsfonts}
     \usepackage{braket}
 \usepackage{esvect}
+\usepackage{hyperref}
 
 \def\df{{\rm d}}
 \begin{document}
 
-\title{LaTeX Typesetting By Example}
-\author{Phil Farrell\\
-Stanford University School of Earth Sciences}
+\title{The Theory about QuSim}
+\author{Harry LEONG}
 
-\renewcommand{\today}{November 2, 1994}
+%\renewcommand{\today}{November 2, 1994}
 \maketitle
 
 $$
@@ -200,14 +200,54 @@ $$
 \Psi(j) = \frac{1}{2i} {\rm inv fft}(2N, \Phi^\prime(k), j)
 $$
 
-\section{Split Method}
-
-Second order approximation
+\section{Time evolution problem}
+\subsection{Eigen Method}
+The time evolution is straight forward if we can diagonal the hamiltonian matrix.
 $$
-e^{t+v} = e^{1/2 v} e^{ t} e^{1/2 v}
+\psi(t+\Delta t) = \sum_i e^{-I E_i \Delta t}c_i \psi_i(t)
 $$
+This method seems exact. However, the indeed we can't diagonal the matrix exactly and it's very time consuming to diagonal a matrix.
+Even, the after diagonal the matrix, it not very efficient to update the state, It's $O(N^2)$.
 
-Fourth-order approximation
+\subsection{Split Method}
+
+We want to keep the evolution unitary. The first try would be
+$$
+e^{t+v}=e^t e^v
+$$
+where
+$$
+t=-I T\Delta t/\hbar
+$$
+$$
+v=-I V\Delta t/\hbar
+$$
+It's straight froward to evaluate the $e^t$, $e^v$. To obtain higher precision. We have the approximation of order 2
+$$
+e^{t+v} \approx e^{1/2 v} e^{ t} e^{1/2 v}
+$$
+It is of approximation of order 2. The proof is very straight forward.
+firstly, the exact expansion is
+$$
+e^{t+v} = 1 + t + v + 1/2 (t^2 + tv + vt + v^2) + 1/6 (t^3 + t^2v + tvt + tv^2 + vt^2 + vtv + v^2t + v^3) + O(v^nt^{4-n})
+$$
+And the approximation expansion is
+\begin{align*}
+e^{1/2 v} e^{ t} e^{1/2 v} &=(1 + 1/2v + 1/2(1/2v)^2+1/6 (1/2v)^3) (1 + t + 1/2t^2+1/6 t^3)\times\\
+&(1 + 1/2v + 1/2(1/2v)^2+1/6 (1/2v)^3)+ O(v^nt^{4-n})\\
+&=(1 + 1/2v + 1/8v^2+1/48 v^3) (1 + t + 1/2t^2+1/6 t^3)\times\\ 
+&(1 + 1/2v + 1/8v^2+1/48 v^3)+ O(v^nt^{4-n})\\
+&=(1 + t + 1/2v + 1/2 vt + 1/8 v^2 + 1/2t^2 + 1/6 t^3  + 1/4 vt^2+ 1/8 v^2t + 1/48 v^3)\times\\ 
+&(1 + 1/2v + 1/8v^2+1/48 v^3)+ O(v^nt^{4-n})\\
+&=(1 + t + 1/2v + 1/2 vt + 1/8 v^2 + 1/2t^2 + 1/6 t^3  + 1/4 vt^2+ 1/8 v^2t + 1/48 v^3)\\
+&+ (1 + t + 1/2v + 1/2 vt + 1/8 v^2 + 1/2t^2)1/2v
++ (1 + t + 1/2v)1/8v^2\\
+&+ 1/48v^3 + O(v^nt^{4-n})\\
+&= 1 + t + v + 1/2 (t^2 + tv + vt + v^2)\\
+&+ 1/6(t^3 + v^3) + 1/4 t^2 v + 1/4 v t^2 + 1/4 vtv + 1/8 tv^2 + 1/8 v^2 t
+\end{align*}
+Basically, the term $tvt$ can not occur in $e^{1/2 v} e^{ t} e^{1/2 v}$. So it can not be better than order of 2.
+and approximation of order 4 (see \url{https://en.wikipedia.org/wiki/Symplectic_integrator})is
 $$
 e^{t+v} = e^{c_1 v} e^{d_1 t} e^{c_2 v} e^{d_2 t} e^{ c_2 v} e^{ d_1 t} e^{ c_1 v}
 $$
@@ -225,31 +265,11 @@ $$
 $$
 d_2 = -2^{1/3}/(2-2^{1/3})
 $$
+This is called the split method.
+\subsection{Gauss-Legendre Method}
 
-\section{Eigen Method}
-
-\section{Gauss-Legendre Method}
-The SE, can be written as
-$$
-\frac{d\psi}{ dt} = - I h \psi
-$$
-the formal solution is
-$$
-\psi(t) = e^{ -I h t}\psi(0)
-$$
-
-In numerical analysis, many methods are special cases of Runge-Kutta methods.
-\begin{itemize}
-\item Euler Method
-\begin{itemize}
-    \item Forward Euler Method
-    \item Backward Euler Method
-\end{itemize}
-\item Gauss-Legendre Method
-\item ...
-\end{itemize}
-
-\subsection{Forward euler method}
+\subsubsection{Forward Euler Method Will Fail}
+The most straight forward method for time step is the Forward Euler Method
 $$
 \psi(t + \Delta t) = (1 - I \Delta t h) \psi(t)
 $$
@@ -263,7 +283,7 @@ For the Forward euler method, the local time discrete error is $O(\Delta ^2 t)$
 $$
 \psi(t + \Delta t) = (1 - I \Delta t h)\psi(t) + O(\Delta t^2)
 $$
-We say this method is order One.
+We say this method is order 1.
 
 Numerical stability requires
 $$
@@ -300,25 +320,26 @@ $$
 \Delta t < (\hbar^2/2m(\Delta x)^2)^{-1}
 $$
 The requrement for $\Delta t$ is too strict.
+In summary, we can not use $1 + I\Delta t h$ to approximate $e^{I\Delta t h}$. because the behavior is too bad for high energy eigen state. the large $\Delta t h$ will ruin everything.
 
-\subsection{Backward Euler method}
-
+\subsubsection{Backward Euler method}
+The Backward Euler method is defined as
 $$
 \psi(t + \Delta t) = (1 + I \Delta t h)^{-1} \psi(t)
 $$
+This is an order one method.
+The stability requires
+$$
+|(1 + I \Delta t h)^{-1}\psi| < |(1 + \Delta t / T) \psi|
+$$
+Because for each eigen state with eigen ernery of $E$
+$$
+|(1 + I \Delta t E)^{-1}/\hbar| < 1 < (1 + \Delta t / T)
+$$
+This methods is unconditional stable. We will not use this method. In this method we need to inverse a hamiltonian matrix.
+We can do better with the similar amount of computation.
 
-This is an order of One method
-The stability requres
-$$
-|(1 + I \Delta t h)^{-1}\psi| < (1 + \Delta t / T) \psi
-$$
-Because for each eigenstate with eigenernery of $e$
-$$
-|(1 + I \Delta t e)^{-1}| < 1 < (1 + \Delta t / T)
-$$
-This methods is unconditional stable
-
-\subsection{Gauss-Legendre Methods}
+\subsubsection{Gauss-Legendre Methods}
 
 Gauss-Legendre methods are implicit Runge-Kutta methods.
 
@@ -395,6 +416,9 @@ where
 $$
 A(x)=\df x\begin{pmatrix}  0 & 1 \\ -x\frac{2m}{\hbar^2}(E-V(x)) & 0 \end{pmatrix}
 $$
+\subsection{Runge-Kutta Method}
+
+
 Direct use of range-kutta method will be good choice.
 The only different from the time evolution problem is that, the potential will almost depend on the location, however, the hamiltonian will not depend on the time in a wide classes of case.
 We define the $T$ matrix as
@@ -412,27 +436,62 @@ where
 $$
 A = A(x+1/2\Delta x) =\Delta x \begin{pmatrix}  0 & 1 \\ -\frac{2m}{\hbar^2}(E-V(x+1/2\Delta x)) & 0 \end{pmatrix}
 $$
-Thus
+It is actually a linear equation of dimension of four. It is worth to solve it by hands. The solution is
 $$
 T = 1 + \frac{A}{1 - 1/2A}
 $$
+We need only to inverse a matrix of dimension of two.
 
 For the gauss-legendre of order of four
 \begin{align*}
-K_1 &= A_1(1 + c_{11} K_1 + c_{12} K_2)\\
-K_2 &= A_2(1 + c_{21} K_1 + c_{22} K_2)\\
-T &= 1 + 1/2(K_1+K_2)
+K_1 &= A_1(1 + a_{11} K_1 + a_{12} K_2)\\
+K_2 &= A_2(1 + a_{21} K_1 + a_{22} K_2)\\
+T &= 1 + b_1 K_1+ b_2 K_2
 \end{align*}
 where
 \begin{align*}
 A_1 = A(x + c_1\Delta x)\\
 A_2 = A(x + c_2\Delta x)
 \end{align*}
-The solution is
+It is actually a linear equation of dimension of 8. The solution is
 $$
-T = 1 + c_1 (1 - a_{22} A_2 - a_{11} A_1 + (a_{22} a_{11} - a_{12} a_{21})A_2 A_1)^{-1}(A_1+(a_{12}-a_{22})A_2A_1) + (1\leftrightarrow 2)
+T = 1 + b_1 A_1(1 - a_{22} A_2 - a_{11} A_1 + (a_{22} a_{11} - a_{12} a_{21})A_2 A_1)^{-1}(1+(a_{12}-a_{22})A_2) + (1\leftrightarrow 2)
 $$
-a delicate program is deveped for the matrix of dimension of two. but the program can never be smart as man. the more work we did, the lesser calculation the computer need to do on run time. please simplify the $A_2A_1$ as a excise. and note $A_2A_1\neq A_1A_2$.
+and note
+$$
+A_2 A_1 = \Delta x \begin{pmatrix}  -\frac{2m}{\hbar^2}(E-V(x_1)) & 0 \\ 0 & -\frac{2m}{\hbar^2}(E-V(x_2))  \end{pmatrix}
+$$
+$$
+A_2 A_1 \neq A_1 A_2
+$$
+
+\iffalse
+For the gauss-legendre of order of six
+\begin{align*}
+K_1 &= A_1(1 + c_{11} K_1 + c_{12} K_2+ c_{13} K_3)\\
+K_2 &= A_2(1 + c_{21} K_1 + c_{22} K_2+ c_{23} K_3)\\
+K_3 &= A_3(1 + c_{31} K_1 + c_{32} K_2 + c_{33} K_3)\\
+T &= 1 + b_1 K_1+ b_2 K_2+b_3K_3
+\end{align*}
+we firstly have
+
+\begin{align*}
+K_3 = (1-a_{33}A_3)^{-1}A_3 (1 + c_{31} K_1 + c_{32} K_2) = M_3 (1 + c_{31} K_1 + c_{32} K_2)\\
+K_1 = A_1 (1 + c_{11} K_1 + c_{12} K_2 + c_{13} M_3(1 + c_{31} K_1 + c_{32} K_2))\\
+K_2 = A_2 (1 + c_{21} K_1 + c_{22} K_2 + c_{23} M_3(1 + c_{31} K_1 + c_{32} K_2))\\
+\end{align*}
+\begin{align*}
+K_1 = A_1 (1 + c_{13} M_3 + (c_{11} + c_{13} c_{31}M_3) K_1 + (c_{12} + c_{13} c_{32} M_3) K_2)\\
+K_2 = A_2 (1 + c_{23} M_3 + (c_{21} + c_{23} c_{31}M_3) K_1 + (c_{22} + c_{23} c_{32} M_3) K_2)\\
+\end{align*}
+the final solution
+$$
+\text{to be finished!}
+$$
+
+\fi
+The correctness checking can be found in \url{RungeKuttaIntialValueProblem.wl}.
+We need only to inverse a matrix of dimension of two. A delicate program is develed for the matrix of dimension of two. but the program can never be smart as man. the more work we did, the lesser calculation the computer need to do on run time.
 \subsection{Small round error}
 Finally we need to calculate
 $$
@@ -440,7 +499,7 @@ T_1 T_2 T_3 ...
 $$
 each $T_i$ is very close to unitary. We will lose some precision, because only the difference of $T_i$ from 1 carry the information. The use full information were trucked in the floating architecture.
 
-Let's focus the 
+Let's focus the
 $$
 T \leftarrow T T_i
 $$
@@ -452,7 +511,7 @@ However the change we really store in $T$ is
 $$
 (T T_i) - T
 $$
-Latter is less precise, because of large round error. We can reduce the effect of round error by recording the difference. 
+Latter is less precise, because of large round error. We can reduce the effect of round error by recording the difference.
 $$
 T(T_i -1) - ((T T_i) - T)
 $$
@@ -463,12 +522,240 @@ The new method is to use two matrix. one is for the main part, the other one is 
 \end{align}
 And this is reason that we represent our result in the form $T_i = 1 + ...$ without any implication. We need calculate $T_i-1$ directly.
 
-\section{Perburbation}
+\subsection{Probability current}
+The probability current is proportional to
+$$
+\psi^\prime\psi^*-\psi^{*\prime}\psi
+$$
+or in matrix form
+$$
+(\psi,\psi^\prime)^* \begin{pmatrix} 0 & 1 \\ -1 & 0\end{pmatrix}  \begin{pmatrix} \psi \\ \psi^\prime \end{pmatrix}
+$$
+After one step, the current will be
+$$
+(\psi,\psi^\prime)^* T_i^\dagger\begin{pmatrix} 0 & 1 \\ -1 & 0\end{pmatrix}  T_i \begin{pmatrix} \psi \\ \psi^\prime \end{pmatrix}
+$$
+for every $\begin{pmatrix} \psi \\ \psi^\prime \end{pmatrix}$, we dont't want the current change. so we need
+$$
+T_i^\dagger\begin{pmatrix} 0 & 1 \\ -1 & 0\end{pmatrix}  T_i = \begin{pmatrix} 0 & 1 \\ -1 & 0\end{pmatrix}
+$$
+
+For Gauss-legendre order 2 and 4, obove equation can be exactly satisfied. See \url{RungeKuttaIntialValueProblem.wl}
+
+\section{Scattering Problem}
+
+For scattering problem, we need to find a wave function,$\psi(r)$,that
+\begin{align*}
+(-\hbar^2/2m\nabla^2 + V)\psi &= E \psi\\
+\psi(r\rightarrow\infty) &= \text{plane wave + scattering state wave function}
+\end{align*}
+or
+\begin{align}\label{eq:scattering}
+(E - V -(-\hbar^2/2m)\nabla^2)\Delta\psi &= V\psi_0\\ \label{eq:scattering_boundary}
+\Delta\psi(r\rightarrow\infty) &= \text{scattering state wave function}
+\end{align}
+where $\psi_0$ is the incident wave function, a plane wave function.
+The $\Delta \psi = \psi - \psi_0$ is the scattering wave function.
+
+\subsection{Absorbtion layer}
+Because we can only solve the problem in finite space. If we solve the Eq. \ref{eq:scattering}, directly ignoring the requirement of boundary condition. It will be a absolutely a mistake. for example, we are using the periodic boundary condition, breaking down the Eq. \ref{eq:scattering_boundary}. Then the scattering wave function will go through the boundary can reach the scattering potential again. In $d$ dimensional, total amplitude would be
+$$
+\sim\sum_i r_i^{-(d-1)/2} \sim \int \df r r^{(d-1)} r^{-(d-1)/2} \sim \int \df r r^{(d-1)/2} \rightarrow \infty
+$$
+We can not even obtain a approximate result. We have the same satiation for infinite wall boundary condition.
+
+The key idea to resolve the problem, it to add a absorbtion layer at the boundary. A perfect absorbtion layer should only absorb 100\% wave function without any reflection.
+The absorbtion layer should not overlap with potential. To add the absorbtion layer, we need add the absorbtion term to the potential.
+$$
+IV_\text{abs}
+$$
+and the equation will be
+\begin{align}\label{eq:scattering_abs}
+(E - V - IV_\text{abs} -(-\hbar^2/2m)\nabla^2)\Delta\psi &= V\psi_0\\ \label{eq:scattering_boundary_abs}
+\Delta\psi(r\rightarrow boundary) = \text{periodic or infinite wall}
+\end{align}
+where $V_\text{abs} < 0$. No need adding $V_\text{abs}$ to right side of the equation.
+Let's discuss the solution of Eq. \ref{eq:scattering_abs} and Eq. \ref{eq:scattering_boundary_abs}.
+\begin{itemize}
+  \item In the region of potential, because there is no absorbtion layer. Thus Eq. \ref{eq:scattering} will be stratified.
+  \item and in the region outside of the potential, there is no source of wave function. whatever boundary condition, periodic or infinite wall is used. the scattering state wave function will be absorbed at the boundary and the incoming state wave function can't come from the absorbtion layer. thus only scattering state wave can exist. Thus Eq. \ref{eq:scattering_boundary} will be stratified.
+\end{itemize}
+Finally we can conclude the scattering solution is found.
+
+
+In theory side. Often a homogenous absorbtion layer $-I\epsilon$ are added. there will be overlap with potential. The solution of plane wave function is
+The equation will be
+\begin{align}
+(E - V + I\epsilon -(-\hbar^2/2m)\nabla^2)\Delta\psi &= V\psi_0\\
+\text{what ever boundary condition}
+\end{align}
+It looks like adding $I\epsilon$ to energy. The solution is
+$$
+e^{I k_\text{complex} x}, k_\text{complex} = \sqrt{2m(E+I\epsilon)}/\hbar =  p(1+1/2\epsilon/E)
+$$
+Four numerical computation, we need $$pL_\text{potential} \epsilon/E \ll 1,$$ $$ p L_\text{space}\epsilon/E \gg 1.$$
+For theory treatment, we need $L_\text{space}\rightarrow \infty$ then $\epsilon \rightarrow 0$. just as theorists did.
 
 The fermi golden rule
 $$
 \Gamma_{i\rightarrow f} = \frac{2\pi}{\hbar} \rho_E |\bra{\psi_f}V\ket{\psi_i}|^2
 $$
+\subsection{Inverse Matrix Method}
+To solve the Eq. \ref{eq:scattering_abs}. We can descries the space, and inverse the spare matrix directly. We call this method Inverse matrix method.
+
+
+
+
+
+\subsection{Born Series}
+We can think the potential is a perturbation of free system.
+
+In the naive born series, I want to simulate the way theorist did. We use the iterative solution
+$$
+(E + I\epsilon-(-\hbar^2/2m)\nabla^2)\Delta\psi = V(\psi_0 + V\Delta \psi)
+$$
+In theoretical treatment, we calculate the $\psi$ analytically and let $\epsilon \rightarrow 0$ in the final state.
+In numerical treatment, we require
+$$pL_\text{potential} \epsilon/E \ll 1,$$ $$ p L_\text{space}\epsilon/E \gg 1.$$
+The precision of this method is quite limited, since if we want $\epsilon$ to be sufficiently small, we need the size of space to be extremal large.
+
+
+To reduce the size of space, we need the absorbtion layer. We can write down the iterative solution
+$$
+(E -(-\hbar^2/2m)\nabla^2)\Delta\psi = V\psi_0 + (V+V_\text{abs})\Delta \psi
+$$
+However, the left side is not invertible, we add additional absorbtion term $-I\epsilon$, too keep equation exact. we need add this term on the right side too.
+$$
+(E + I\epsilon-(-\hbar^2/2m)\nabla^2)\Delta\psi = V\psi_0 + (V+V_\text{abs} + I\epsilon)\Delta \psi
+$$
+The $\epsilon$ need not be very small. and It should not be very small. so that the left side can be invertible.
+Let's define
+$$
+G_0 = (E + I\epsilon-(-\hbar^2/2m)\nabla^2)^{-1}
+$$
+The inverse can be done in momentum space.
+Thus
+$$
+\Delta\psi = G_0(V\psi_0 + (V+V_\text{abs} + I\epsilon)\Delta \psi)
+$$
+
+\subsubsection{Preconditioner}
+But this expression may not converge. The trick here is that we use a mix of new $\Delta \psi$ and the old $\Delta \psi$.
+$$\Delta\psi = \gamma(x) G_0(V\psi_0 + (V+V_\text{abs} + I\epsilon)\Delta \psi) + (1-\gamma(x))\Delta \psi$$
+
+\begin{itemize}
+  \item Identity. $\gamma=1$
+  \item Vellekoop. $\gamma=1 - I (V+IV_\text{abs}) /\epsilon$ .see A convergent Born series for solving the inhomogeneous Helmholtz equation in arbitrarily large media.
+  \item Hao1. $\gamma=1 - I (V-IV_\text{abs}) /\epsilon$.
+  \item Hao2. $\gamma=2/(1 + I (V+IV_\text{abs}) / \epsilon)$.
+\end{itemize}
+The preconditioners are chosen for reasons.
+
+\subsubsection{Slow Factor}
+Slow factor is to scale the $\gamma$ factor globally.
+$$\Delta\psi = f_\text{slow} \gamma(x) G_0(V\psi_0 + (V+V_\text{abs} + I\epsilon)\Delta \psi) + (1- f_\text{slow}\gamma(x))\Delta \psi$$
+When the oscillation occur, given a smaller slow factor may resolve the problem.
+
+\subsection{Scattering Cross-section}
+
+After we obtain the $\Delta \psi$ in the potential region. we need to calculate the scattering wave function at infinity. this is done by
+\begin{align}
+(E + I\epsilon -(-\hbar^2/2m)\nabla^2)\Delta\psi &= V(\psi_0 + \Delta \psi)
+\end{align}
+where $\epsilon\rightarrow +0$. this is done by theoretical calculation.
+Let's define
+$$
+(E + I\epsilon -(-\hbar^2/2m)\nabla^2)\psi_\delta(r) = \delta(r)
+$$
+Then
+$$
+\Delta\psi(r) = \int \df r^\prime \psi_\delta(r-r^\prime) V(r^\prime)(\psi_0(r^\prime) + \Delta\psi(r^\prime))
+$$
+
+In the perturbation section, we use this iterative formual, because this is not efficient and it's problematic for short distance point. But if we want to calculate several points at infinity. The un-efficiency will not cause any problem.
+\begin{itemize}
+  \item 1D. Note
+  $$
+  \delta(r) = \frac{1}{2\pi}\int e^{i r k} \df k
+  $$
+  Then
+  $$
+  \psi_\delta(r) = \frac{1}{2\pi}\int e^{i r k}/(E + I\epsilon -(-\hbar^2/2m)k^2) \df k
+  $$
+  The integral is
+  $$
+  \psi_\delta(r) = \frac{m}{I \hbar p_\text{complex}} e^{I|r|p_\text{complex}/\hbar}
+  $$
+  where
+  $$
+  p_\text{complex} = \sqrt{2m(E+I \epsilon)}
+  $$
+  with $\epsilon \rightarrow 0$
+  $$
+  \psi_\delta(r) = \frac{m}{I \hbar^2 k} e^{I|r|k}
+  $$
+  Thus
+  $$
+\Delta\psi(r) = \frac{m}{I \hbar^2 k}\int \df r^\prime  e^{I|r-r^\prime|k} V(r^\prime)(\psi_0(r^\prime) + \Delta\psi(r^\prime))
+  $$
+  For for reflection,   If the particle come from left
+  $$
+\Delta\psi(-\infty) \sim \frac{m}{I \hbar^2 k} \int \df r^\prime e^{Ir^\prime k} V(r^\prime)(\psi_0(r^\prime) + \Delta\psi(r^\prime))
+  $$
+  If the particle come from right
+  $$
+\Delta\psi(+\infty) \sim \frac{m}{I \hbar^2 k}\int \df r^\prime  e^{-I r^\prime k} V(r^\prime)(\psi_0(r^\prime) + \Delta\psi(r^\prime))
+  $$
+
+ For the tunneling,  If the particle come from left
+  $$
+\Delta\psi(+\infty) \sim \frac{m}{I \hbar^2 k} \int \df r^\prime e^{-Ir^\prime k} V(r^\prime)(\psi_0(r^\prime) + \Delta\psi(r^\prime)) + \psi_0(0)
+  $$
+    If the particle come from right
+   $$
+\Delta\psi(+\infty) \sim \frac{m}{I \hbar^2 k} \int \df r^\prime e^{+Ir^\prime k} V(r^\prime)(\psi_0(r^\prime) + \Delta\psi(r^\prime)) + \psi_0(0)
+  $$
+ note the original wave function need to be added. This is a special treatment in one dimension.
+
+  \item 2D.
+  Rewrite the equation to the form
+  $$
+  (\nabla^2 + k_0^2) \psi = 2m/\hbar^2 V (\psi_0+\Delta\psi)
+  $$
+  The solution (See wikipeida $https://en.wikipedia.org/wiki/Helmholtz_equation$) is
+  $$
+\Delta\psi(r) =-2m/\hbar^2 \int \df r^\prime  \frac{I H_0^{(1)}(k |r -r^\prime|)}{4} V(r^\prime) (\psi_0(r^\prime)+\Delta\psi(r^\prime))
+  $$
+  And note
+  $$
+  H_0^{(1)}(z\rightarrow\infty) = \sqrt{\frac{2}{\pi z}} e^{I (z - \pi/4)}
+  $$
+  thus
+  $$
+  \Delta\psi(r\sim\infty) \sim \frac{m}{\hbar^2 \sqrt{2\pi k r}} \int \df r^\prime e^{-i k e_r \cdot r^\prime} V(r^\prime) (\psi_0(r^\prime)+\Delta\psi(r^\prime))
+  $$
+  the cross-section is
+  $$
+  \frac{\df \sigma}{\df \theta} = \left(\frac{1}{\psi_0(0)}\frac{m}{\hbar^2 \sqrt{2\pi k}} \int \df r^\prime e^{-i k e_r \cdot r^\prime} V(r^\prime) (\psi_0(r^\prime)+\Delta\psi(r^\prime))\right)^2
+  $$
+  \item 3D.
+  Rewrite the equation to the form
+  $$
+  (\nabla^2 + k_0^2) \psi = 2m/\hbar^2 V (\psi_0+\Delta\psi)
+  $$
+  The solution (See wikipeida $https://en.wikipedia.org/wiki/Helmholtz_equation$) is
+  $$
+\Delta\psi(r) =-2m/\hbar^2 \int \df r^\prime  \frac{e^{i k |r-r^\prime|}}{4\pi |r -r^\prime|} V(r^\prime) (\psi_0(r^\prime)+\Delta\psi(r^\prime))
+  $$
+    $$
+\Delta\psi(r\sim\infty) \sim \frac{m}{2\pi\hbar^2 r} \int \df r^\prime e^{-i k e_r \cdot r^\prime} V(r^\prime) (\psi_0(r^\prime)+\Delta\psi(r^\prime))
+  $$
+  The cross-section is
+  $$
+  \frac{\df\sigma}{\df\Omega} = \left(\frac{1}{\psi_0(0)}\frac{m}{2\pi\hbar^2} \int \df r^\prime e^{-i k e_r \cdot r^\prime} V(r^\prime) (\psi_0(r^\prime)+\Delta\psi(r^\prime))\right)^2
+  $$
+
+\end{itemize}
 
 \subsection{3D dimential}
 
