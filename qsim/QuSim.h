@@ -215,6 +215,11 @@ struct Options {
 		return *this;
 	}
 
+	inline Options &PreferPreciseSmallWaveFunction(bool prefer = true) {
+		SetBool("PreferPreciseSmallWaveFunction", prefer);
+		return *this;
+	}
+
 	EXPORT_FUNC Options();
 	EXPORT_FUNC Options(Options const &);
 	EXPORT_FUNC Options& operator=(Options const &);

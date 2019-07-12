@@ -4,7 +4,7 @@
 
 struct ScatteringProblemSolverInverseMatrix1D : ScatteringSolver1DImpl {
 
-	ScatteringProblemSolverInverseMatrix1D() : fOrder(), fMatrixSolver() { }
+	ScatteringProblemSolverInverseMatrix1D() : fSpaceOrder(), fMatrixSolver(), fPreferPreciseSmallWaveFunction() { }
 	void InitScatteringSolver1D(
 		std::function<Complex(Real)> const & v,
 		Real x0,
@@ -20,7 +20,9 @@ struct ScatteringProblemSolverInverseMatrix1D : ScatteringSolver1DImpl {
 	void Compute() override;
 
 	SparseMatrixSolver fMatrixSolver;
-	int const fOrder;
+	int const fSpaceOrder;
+	bool const fPreferPreciseSmallWaveFunction;
+	std::vector<double> const fVabs;
 	Eigen::SparseMatrix<Complex> fEMinusH;
 
 
