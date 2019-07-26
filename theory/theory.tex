@@ -11,194 +11,11 @@
 \begin{document}
 
 \title{The Theory about QuSim}
-\author{Harry LEONG}
+\author{Hao LIANG}
 
 %\renewcommand{\today}{November 2, 1994}
 \maketitle
 
-$$
--\hbar^2/(2m) \nabla^2 \psi = i \hbar \partial_t \psi
-$$
-
-$$
-\psi_p(x) = e^{ i/\hbar (p x - p^2 /(2m)t)}
-$$
-$$
-\Psi(x) = \int dp \phi_x(p) \psi_p(x)
-$$
-
-Note
-$$
-\int dx \psi_{p^\prime}^*(x) \psi_{p}(x) = e^{ i/\hbar ((p^{\prime2} - p^2) /(2m)t)} 2\pi\delta(1/\hbar(p-p^\prime))
-=2\pi\hbar\delta(p-p^\prime)
-$$
-
-$$
-\phi_x(p) = \frac{1}{2\pi\hbar}\int dx \psi^*_p(x) \Psi(x)
-$$
-the solution for any time:
-$$
-\Psi(x, t) = \int dp \frac{1}{2\pi\hbar}\int dy \psi^*_p(y) \Psi(y) \psi_p(x,t)
-$$
-
-$$
-\Psi(x, t) = \int dy  \Psi(y) \int dp \frac{1}{2\pi\hbar}\psi^*_p(y) \psi_p(x,t)
-$$
-
-$$
-\Psi(x, t) = \int dy  \Psi(y) \int dp \frac{1}{2\pi\hbar} e^{i(p(x-y)/\hbar - p^2 t/(2m\hbar))}
-$$
-
-$$
-T=t/(m\hbar)
-$$
-$$
-\Psi(x, t) = \int dy  \Psi(y) \frac{1}{2\pi\hbar} (1-i) e^{i (x-y)^2 / (2 T \hbar^2)}  \sqrt{\pi / T}
-$$
-
-
-For space $a$
-$$
--\hbar^2/(2m a^2) (\psi(x+a) + \psi(x-a) - 2\psi(x)) \psi = i \hbar \partial_t \psi
-$$
-
-$$
-\psi_p(x) = e^{ i/\hbar (p x - \hbar^2(1 - \cos(a p/\hbar))/(m a^2)t)}
-$$
-
-$$
-\psi_p(x) = e^{ i/\hbar (p x - (p^2/(2m))t)}
-$$
-
-$$
-0 \le p < 2\pi / a
-$$
-
-$$
-\sum_{x_i} \psi_{p^\prime}^*(x_i) \psi_{p}(x_i) = e^{ i/\hbar (\hbar^2(1 - \cos(a p^\prime/\hbar) - \hbar^2(1 - \cos(a p/\hbar))/(m a^2)t)}
-\sum_{x_i}e^{i(p-p^\prime)x_i/\hbar} = 2\pi\delta(1/\hbar(p - p\prime))
-$$
-$$
-x_i = ai
-$$
-
-$$
-\phi_x(p) = \frac{1}{2\pi\hbar}\sum_{x_i} \psi^*_p(x_i) \Psi(x_i)
-$$
-
-$$
-\Psi(x, t) = \sum_{y_i} \Psi(y_i) \int dp \frac{1}{2\pi\hbar} e^{ ip(x-y)/\hbar - i\hbar(1 - \cos(a p/\hbar))/(m a^2)t}
-$$
-
-
-
-$$
-g(k) = \int dx f(x) \exp(ikx)
-$$
-
-$$
-f(x) = \frac{1}{2\pi}\int dk g(k) \exp(-ikx)
-$$
-
-$$
-f(x) = \sum_j \delta(x - ja)
-$$
-$$
-g(k) = \int dx \sum_j \delta(x - ja) \exp(ikx) = \sum_j \exp(ijka)
-$$
-
-$$
-f(x) = \sum_j \delta(x - ja) = \frac{1}{2\pi}\int dk g(k) \exp(-ikx)
-$$
-
-$$
-g(k) = 1/(2\pi a)\sum_n \delta(k+2\pi n/a)
-$$
-
-
-\section{Infinite Wall}
-
-Eigen state
-$$
-\psi_k(j) = \sin(jk\pi/N)
-$$
-
-$$
-j=0..N-1
-$$
-
-$$
-k=1...N-1
-$$
-
-Eigen value
-$$
-E_k = k\pi/(N a)
-$$
-
-$$
-\sum_j \psi_j(k)\psi_j(k) = N/2
-$$
-
-$$
-\Psi(j) = \sum_{k=1}^{N-1} \Phi(k) \psi_k(j)
-$$
-
-$$
-\Phi(k) = (2/N) \sum_j \Psi(j) \psi_k(j)
-$$
-
-$$
-\Phi(k) = (2/N) \sum_j \Psi(j) \sin(jk\pi/N)
-$$
-
-$$
-\Phi(k) = (1/(Ni)) \sum_j \Psi(j) (\exp(ijk\pi/N) - \exp(-ijk\pi/N))
-$$
-
-$$
-\Phi(k) = (1/(Ni)) \sum_j \Psi(j) (\exp(ijk2\pi/2N) - \exp(i(2N-j)k2\pi/2N))
-$$
-
-$$
-\Phi(k) = \frac{1}{Ni}\left(\sum_j^{N-1} \Psi(j)\exp(ijk2\pi/2N) - \sum_{N+1}^{2N} \Psi(2N-j)\exp(jk2\pi/2N))\right)
-$$
-
-by define
-$$
-\Phi(N)=0
-$$
-
-$$
-\Phi(k) = \frac{1}{Ni}\left(\sum_j^{N-1} \Psi(j)\exp(ijk2\pi/2N) - \sum_{j=N}^{2N-1} \Psi(2N-j)\exp(ijk2\pi/2N))\right)
-$$
-
-$$
-\Phi(k) = \frac{1}{Ni}\left(\sum_{j=0}^{2N-1} \Psi^\prime(j)\exp(ijk2\pi/2N)\right)
-$$
-
-$$
-\Psi^\prime(j) = \Psi(j) (j \le N-1)
-$$
-$$
-\Psi^\prime(j) = 0 (j = N)
-$$
-$$
-\Psi^\prime(j) = -\Psi(2N-j) (j > N)
-$$
-
-$$
-\Phi(k) = \frac{1}{Ni} {\rm inv fft}(2N, \Psi^\prime(j), k)
-$$
-
-
-$$
-\Psi(j) = \sum_{k=1}^{N-1} \Phi(k) \sin(jk\pi/N)
-$$
-
-$$
-\Psi(j) = \frac{1}{2i} {\rm inv fft}(2N, \Phi^\prime(k), j)
-$$
 
 \section{Time evolution problem}
 \subsection{Eigen Method}
@@ -235,9 +52,9 @@ And the approximation expansion is
 \begin{align*}
 e^{1/2 v} e^{ t} e^{1/2 v} &=(1 + 1/2v + 1/2(1/2v)^2+1/6 (1/2v)^3) (1 + t + 1/2t^2+1/6 t^3)\times\\
 &(1 + 1/2v + 1/2(1/2v)^2+1/6 (1/2v)^3)+ O(v^nt^{4-n})\\
-&=(1 + 1/2v + 1/8v^2+1/48 v^3) (1 + t + 1/2t^2+1/6 t^3)\times\\ 
+&=(1 + 1/2v + 1/8v^2+1/48 v^3) (1 + t + 1/2t^2+1/6 t^3)\times\\
 &(1 + 1/2v + 1/8v^2+1/48 v^3)+ O(v^nt^{4-n})\\
-&=(1 + t + 1/2v + 1/2 vt + 1/8 v^2 + 1/2t^2 + 1/6 t^3  + 1/4 vt^2+ 1/8 v^2t + 1/48 v^3)\times\\ 
+&=(1 + t + 1/2v + 1/2 vt + 1/8 v^2 + 1/2t^2 + 1/6 t^3  + 1/4 vt^2+ 1/8 v^2t + 1/48 v^3)\times\\
 &(1 + 1/2v + 1/8v^2+1/48 v^3)+ O(v^nt^{4-n})\\
 &=(1 + t + 1/2v + 1/2 vt + 1/8 v^2 + 1/2t^2 + 1/6 t^3  + 1/4 vt^2+ 1/8 v^2t + 1/48 v^3)\\
 &+ (1 + t + 1/2v + 1/2 vt + 1/8 v^2 + 1/2t^2)1/2v
@@ -265,7 +82,7 @@ $$
 $$
 d_2 = -2^{1/3}/(2-2^{1/3})
 $$
-This is called the split method.
+This kinds of methods called the split methods.
 \subsection{Gauss-Legendre Method}
 
 \subsubsection{Forward Euler Method Will Fail}
@@ -583,7 +400,7 @@ Let's discuss the solution of Eq. \ref{eq:scattering_abs} and Eq. \ref{eq:scatte
 Finally we can conclude the scattering solution is found.
 
 
-In theory side. Often a homogenous absorbtion layer $-I\epsilon$ are added. there will be overlap with potential. The solution of plane wave function is
+In theory side. Often a homogenous absorbtion layer $-I\epsilon$ are added. The solution of plane wave function is
 The equation will be
 \begin{align}
 (E - V + I\epsilon -(-\hbar^2/2m)\nabla^2)\Delta\psi &= V\psi_0\\
@@ -593,19 +410,28 @@ It looks like adding $I\epsilon$ to energy. The solution is
 $$
 e^{I k_\text{complex} x}, k_\text{complex} = \sqrt{2m(E+I\epsilon)}/\hbar =  p(1+1/2\epsilon/E)
 $$
+The absorbtion will overlap with potential. we need the absorbtion layer is thin enough, and thus the wave function will not be absorbed much in potential region. However, we need also the size of space large enough to let wave function to be absorbed at the boundary.
 Four numerical computation, we need $$pL_\text{potential} \epsilon/E \ll 1,$$ $$ p L_\text{space}\epsilon/E \gg 1.$$
-For theory treatment, we need $L_\text{space}\rightarrow \infty$ then $\epsilon \rightarrow 0$. just as theorists did.
+For theory treatment, we need $L_\text{space}\rightarrow \infty$ \textbf{then} $\epsilon \rightarrow 0$. just as theorists did.
 
-The fermi golden rule
-$$
-\Gamma_{i\rightarrow f} = \frac{2\pi}{\hbar} \rho_E |\bra{\psi_f}V\ket{\psi_i}|^2
-$$
 \subsection{Inverse Matrix Method}
 To solve the Eq. \ref{eq:scattering_abs}. We can descries the space, and inverse the spare matrix directly. We call this method Inverse matrix method.
 
 
+\subsubsection{Precise Small Wave Function}
+When $\Delta \psi$ is small, the Eq. \ref{eq:scattering_abs} will result in good result. however, when the potential is very strong, the $\psi$ could be very small. So the $\Delta \psi$ is very close to $-\psi_0$. We will lose precision, If we don't record the $\psi$ directly. besides the round error, $(E-(-\hbar^2/2m)\nabla^2)\psi_0 \neq 0$ will also cause problem. Let's assume $V > E$ is constant and ignoring $V_\text{abs}$ (we are considering the potential region.). we can expect $\psi=0$. Now we can find a plane wave solution for $\Delta\psi$
+$$
+\Delta\psi = -V\psi_0/(V-E^\prime+E) \neq -\psi_0
+$$
+where $E^\prime =\hbar^2 {k^\prime}^2 / (2m)$
+where ${k^\prime}^2 \psi_0 = -\nabla^2\psi_0$
+note $k^\prime\neq k$, because of the discrete error. Finally, we can say $\psi_0+\Delta\psi\neq 0$, not as expect.
 
-
+We can overcome the problem. by rewrite Eq. \ref{eq:scattering_abs} to
+\begin{align}\label{eq:scattering_abs_psi}
+(E - V - IV_\text{abs} -(-\hbar^2/2m)\nabla^2)\psi &= -IV_\text{abs}\psi_0\\ \label{eq:scattering_boundary_abs}
+\end{align}
+It is obvious that the plane wave solution is $0$ for $V_\text{abs} = 0$. But now problem arise. We just can not decries the $\Delta\psi$ precisely at the boundary. And we will has more reflection due to round error and discrete error.
 
 \subsection{Born Series}
 We can think the potential is a perturbation of free system.
@@ -641,12 +467,71 @@ $$
 
 \subsubsection{Preconditioner}
 But this expression may not converge. The trick here is that we use a mix of new $\Delta \psi$ and the old $\Delta \psi$.
-$$\Delta\psi = \gamma(x) G_0(V\psi_0 + (V+V_\text{abs} + I\epsilon)\Delta \psi) + (1-\gamma(x))\Delta \psi$$
+$$\Delta\psi = \gamma(x) G_0(V\psi_0 + (V+IV_\text{abs} + I\epsilon)\Delta \psi) + (1-\gamma(x))\Delta \psi$$
+It is obviously the fix-point don't change. for a bias $\delta\psi$ of $\Delta\psi$. then the update equation of $\delta\psi$ is
+$$
+\delta\psi = \gamma(x)G_0 (V+IV_\text{abs}+I\epsilon)\delta\psi + (1-\gamma(x))\delta\psi
+$$
+
+The necessary and sufficient condition that iteration converge is that for any $\psi$
+
+$$
+\left|\psi^\dagger M\psi\right| < |\psi^\dagger\psi|
+$$
+where
+$$
+M = \gamma G_0 (V+IV_\text{abs}+I\epsilon) + (1-\gamma)
+$$
+Let's do some calculation, firstly
+$$
+G_0 = F^{-1} \frac{1}{E-E_k+I\epsilon} F
+$$
+where $F$ and $F^{-1}$ is Fourier transform. Note
+$$
+\frac{1}{E-E_k+I\epsilon} =\frac{1}{2I\epsilon}\left( 1- \frac{E-E_k-I\epsilon}{E-E_k+I\epsilon}\right)
+$$
+Thus
+$$
+G_0 = \frac{1}{2I\epsilon} - \frac{1}{2I\epsilon}F^{-1}  \frac{E-E_k-I\epsilon}{E-E_k+I\epsilon} F
+$$
+The part
+ $F^{-1}  \frac{E-E_k-I\epsilon}{E-E_k+I\epsilon} F$ is an unitary operator. we denote it as $U$.
+Now we get
+$$
+M = \gamma  \frac{1}{2I\epsilon} (1 - U) (V + IV_\text{abs} + I\epsilon) + 1 -\gamma
+$$
+$$
+M = 1 -\gamma + \gamma  \frac{1}{2I\epsilon} (V + IV_\text{abs} + I\epsilon)  - \gamma  \frac{1}{2I\epsilon} U (V + IV_\text{abs} + I\epsilon)
+$$
+If we don't have any knowledge about $U$, it seems we will have the wrose case when the two vector `aligned'.
+$$
+|1 -\gamma + \gamma  \frac{1}{2I\epsilon} (V + IV_\text{abs} + I\epsilon)| + |\gamma  \frac{1}{2I\epsilon} (V + IV_\text{abs} + I\epsilon)| < 1
+$$
+
 
 \begin{itemize}
-  \item Identity. $\gamma=1$
-  \item Vellekoop. $\gamma=1 - I (V+IV_\text{abs}) /\epsilon$ .see A convergent Born series for solving the inhomogeneous Helmholtz equation in arbitrarily large media.
-  \item Hao1. $\gamma=1 - I (V-IV_\text{abs}) /\epsilon$.
+  \item Identity. $\gamma=1$. The iteration with this preconditioner is also called the unconditional iteration.
+  the requirement become
+$$
+\left| 1 - I(V + IV_\text{abs})/\epsilon\right| < 1
+$$
+the requirement can't be satisfied. But it don't mean the iteration will not converge, It just means it can't satisfy the sufficient condition of convergence. Indeed, by numerical test, the iteration can converge, for a range of potential, with the this practitioner.
+
+  \item Vellekoop. $\gamma=1 - I (V+IV_\text{abs}) /\epsilon$. See A convergent Born series for solving the inhomogeneous Helmholtz equation in arbitrarily large media. the requirement is
+      $$
+      |I\alpha + 1/2(1-I\alpha)^2|+|1/2(1-I\alpha)^2| < 1
+      $$
+      $$
+        |1/2 - |\alpha|^2| + |\alpha|\text{Im}\alpha + 1/2(1+|\alpha|^2-2\text{Im}\alpha)<1
+      $$
+      Thus we need
+      $$
+      |\alpha| < 1
+      $$
+      $$
+      \text{Im}\alpha > 0
+      $$
+ \item Hao1. $\gamma=1 - I (V-IV_\text{abs}) /\epsilon$.
   \item Hao2. $\gamma=2/(1 + I (V+IV_\text{abs}) / \epsilon)$.
 \end{itemize}
 The preconditioners are chosen for reasons.
@@ -672,7 +557,7 @@ $$
 \Delta\psi(r) = \int \df r^\prime \psi_\delta(r-r^\prime) V(r^\prime)(\psi_0(r^\prime) + \Delta\psi(r^\prime))
 $$
 
-In the perturbation section, we use this iterative formual, because this is not efficient and it's problematic for short distance point. But if we want to calculate several points at infinity. The un-efficiency will not cause any problem.
+In the perturbation section, we use this iterative formula, because this is not efficient and it's problematic for short distance point. But if we want to calculate several points at infinity. The un-efficiency will not cause any problem.
 \begin{itemize}
   \item 1D. Note
   $$
@@ -722,7 +607,7 @@ In the perturbation section, we use this iterative formual, because this is not 
   $$
   (\nabla^2 + k_0^2) \psi = 2m/\hbar^2 V (\psi_0+\Delta\psi)
   $$
-  The solution (See wikipeida $https://en.wikipedia.org/wiki/Helmholtz_equation$) is
+  The solution (See wikipeida \url{https://en.wikipedia.org/wiki/Helmholtz_equation}) is
   $$
 \Delta\psi(r) =-2m/\hbar^2 \int \df r^\prime  \frac{I H_0^{(1)}(k |r -r^\prime|)}{4} V(r^\prime) (\psi_0(r^\prime)+\Delta\psi(r^\prime))
   $$
@@ -743,7 +628,7 @@ In the perturbation section, we use this iterative formual, because this is not 
   $$
   (\nabla^2 + k_0^2) \psi = 2m/\hbar^2 V (\psi_0+\Delta\psi)
   $$
-  The solution (See wikipeida $https://en.wikipedia.org/wiki/Helmholtz_equation$) is
+  The solution (See wikipeida \url{https://en.wikipedia.org/wiki/Helmholtz_equation}) is
   $$
 \Delta\psi(r) =-2m/\hbar^2 \int \df r^\prime  \frac{e^{i k |r-r^\prime|}}{4\pi |r -r^\prime|} V(r^\prime) (\psi_0(r^\prime)+\Delta\psi(r^\prime))
   $$
@@ -757,7 +642,14 @@ In the perturbation section, we use this iterative formual, because this is not 
 
 \end{itemize}
 
-\subsection{3D dimential}
+
+\section{Cross-check with theoretical result of first-order}
+The fermi golden rule
+$$
+\Gamma_{i\rightarrow f} = \frac{2\pi}{\hbar} \rho_E |\bra{\psi_f}V\ket{\psi_i}|^2
+$$
+
+\subsection{3D Dimension}
 
 In 3D,
 $$
@@ -783,7 +675,7 @@ $$
 $$
 
 $$
-\Gamma_{i\rightarrow f} = \frac{mp d\Omega}{(2\pi \hbar^2)^2 V} |\int dr V(r) e^{i(k_f - k_i) r}|^2
+\Gamma_{i\rightarrow f} = \frac{mp d\Omega}{(2\pi \hbar^2)^2 V} \left|\int dr V(r) e^{i(k_f - k_i) r} \right|^2
 $$
 
 $$
@@ -791,7 +683,7 @@ $$
 $$
 
 $$
-\frac{d\sigma}{d\Omega} = \frac{m^2}{(2\pi \hbar^2)^2} |\int dr V(r) e^{i(k_f - k_i) r}|^2
+\frac{d\sigma}{d\Omega} = \frac{m^2}{(2\pi \hbar^2)^2} \left|\int \df r V(r) e^{i(k_f - k_i) r}\right|^2
 $$
 
 For $V(r) = V_0 e^{-\alpha r^2}$
@@ -801,7 +693,7 @@ $$
 $$
 
 
-\subsection{2D dimential}
+\subsection{2D Dimension}
 
 In 2D,
 $$
@@ -827,7 +719,7 @@ $$
 $$
 
 $$
-\Gamma_{i\rightarrow f} = \frac{m d\Omega}{2\pi \hbar^3 V} |\int dr V(r) e^{i(k_f - k_i) r}|^2
+\Gamma_{i\rightarrow f} = \frac{m d\Omega}{2\pi \hbar^3 V} \left|\int dr V(r) e^{i(k_f - k_i) r}\right|^2
 $$
 
 $$
@@ -835,7 +727,7 @@ $$
 $$
 
 $$
-\frac{d\sigma}{d\Omega} = \frac{m^2}{2\pi \hbar^3 p} |\int dr V(r) e^{i(k_f - k_i) r}|^2
+\frac{d\sigma}{d\Omega} = \frac{m^2}{2\pi \hbar^3 p} \left|\int dr V(r) e^{i(k_f - k_i) r}\right|^2
 $$
 
 For $V(r) = V_0 e^{-\alpha r^2}$
@@ -844,4 +736,191 @@ $$
 \int dr V(r) e^{i(k_f - k_i) r} = \frac{V_0 \pi}{\alpha} e^{-(k_i - k_f)^2/(4\alpha)}
 $$
 
+
+
+\section{Fast Fourier Transform and Others}
+
+$$
+-\hbar^2/(2m) \nabla^2 \psi = i \hbar \partial_t \psi
+$$
+
+$$
+\psi_p(x) = e^{ i/\hbar (p x - p^2 /(2m)t)}
+$$
+$$
+\Psi(x) = \int dp \phi_x(p) \psi_p(x)
+$$
+
+Note
+$$
+\int dx \psi_{p^\prime}^*(x) \psi_{p}(x) = e^{ i/\hbar ((p^{\prime2} - p^2) /(2m)t)} 2\pi\delta(1/\hbar(p-p^\prime))
+=2\pi\hbar\delta(p-p^\prime)
+$$
+
+$$
+\phi_x(p) = \frac{1}{2\pi\hbar}\int dx \psi^*_p(x) \Psi(x)
+$$
+the solution for any time:
+$$
+\Psi(x, t) = \int dp \frac{1}{2\pi\hbar}\int dy \psi^*_p(y) \Psi(y) \psi_p(x,t)
+$$
+
+$$
+\Psi(x, t) = \int dy  \Psi(y) \int dp \frac{1}{2\pi\hbar}\psi^*_p(y) \psi_p(x,t)
+$$
+
+$$
+\Psi(x, t) = \int dy  \Psi(y) \int dp \frac{1}{2\pi\hbar} e^{i(p(x-y)/\hbar - p^2 t/(2m\hbar))}
+$$
+
+$$
+T=t/(m\hbar)
+$$
+$$
+\Psi(x, t) = \int dy  \Psi(y) \frac{1}{2\pi\hbar} (1-i) e^{i (x-y)^2 / (2 T \hbar^2)}  \sqrt{\pi / T}
+$$
+
+
+For space $a$
+$$
+-\hbar^2/(2m a^2) (\psi(x+a) + \psi(x-a) - 2\psi(x)) \psi = i \hbar \partial_t \psi
+$$
+
+$$
+\psi_p(x) = e^{ i/\hbar (p x - \hbar^2(1 - \cos(a p/\hbar))/(m a^2)t)}
+$$
+
+$$
+\psi_p(x) = e^{ i/\hbar (p x - (p^2/(2m))t)}
+$$
+
+$$
+0 \le p < 2\pi / a
+$$
+
+$$
+\sum_{x_i} \psi_{p^\prime}^*(x_i) \psi_{p}(x_i) = e^{ i/\hbar (\hbar^2(1 - \cos(a p^\prime/\hbar) - \hbar^2(1 - \cos(a p/\hbar))/(m a^2)t)}
+\sum_{x_i}e^{i(p-p^\prime)x_i/\hbar} = 2\pi\delta(1/\hbar(p - p\prime))
+$$
+$$
+x_i = ai
+$$
+
+$$
+\phi_x(p) = \frac{1}{2\pi\hbar}\sum_{x_i} \psi^*_p(x_i) \Psi(x_i)
+$$
+
+$$
+\Psi(x, t) = \sum_{y_i} \Psi(y_i) \int dp \frac{1}{2\pi\hbar} e^{ ip(x-y)/\hbar - i\hbar(1 - \cos(a p/\hbar))/(m a^2)t}
+$$
+
+
+
+$$
+g(k) = \int dx f(x) \exp(ikx)
+$$
+
+$$
+f(x) = \frac{1}{2\pi}\int dk g(k) \exp(-ikx)
+$$
+
+$$
+f(x) = \sum_j \delta(x - ja)
+$$
+$$
+g(k) = \int dx \sum_j \delta(x - ja) \exp(ikx) = \sum_j \exp(ijka)
+$$
+
+$$
+f(x) = \sum_j \delta(x - ja) = \frac{1}{2\pi}\int dk g(k) \exp(-ikx)
+$$
+
+$$
+g(k) = 1/(2\pi a)\sum_n \delta(k+2\pi n/a)
+$$
+
+
+\section{Infinite Wall}
+
+Eigen state
+$$
+\psi_k(j) = \sin(jk\pi/N)
+$$
+
+$$
+j=0..N-1
+$$
+
+$$
+k=1...N-1
+$$
+
+Eigen value
+$$
+E_k = k\pi/(N a)
+$$
+
+$$
+\sum_j \psi_j(k)\psi_j(k) = N/2
+$$
+
+$$
+\Psi(j) = \sum_{k=1}^{N-1} \Phi(k) \psi_k(j)
+$$
+
+$$
+\Phi(k) = (2/N) \sum_j \Psi(j) \psi_k(j)
+$$
+
+$$
+\Phi(k) = (2/N) \sum_j \Psi(j) \sin(jk\pi/N)
+$$
+
+$$
+\Phi(k) = (1/(Ni)) \sum_j \Psi(j) (\exp(ijk\pi/N) - \exp(-ijk\pi/N))
+$$
+
+$$
+\Phi(k) = (1/(Ni)) \sum_j \Psi(j) (\exp(ijk2\pi/2N) - \exp(i(2N-j)k2\pi/2N))
+$$
+
+$$
+\Phi(k) = \frac{1}{Ni}\left(\sum_j^{N-1} \Psi(j)\exp(ijk2\pi/2N) - \sum_{N+1}^{2N} \Psi(2N-j)\exp(jk2\pi/2N))\right)
+$$
+
+by define
+$$
+\Phi(N)=0
+$$
+
+$$
+\Phi(k) = \frac{1}{Ni}\left(\sum_j^{N-1} \Psi(j)\exp(ijk2\pi/2N) - \sum_{j=N}^{2N-1} \Psi(2N-j)\exp(ijk2\pi/2N))\right)
+$$
+
+$$
+\Phi(k) = \frac{1}{Ni}\left(\sum_{j=0}^{2N-1} \Psi^\prime(j)\exp(ijk2\pi/2N)\right)
+$$
+
+$$
+\Psi^\prime(j) = \Psi(j) (j \le N-1)
+$$
+$$
+\Psi^\prime(j) = 0 (j = N)
+$$
+$$
+\Psi^\prime(j) = -\Psi(2N-j) (j > N)
+$$
+
+$$
+\Phi(k) = \frac{1}{Ni} {\rm inv fft}(2N, \Psi^\prime(j), k)
+$$
+
+
+$$
+\Psi(j) = \sum_{k=1}^{N-1} \Phi(k) \sin(jk\pi/N)
+$$
+
+$$
+\Psi(j) = \frac{1}{2i} {\rm inv fft}(2N, \Phi^\prime(k), j)
+$$
 \end{document}
