@@ -1,6 +1,12 @@
 # QuSim
 Quantum simulation and visualization program for wave function.
 
+## Note
+The core functions of this project is avoiding using the Windows SDK, except the GUI part.
+Now the GUI part of this project is moving from native Windows API to the partable GUI library, ```nana```.
+## Algorithm and Theory
+ See the [FILE](theory/theory.pdf). Now the progress of document is far behind the codes.
+
 ## Quantum Evolution for 1 Dimension Wave Function
 Solve the 1 D time evolution problem for given initial wave function and potential.
 ![Quantum Evolution for 1 Dimsional Wave Function](screenshot/QuSim1DExample.png)
@@ -18,5 +24,3 @@ The solver for two-side boundary value problem using `shooting` method is also p
 Solve the 2 D scattering problem for given initial wave function, energy, and potential.
 ![Quantum Scattering for 2 Dimsional Wave Function](screenshot/QuScattering2DExample.png)
 
-# Algorithm
- See the theroy folder. there is an article about the algorithm, but not very complete.
