@@ -27,119 +27,110 @@ void SolverImpl1D:: LOOP_FUNC_NAME ()
 	mat(1, 0) = fTMat(1, 0);
 	mat(1, 1) = fTMat(1, 1);
 #endif
+
+#ifdef Tail
+#undef Tail
+#endif
+
+#if !defined(SMALL_ROUND_ERROR)
+
 #define Tail()											   \
-	 mat = tr * mat;                                       \
+	mat = tr * mat;                                        \
 	Complex psi_ = psi;									   \
 	Complex psiPrime_ = psiPrime;						   \
-	psi = psi_ * tr(0, 0) + psiPrime_ * tr(0, 1);		   \
-	psiPrime = psi_ * tr(1, 0) + psiPrime_ * tr(1, 1);	   \
+	psi = psi_ * tr.Get11() + psiPrime_ * tr.Get12();	   \
+	psiPrime = psi_ * tr.Get21() + psiPrime_ * tr.Get22(); \
 														   \
 	fPsi[i + 1] = psi;									   \
 	fPsiPrime[i + 1] = psiPrime;
 
-#define Tail_SMALLROUNDERR()		                       \
+#else
+
+#define Tail()		                       \
 	little = tr * little + (tr_mI*big - ((tr*big) - big)); \
 	big = tr * big;                                        \
 	Complex psi_ = psi;									   \
 	Complex psiPrime_ = psiPrime;						   \
-	psi = psi_ * tr(0, 0) + psiPrime_ * tr(0, 1);		   \
-	psiPrime = psi_ * tr(1, 0) + psiPrime_ * tr(1, 1);	   \
+	psi = psi_ * tr.Get11() + psiPrime_ * tr.Get12();	   \
+	psiPrime = psi_ * tr.Get21() + psiPrime_ * tr.Get22(); \
 														   \
 	fPsi[i + 1] = psi;									   \
 	fPsiPrime[i + 1] = psiPrime;
 
+#endif
 
 
+	//                                    | 0        1 |
+	//       d{psi, psiPrime}^T /dx =     |            |  {psi, psiPrime}^T
+	//                                    | e-vk*v   0 |
 	if (fMethod == SolverMethod::ImplicitMidpointMethod) {
 		for (size_t i = 0; i < fNBins; ++i) {
-			Matrix tr;
+			// K = A (1 + 1/2 K)
+			// tr = 1 + 1.0 K
+
 			Real a = e - vk * fV[i];
+			AntiDiagonalMatrix2<Real> A(fDx, a*fDx);
+			Matrix tr_mI = A * (Matrix::Identity() - 0.5*A).inverse();
+			Matrix tr = Matrix::Identity() + tr_mI;
 
-			AntiDiagonalMatrix2<Real> A;
-			A(0, 1) = 1; A(1, 0) = a;
-
-			// K = dx A (1 + 1/2 K)
-			AntiDiagonalMatrix2<Real> dxA = fDx * A;
-
-#ifdef SMALL_ROUND_ERROR
-				Matrix tr_mI = dxA * (Matrix::Identity() - 0.5*dxA).inverse();
-				tr = Matrix::Identity() + tr_mI;
-				Tail_SMALLROUNDERR();
-#else
-				tr = Matrix::Identity() + dxA * (Matrix::Identity() - 0.5*dxA).inverse();
-				Tail();
-#endif
+			Tail();
 		}
 
 	} else if (fMethod == SolverMethod::ExplicitRungeKuttaO4Classical) {
 		for (size_t i = 0; i < fNBins; ++i) {
-			Matrix tr;
+
 			Real a1 = e - vk * fV[3 * i];
 			Real a2 = e - vk * fV[3 * i + 1];
 			//Real a3 = a2;
 			Real a4 = e - vk * fV[3 * i + 2];
 
-			AntiDiagonalMatrix2<Real> A1;
-			A1(0, 1) = 1; A1(1, 0) = a1;
-			AntiDiagonalMatrix2<Real> A2;
-			A2(0, 1) = 1; A2(1, 0) = a2;
-
+			AntiDiagonalMatrix2<Real> const A1(fDx, a1*fDx);
+			AntiDiagonalMatrix2<Real> const A2(fDx, a2*fDx);
 			AntiDiagonalMatrix2<Real> const &A3 = A2;
-			AntiDiagonalMatrix2<Real> A4;
-			A4(0, 1) = 1; A4(1, 0) = a4;
+			AntiDiagonalMatrix2<Real> const A4(fDx, a4*fDx);
 
 			AntiDiagonalMatrix2<Real> const &K1 = A1;
-			Matrix K2 = A2 * (Matrix::Identity() + 1. / 2 * fDx*K1);
-			Matrix K3 = A3 * (Matrix::Identity() + 1. / 2 * fDx*K2);
-			Matrix K4 = A4 * (Matrix::Identity() + fDx * K3);
+			Matrix const K2 = A2 * (Matrix::Identity() + 1. / 2 * K1);
+			Matrix const K3 = A3 * (Matrix::Identity() + 1. / 2 * K2);
+			Matrix const K4 = A4 * (Matrix::Identity() + K3);
 
-#ifdef SMALL_ROUND_ERROR
-				Matrix tr_mI = 1. / 6 * fDx * (
-					K1 + 2. * K2 + 2. * K3 + K4
-					);
-				tr = Matrix::Identity() + tr_mI;
-				Tail_SMALLROUNDERR();
-#else
-				tr = Matrix::Identity() + 1. / 6 * fDx * (
-					K1 + 2. * K2 + 2. * K3 + K4
-					);
-				Tail();
-#endif
+			Matrix tr_mI = 1. / 6 * (K1 + 2. * K2 + 2. * K3 + K4);
+			Matrix tr = Matrix::Identity() + tr_mI;
+
+			Tail();
 		}
 
 	} else if (fMethod == SolverMethod::GaussLegendreO4) {
 
+		// K1 = A1(1 + a11*K1 + a12*K2)
+		// K2 = A2(1 + a21*K1 + a22*K2)
+		// K1 = (1 - A2 a22 - A1 a11 + (a22 a11-a12 a21)A2A1)^-1 (A1 - A2A1 a22 + A2A1 a12)
+		// K2 = (1 - A2 a22 - A1 a11 + (a22 a11-a12 a21)A1A2)^-1 (A2 - A1A2 a11 + A1A2 a21)
 		Real const a12 = 1. / 4 - sqrt(3) / 6;
 		Real const a21 = 1. / 4 + sqrt(3) / 6;
-		Real const BB = -a12 * fDx;
-		Real const CC = -a21 * fDx;
-		Real const FF = 1. / 16 * fDx*fDx - CC * BB;
+		Real const a11 = 1. / 4;
+		Real const a22 = 1. / 4;
+		Real const C2 = a22*a11 - a12*a21;
 
 		for (size_t i = 0; i < fNBins; ++i) {
-			Matrix tr;
 			Real a1 = e - vk * fV[2 * i];
 			Real a2 = e - vk * fV[2 * i + 1];
 
+			AntiDiagonalMatrix2<Real> A1(fDx, fDx*a1);
+			AntiDiagonalMatrix2<Real> A2(fDx, fDx*a2);
+			double dx2a1 = fDx*fDx*a1;
+			double dx2a2 = fDx*fDx*a2;
+			DiagonalMatrix2<Real> const A1A2(dx2a1, dx2a2);
+			DiagonalMatrix2<Real> const A2A1(dx2a2, dx2a1);
 
-			AntiDiagonalMatrix2<Real> A1;
-			A1(0, 1) = 1; A1(1, 0) = a1;
-			AntiDiagonalMatrix2<Real> A2;
-			A2(0, 1) = 1; A2(1, 0) = a2;
+			AntiDiagonalMatrix2<Real> T = a11*A1 + a22*A2;
+			Matrix K1 = A1 * (Matrix::Identity() + C2 * A2A1 - T).inverse() * (Matrix::Identity() + (a12 - a22)*A2);
+			Matrix K2 = A2 * (Matrix::Identity() + C2 * A1A2 - T).inverse() * (Matrix::Identity() + (a21 - a11)*A1);
 
-			AntiDiagonalMatrix2<Real> tmp = 0.25*fDx*(A1 + A2);
-			Matrix kk1 = A1 * (Matrix::Identity() - tmp + FF * A2 * A1).inverse() * (Matrix::Identity() - (1. / 4 * fDx + BB)*A2);
-			Matrix kk2 = A2 * (Matrix::Identity() - tmp + FF * A1 * A2).inverse() * (Matrix::Identity() - (1. / 4 * fDx + CC)*A1);
+			Matrix tr_mI = 0.5*(K1 + K2);
+			Matrix tr = Matrix::Identity() + tr_mI;
 
-#ifdef SMALL_ROUND_ERROR
-			Matrix tr_mI = fDx * 0.5*(kk1 + kk2);
-			tr = Matrix::Identity() + tr_mI;
-			Tail_SMALLROUNDERR();
-#else
-			Matrix tr_mI = fDx * 0.5*(kk1 + kk2);
-				tr = Matrix::Identity() + tr_mI;
-				//tr = Matrix::Identity() + fDx * 0.5*(kk1 + kk2);
-				Tail();
-#endif
+			Tail();
 		}
 	} else if (fMethod == SolverMethod::ExplicitRungeKuttaO6Luther1967) {
 
@@ -187,7 +178,7 @@ void SolverImpl1D:: LOOP_FUNC_NAME ()
 
 
 		for (size_t i = 0; i < fNBins; ++i) {
-			Matrix tr;
+
 			Real a1 = e - vk * fV[7 * i];
 			Real a2 = e - vk * fV[7 * i + 1];
 			Real a3 = e - vk * fV[7 * i + 2];
@@ -196,41 +187,30 @@ void SolverImpl1D:: LOOP_FUNC_NAME ()
 			Real a6 = e - vk * fV[7 * i + 5];
 			Real a7 = e - vk * fV[7 * i + 6];
 
-			AntiDiagonalMatrix2<Real> A1;
-			AntiDiagonalMatrix2<Real> A2;
-			AntiDiagonalMatrix2<Real> A3;
-			AntiDiagonalMatrix2<Real> A4;
-			AntiDiagonalMatrix2<Real> A5;
-			AntiDiagonalMatrix2<Real> A6;
-			AntiDiagonalMatrix2<Real> A7;
-			A1(0, 1) = 1; A1(1, 0) = a1;
-			A2(0, 1) = 1; A2(1, 0) = a2;
-			A3(0, 1) = 1; A3(1, 0) = a3;
-			A4(0, 1) = 1; A4(1, 0) = a4;
-			A5(0, 1) = 1; A5(1, 0) = a5;
-			A6(0, 1) = 1; A6(1, 0) = a6;
-			A7(0, 1) = 1; A7(1, 0) = a7;
+			AntiDiagonalMatrix2<Real> A1(fDx, a1*fDx);
+			AntiDiagonalMatrix2<Real> A2(fDx, a2*fDx);
+			AntiDiagonalMatrix2<Real> A3(fDx, a3*fDx);
+			AntiDiagonalMatrix2<Real> A4(fDx, a4*fDx);
+			AntiDiagonalMatrix2<Real> A5(fDx, a5*fDx);
+			AntiDiagonalMatrix2<Real> A6(fDx, a6*fDx);
+			AntiDiagonalMatrix2<Real> A7(fDx, a7*fDx);
 
+			AntiDiagonalMatrix2<Real> const &K1 = A1;
+			Matrix const K2 = A2 * (Matrix::Identity() + K1);
+			Matrix const K3 = A3 * (Matrix::Identity() + c31 * K1 + c32 * K2);
+			Matrix const K4 = A4 * (Matrix::Identity() + c41 * K1 + c42 * K2 + c43 * K3);
+			Matrix const K5 = A5 * (Matrix::Identity() + c51 * K1 + c52 * K2 + c53 * K3 + c54 * K4);
+			Matrix const K6 = A6 * (Matrix::Identity() + c61 * K1 + c62 * K2 + c63 * K3 + c64 * K4 + c65 * K5);
+			Matrix const K7 = A7 * (Matrix::Identity() + c71 * K1 + c72 * K2 + c73 * K3 + c74 * K4 + c75 * K5 + c76 * K6);
 
-			AntiDiagonalMatrix2<Real> K1 = fDx * A1;
-			Matrix K2 = fDx * A2 * (Matrix::Identity() + K1);
-			Matrix K3 = fDx * A3 * (Matrix::Identity() + c31 * K1 + c32 * K2);
-			Matrix K4 = fDx * A4 * (Matrix::Identity() + c41 * K1 + c42 * K2 + c43 * K3);
-			Matrix K5 = fDx * A5 * (Matrix::Identity() + c51 * K1 + c52 * K2 + c53 * K3 + c54 * K4);
-			Matrix K6 = fDx * A6 * (Matrix::Identity() + c61 * K1 + c62 * K2 + c63 * K3 + c64 * K4 + c65 * K5);
-			Matrix K7 = fDx * A7 * (Matrix::Identity() + c71 * K1 + c72 * K2 + c73 * K3 + c74 * K4 + c75 * K5 + c76 * K6);
-
-#ifdef SMALL_ROUND_ERROR
 			Matrix tr_mI = b1 * K1 + b3 * K3 + b5 * K5 + b6 * K6 + b7 * K7;
-			tr = Matrix::Identity() + tr_mI;
-			Tail_SMALLROUNDERR();
-#else
-			tr = Matrix::Identity() + b1 * K1 + b3 * K3 + b5 * K5 + b6 * K6 + b7 * K7;
+			Matrix tr = Matrix::Identity() + tr_mI;
+
 			Tail();
-#endif
 		}
 
 	}
+
 #ifdef SMALL_ROUND_ERROR
 	Matrix mat = big + little;
 #endif

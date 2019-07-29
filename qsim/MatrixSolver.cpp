@@ -23,7 +23,7 @@ void SparseMatrixSolver::Init(OptionsImpl const & opts)
 		Preconditioner prc = Preconditioner::DiagonalPreconditioner;
 
 		std::string prec_str;
-		if (opts.Get("preconditioner", prec_str)) {
+		if (opts.Get("matrix_preconditioner", prec_str)) {
 			if (prec_str == "DiagonalPreconditioner") {
 				prc = Preconditioner::DiagonalPreconditioner;
 			} else if (prec_str == "IdentityPreconditioner") {

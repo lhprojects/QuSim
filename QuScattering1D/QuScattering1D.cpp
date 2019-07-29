@@ -33,7 +33,7 @@ std::string & trim(std::string & str)
 
 struct Button : nana::button {
 	Button(nana::form &fm, std::string const &caption) : nana::button(fm, caption) {
-		edge_effects(false);
+		//edge_effects(false);
 	}
 };
 
@@ -173,19 +173,21 @@ struct WaveFunction1D : nana::panel<true> {
 
 };
 
-#if !defined(NDEBUG)
-int main()
-#else
+#if defined(_WIN32)
 #include <Windows.h>
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
+#else
+int main()
 #endif
 {
 	nana::form fm;
 	fm.caption("Scattering 1D");
 	fm.size(nana::size(1000, 600));
+	fm.bgcolor(nana::color(240, 240, 240));
+
 	//fm.bgcolor(nana::colors::white);
 	nana::label initWaveLabel(fm, "Intial Wave Function:");
 	nana::label energyLabel(fm, "Energy");
@@ -231,12 +233,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 	nana::place layout(fm);
-	char const *laystr = "vert gap=10 margin=[10,10,10,10]\
+	char const *laystr = "vert\
+<vert weight=180 gap=10 margin=[10,10,10,10]\
 <l1 weight=30 fit gap=5 arrange=[variable,variable,200,variable,100,variable,100]>\
 <l2 weight=30 fit gap=5 arrange=[variable,400]>\
 <l3 weight=30 fit gap=5 arrange=[variable,100,variable,100,variable,100,variable,100]>\
 <l4 weight=30 fit gap=5 arrange=[variable,variable,variable,120,120,110,variable,110,120]>\
 <l5 weight=30 fit gap=5 arrange=[variable,120,170,120]>\
+>\
 <l6>\
 ";
 	try {

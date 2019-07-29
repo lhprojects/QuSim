@@ -109,30 +109,34 @@ struct Options {
 		return *this;
 	}
 
+	// born series preconditioner
 	inline Options &VellekoopPreconditioner()
 	{
 		SetString("preconditioner", "Vellekoop");
 		return *this;
 	}
-
+	// born series preconditioner
 	inline Options &Hao1Preconditioner()
 	{
 		SetString("preconditioner", "Hao1");
 		return *this;
 	}
 
+	// born series preconditioner
 	inline Options &BornIdentityPreconditioner()
 	{
 		SetString("preconditioner", "BornIndentity");
 		return *this;
 	}
 
+	// born series preconditioner
 	inline Options &Hao2Preconditioner()
 	{
 		SetString("preconditioner", "Hao2");
 		return *this;
 	}
 
+	// born series preconditional ?
 	inline Options &Preconditional(bool v)
 	{
 		SetBool("preconditional", v);
@@ -195,20 +199,24 @@ struct Options {
 
 	inline Options &DiagonalPreconditioner()
 	{
-		SetString("preconditioner", "DiagonalPreconditioner");
+		SetString("matrix_preconditioner", "DiagonalPreconditioner");
 		return *this;
 	}
 
-
 	inline Options &IdentityPreconditioner()
 	{
-		SetString("preconditioner", "IdentityPreconditioner");
+		SetString("matrix_preconditioner", "IdentityPreconditioner");
 		return *this;
 	}
 
 	inline Options &IncompleteLUTPreconditioner()
 	{
-		SetString("preconditioner", "IncompleteLUT");
+		SetString("matrix_preconditioner", "IncompleteLUT");
+		return *this;
+	}
+
+	inline Options &PreferPreciseSmallWaveFunction(bool prefer = true) {
+		SetBool("PreferPreciseSmallWaveFunction", prefer);
 		return *this;
 	}
 
