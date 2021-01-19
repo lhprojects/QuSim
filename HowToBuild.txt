@@ -1,3 +1,8 @@
+0. download source and submodules
+```bash
+git submodule update
+```
+
 1. Build nana
 (1). Install Visual Studio.
 The VS2017 will work. Not tested, but VS2015/VS2019 should also work.
