@@ -21,7 +21,7 @@ if(NANA_CMAKE_NANA_FILESYSTEM_FORCE)
 
 elseif(NANA_CMAKE_STD_FILESYSTEM_FORCE)
     target_compile_definitions(nana PUBLIC STD_FILESYSTEM_FORCE)
-    target_link_libraries     (nana PUBLIC stdc++fs)
+    #target_link_libraries     (nana PUBLIC stdc++fs)
 
 elseif(NANA_CMAKE_BOOST_FILESYSTEM_FORCE)
     target_compile_definitions(nana PUBLIC BOOST_FILESYSTEM_FORCE)
@@ -43,7 +43,7 @@ elseif(NANA_CMAKE_BOOST_FILESYSTEM_FORCE)
 
 else()
     # todo   test for std    (for now just force nana or boost if there no std)
-    target_link_libraries     (nana PUBLIC stdc++fs)
+    # target_link_libraries     (nana PUBLIC stdc++fs)
 
     # todo if not test for boost
     # if not add nana filesystem

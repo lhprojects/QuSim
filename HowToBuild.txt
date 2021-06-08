@@ -1,33 +1,25 @@
-1. Build nana
-(1). Install Visual Studio.
-The VS2017 will work. Not tested, but VS2015/VS2019 should also work.
+I. Build with Cmake:
 
-(2). Open nana/build/VS2017/nana.sln
-Always use VS2017/nana.sln for all VS201X. It have been modified for this project. 
-You may need to change the SDK to the version you install.
-If you are using very new visual studio, for example, VS2017 15.9. You may need to remove NANA_FILESYSTEM_FORCE from the Property -> C/C++ -> Preprocessor -> Preprocessor Definitions.
-
-
-2. Build QuSim WITHOUT CUDA
 (1). Install Visual Studio
-The VS2017 will work. Not tested, but VS2015/VS2019 should also work.
+The VS2019 will work.
+VS2015/VS2017 should also work.
 
-(2). Open QuSim.sln
-You may need to change the SDK to the version you install.
+1. Build QuSim WITHOUT CUDA
 
+(1). Create & goto a new folder, e.g. <QuSim>/build
+(2). Invoke cmake, e.g. `cmake -S ../applications`
+(3). Open QuSim.sln
 
 2. Build QuSim WITH CUDA
-(1). Install Visual Studio 2017, 15.0
-version > 15.3 is not supported by CUDA 9.0
 
-(2). Install CUDA 9.0.
-If you have much experience of CUDA and Visual Studio. You can modify the project to support other Visual Studio and CUDA.
+(1). Install CUDA
+If you have much experience of CUDA and Visual Studio. You can modify the cmake to support other Visual Studio and CUDA.
+Your NVDIA GPU & NVDIA DRIVER version & CUDA version & Visual studio should be compatible with each other.
 
-(3). Open QuSim.sln
-You may need to change the SDK to the version you install.
+The following versions has been tested:
+3060Ti &NVDIA DRIVER(27.21.14.6172 In Device Manager or 466.?) & CUDA 11.0 & VS2019(Version 16.9.5)
 
-(4). Build project `CudaUtility`.
-
-(5). Add `cuda9.0.prop` to  Property Manager -> QuSimCore -> *CUDA|x64.
-
-(6). Build the other projects.
+Normally, newer GPU CARD require newer driver version require newer cuda version require newer visual studio version.
+(2). Create & goto a new folder, e.g. <QuSim>/build
+(3). Invoke cmake, e.g. `cmake -S ../applications -DUSE_CUDA=ON`
+(4). Open QuSim.sln
