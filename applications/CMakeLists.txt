@@ -7,15 +7,15 @@ if(USE_CUDA)
     add_compile_definitions(USE_CUDA)
 endif()
 
-
 message("Compiler: ${CMAKE_CXX_COMPILER_ID}")
 
-ADD_DEFINITIONS(-DUNICODE)
-ADD_DEFINITIONS(-D_UNICODE)
-SET(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+set (CMAKE_CXX_STANDARD 17)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_compile_options()
+    SET(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    ADD_DEFINITIONS(-DUNICODE)
+    ADD_DEFINITIONS(-D_UNICODE)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     add_compile_options(-Wfatal-errors -g -march=native)
 else()
@@ -23,7 +23,10 @@ else()
     add_link_options(-stdlib=libc++ -lc++abi -lc++ -lc++abi -lm -lc -lgcc_s -lgcc)
 endif()
 
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../third_party) # for eigen
+
 set(HEADER_FILES 
     ${CMAKE_CURRENT_SOURCE_DIR}/../include/*.h
 )

@@ -1,8 +1,12 @@
 I. Build with Cmake:
 
-(1). Install Visual Studio
-The VS2019 will work.
-VS2015/VS2017 should also work.
+(0). Install Visual Studio
+The VS2019 will work. VS2015/VS2017 should also work.
+
+(1). Download submodules.
+```bash
+git submodule update --init --recursive
+```
 
 1. Build QuSim WITHOUT CUDA
 
