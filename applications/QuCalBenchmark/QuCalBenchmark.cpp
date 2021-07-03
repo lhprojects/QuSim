@@ -1,12 +1,15 @@
 
 #include "../../src/Cal.h"
+#include "../QuBenchmark/Benchmark.h"
 #include <chrono>
 #include <functional>
+#include <utility>
 
 
 void test(char const *expr, std::function<CCom(CCom x, CCom y)> const &func)
 {
-	printf("benchmark for %s\n", expr);
+	begin_section(expr);
+
 	int niter = 10000000;
 
 	{
@@ -26,7 +29,7 @@ void test(char const *expr, std::function<CCom(CCom x, CCom y)> const &func)
 		//printf("%f\n", c);
 		auto t1 = std::chrono::high_resolution_clock::now();
 		auto d = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0);
-		printf("Cal: %f MCLPS\n", 1.0 * niter / d.count());
+		printf("class Cal: %f MCLPS\n", 1.0 * niter / d.count());
 
 	}
 
@@ -39,10 +42,11 @@ void test(char const *expr, std::function<CCom(CCom x, CCom y)> const &func)
 		//printf("%f\n", c);
 		auto t1 = std::chrono::high_resolution_clock::now();
 		auto d = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0);
-		printf("Native Code: %f MCLPS\n", 1.0*niter / d.count());
+		printf("Naive Code: %f MCLPS\n", 1.0*niter / d.count());
 
 	}
 
+	end_section();
 }
 int main()
 {

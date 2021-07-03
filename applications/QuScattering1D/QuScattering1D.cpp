@@ -86,25 +86,57 @@ struct WaveFunction1D : nana::panel<true> {
 		}
 	}
 
-	void DrawPotential(nana::paint::graphics &g, VectorView<double> const &pot) {
+
+	struct Legend {
+
+		int i = 0;
+		nana::color text_color;
+		nana::paint::graphics& g;
+
+		Legend(nana::paint::graphics& g) : g(g) {}
+
+		void Add(std::string const& str,
+			nana::color line_color)
+		{
+			int w = g.width();
+			g.line_begin(w - 100, 20 * i + 20);
+			g.line_to(nana::point(w - 80, 20 * i + 20), line_color);
+			g.string(nana::point(w - 70, 20 * i - 10 + 20), str, text_color);
+
+			++i;
+		}
+	};
+
+	void DrawPotential(nana::paint::graphics &g, 
+		VectorView<Complex> const &pot,
+		Legend &leg) {
 		if (pot.size() < 2) return;
 
 		int w = g.width();
 		int h = g.height();
 		using namespace nana;
-		std::vector<point> abc;
+		std::vector<point> pv;
+		std::vector<point> al;
 
 		for (int i = 0; i < w; i += 1) {
 			int xi = (int)((1.0 * i / w * (pot.size() - 1)));
-			int v = (int)(-abs(pot[xi]) * 100 + h / 2);
-			abc.push_back(point(i, v));
+            int v = (int)(-(+pot[xi].real()) * 100 + h / 2);
+            int a = (int)(-(-pot[xi].imag()) * 100 + h / 2);
+
+			pv.push_back(point(i, v));
+			al.push_back(point(i, a));
 		}
 
-		DrawLine(g, abc, color(0, 255, 255));
+		DrawLine(g, pv, color(0, 255, 0));
+		DrawLine(g, al, color(0, 0, 255));
+		leg.Add("Pot", color(0, 255, 0));
+		leg.Add("Absorb", color(0, 0, 255));
 
 	}
 
-	void DrawPsi(nana::paint::graphics &g, std::vector<Complex> const &psi) {
+	void DrawPsi(nana::paint::graphics &g,
+		std::vector<Complex> const &psi,
+		Legend &leg) {
 		if (psi.size() < 2) return;
 
 		int w = g.width();
@@ -113,7 +145,6 @@ struct WaveFunction1D : nana::panel<true> {
 		std::vector<point> abc;
 		std::vector<point> rec;
 		std::vector<point> imc;
-		std::vector<point> vc;
 
 		for (int i = 0; i < w; i += 1) {
 			int xi = (int)((1.0 * i / w * (psi.size() - 1)));
@@ -128,6 +159,10 @@ struct WaveFunction1D : nana::panel<true> {
 		DrawLine(g, abc, color(255, 0, 0));
 		DrawLine(g, rec, color(255, 0, 255));
 		DrawLine(g, imc, color(255, 255, 0));
+
+		leg.Add("Abs", color(255, 0, 0));
+		leg.Add("Real", color(255, 0, 255));
+		leg.Add("Imag", color(255, 255, 0));
 
 	}
 	
@@ -156,8 +191,11 @@ struct WaveFunction1D : nana::panel<true> {
 
 			g.line(point(0, height / 2), point(width, height / 2), txcolor);
 
+			Legend leg(g);
+			leg.text_color = color(255, 255, 255);
+
 			if (fShowPotential)
-				DrawPotential(g, fSolver->GetV());
+				DrawPotential(g, fSolver->GetV(), leg);
 			if (fShowWaveFunction) {
 				std::vector<Complex> psi(fSolver->GetPsi().begin(),
 					fSolver->GetPsi().end());
@@ -166,7 +204,7 @@ struct WaveFunction1D : nana::panel<true> {
 					for (int i = 0; i < (int)psi0.size(); ++i)
 						psi[i] += psi0(i);
 				}
-				DrawPsi(g, psi);
+				DrawPsi(g, psi, leg);
 			}
 		}
 	}
@@ -278,12 +316,12 @@ int main()
 	drawWaveFunction.check(true);
 	addInit.check(true);
 	drawPoential.check(true);
-	x0.caption("-100");
-	x1.caption("100");
-	bins.caption("1000");
+	x0.caption("-150");
+	x1.caption("150");
+	bins.caption("2000");
 	mass.caption("1");
 	hbar.caption("1");
-	energy.caption("1");
+	energy.caption("0.5");
 	dx.caption("1");
 
 	potential.caption("exp(-x*x)");

@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Perturbation2DImpl.h"
+#include "Utils.h"
 
 void QuPerturbation2DImpl::InitPerturbation2D(std::function<Complex(Real, Real)> const & v, Real x0,
 	Real x1, size_t nx, Real y0, Real y1, size_t ny, Real en, Real epsilon,
@@ -11,97 +12,72 @@ void QuPerturbation2DImpl::InitPerturbation2D(std::function<Complex(Real, Real)>
 		met, mass, hbar, opts);
 
 
-	fFourierTransformOptions.Init(opts);
-	fFFT.reset(FourierTransform2D::Create(fNy, fNx, false, fFourierTransformOptions.fLib));
-	fInvFFT.reset(FourierTransform2D::Create(fNy, fNx, true, fFourierTransformOptions.fLib));
-	const_cast<Real&>(fEpsilon) = epsilon;
-
-	fPsiK.resize(fNy*fNx);
-
-	fPsiX.setZero();
+	fFourierTransformOptions.Init(opts, fDeviceType);
+    fFFT.reset(FourierTransform2D::Create(fNx, fNy, false, fFourierTransformOptions.fLib));
+    fInvFFT.reset(FourierTransform2D::Create(fNx, fNy, true, fFourierTransformOptions.fLib));
+    InitPerturbationCommon(opts, epsilon, fN, fDevice.get());
 
 	if (fMet == SolverMethod::BornSerise) {
 
-		const_cast<int&>(fOrder) = (int)opts.GetInt("order", 1);
+		if (fPreconditional) {
 
-		fPerturbationOptions.Init(opts);
-		if (fPerturbationOptions.fPreconditional) {
+            {
+                Real lambda = QuCalLambda(fMass, fE, fHbar);
+                if (fNx * fDx < 24 * lambda) {
+                    throw std::runtime_error("too small size");
+                }
+                if (fNy * fDy < 24 * lambda) {
+                    throw std::runtime_error("too small size");
+                }
 
-			{
-				fVasb.resize(fNx*fNy);
-				Real lambda = 2 * Pi / (sqrt(2 * fMass*fE) / hbar);
-				if (fNx*fDx < 24 * lambda) {
-					throw std::runtime_error("too small size");
+                PerburbationUtility::GaussMAsbLayer2D(fNx, fNy, fDx, fDy,
+                    mutable_ptr_cast(fVHost),
+                    fHbar, mass, fE, 4.0);
+				if (!fDevice->OnMainMem()) {
+                    fDevice->ToDevice(mutable_ptr_cast(fV), fVHost, fN);
 				}
-				if (fNy*fDy < 24 * lambda) {
-					throw std::runtime_error("too small size");
-				}
-				PerburbationUtility::GaussAsbLayer2D(fNx, fNy, fDx, fDy,
-					fVasb.data(),
-					fHbar, mass, fE, 3.0);
 
-			}
+            }
 
-			PreconditionalBornSeries pbs;
-			pbs.GetEpsilon(epsilon, fPerturbationOptions.fPreconditioner, fNx*fNy, fV.data(), fVasb.data());
-			const_cast<Real&>(fEpsilon) = epsilon;
-
-			ftmp1.resize(fNx*fNy);
+            PreconditionalBornSeries pbs;
+            pbs.GetEpsilon(epsilon, fPreconditioner, fNx * fNy, fV, fDevice.get());
+            mutable_cast(fEpsilon) = epsilon;
 		}
 
 	} else {
 		throw std::runtime_error("not support method!");
 	}
-
-
-
 }
 
 void QuPerturbation2DImpl::Compute()
 {
-	auto X2K = [this](Complex const *psix, Complex *psik) {
-		fFFT->Transform(psix, psik);
-	};
+	fDevice->Copy(fLastPsiX, fPsiX, fN);
 
-	auto K2X = [this](Complex const *psik, Complex *psix) {
-		fInvFFT->Transform(psik, psix);
-		for (size_t i = 0; i < fNx; ++i) {
-			for (size_t j = 0; j < fNy; ++j) {
-				psix[Idx(j, i)] *= 1. / (fNx*fNy);
-			}
-		}
-	};
-
-	for (size_t i = 0; i < fNx*fNy; ++i) {
-		flastPsiX.data()[i] = fPsiX.data()[i];
-	}
-
-	if (fPerturbationOptions.fPreconditional) { // Preconditional Born serise
+	if (fPreconditional) { // Preconditional Born serise
 
 		PreconditionalBornSeries pbs;
 		for (int i = 0; i < fOrder; ++i) {
-			pbs.Update2D(fNx, fNy, fPsi0X.data(), fPsiX.data(), fPsiK.data(),
-				fV.data(), fVasb.data(), ftmp1.data(), fEpsilon, fE,
+			pbs.Update2D(fNx, fNy, fPsi0X, fPsiX, fPsiK,
+				fV, fTmpPsi, fEpsilon, fE,
 				fMass, fHbar, fDx, fDy,
-				X2K, K2X,
-				fPerturbationOptions.fSlow,
-				fPerturbationOptions.fPreconditioner);
+				fSlow,
+				fPreconditioner,
+				fFFT.get(), fInvFFT.get(), fDevice.get());
+		}
+		if (!fDevice->OnMainMem()) {
+			fDevice->ToHost(fPsiXHost, fPsiX, fN);
 		}
 
 	} else { // naive born serise
 		BornSeries bs;
-
 		for (int i = 0; i < fOrder; ++i) {
-			bs.Update2D(fNx, fNy, fPsi0X.data(), fPsiX.data(),
-				fPsiK.data(), fV.data(), fEpsilon, fE, fMass, fHbar, fDx, fDy,
-				X2K, K2X);
+			bs.Update2D(fNx, fNy, fPsi0X, fPsiX,
+				fPsiK, fV, fEpsilon, fE, fMass, fHbar, fDx, fDy,
+				fFFT.get(), fInvFFT.get(), fDevice.get());
 		}
 	}
 
-	Real norm = 0;
-	for (size_t i = 0; i < fNx * fNy; ++i) {
-		norm += abs2(fPsiX.data()[i] - flastPsiX.data()[i])*fDx*fDy;
-	}
-	norm = sqrt(norm);
-	fNormDeltaPsi = norm;
+	Real norm = fDevice->MinusNorm2(fPsiX, fLastPsiX, fN);
+	Real dfnorm = fDevice->Norm2(fPsiX, fN);
+	fNormDeltaPsi = sqrt(norm / dfnorm);
 }

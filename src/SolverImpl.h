@@ -27,10 +27,10 @@ struct SolverImpl1D : IVPSolverImpl {
 	void CalculateFinalJFromPsi();
 
 	std::function<Complex(Real)> fVFunc;
-	size_t fNPoints;
-	size_t fNBins;
-	Real fDx;
-	Real fX0;
+	size_t const fNPoints = 0;
+	size_t const fNBins = 0;
+	Real const fDx = 0;
+	Real const fX0 = 0;
 	Real fInitJ;
 	Real fFinalJ;
 	PsiVector fPsi;

@@ -1,10 +1,11 @@
 #pragma once
 #include "ScatteringSolverImpl.h"
 #include "MatrixSolver.h"
+#include "ScatteringProblemSolverInverseMatrix.h"
 
-struct ScatteringProblemSolverInverseMatrix1D : ScatteringSolver1DImpl {
+struct ScatteringProblemSolverInverseMatrix1D : ScatteringSolver1DImpl, InverseMatrixMethodCommon {
 
-	ScatteringProblemSolverInverseMatrix1D() : fSpaceOrder(), fMatrixSolver(), fPreferPreciseSmallWaveFunction() { }
+
 	void InitScatteringSolver1D(
 		std::function<Complex(Real)> const & v,
 		Real x0,
@@ -18,12 +19,6 @@ struct ScatteringProblemSolverInverseMatrix1D : ScatteringSolver1DImpl {
 		OptionsImpl const &opts) override;
 
 	void Compute() override;
-
-	SparseMatrixSolver fMatrixSolver;
-	int const fSpaceOrder;
-	bool const fPreferPreciseSmallWaveFunction;
-	std::vector<double> const fVabs;
-	Eigen::SparseMatrix<Complex> fEMinusH;
 
 
 

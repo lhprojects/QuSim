@@ -9,11 +9,7 @@
 
 #include <memory>
 
-struct QuPerturbation3DImpl : ScatteringSolver3DImpl {
-
-	QuPerturbation3DImpl() : fEpsilon(), fOrder()
-	{
-	}
+struct QuPerturbation3DImpl : ScatteringSolver3DImpl, PerturbationCommon {
 
 	virtual void InitPerturbation3D(
 		std::function<Complex(Real, Real, Real)> const & v,
@@ -43,15 +39,7 @@ struct QuPerturbation3DImpl : ScatteringSolver3DImpl {
 	std::shared_ptr<FourierTransform3D> fFFT;
 	std::shared_ptr<FourierTransform3D> fInvFFT;
 
-	PerturbationOptions fPerturbationOptions;
-	int const fOrder;
-	Real const fEpsilon;
-	PsiVector fPsiK;
 
-
-	std::vector<Real> fVasb;
 	Real fNormDeltaPsi;
-	PsiVector ftmp1;
-	PsiVector ftmp2;
 
 };

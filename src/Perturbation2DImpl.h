@@ -8,10 +8,7 @@
 #include "PerturbationOptions.h"
 #include <memory>
 
-struct QuPerturbation2DImpl : ScatteringSolver2DImpl {
-
-	QuPerturbation2DImpl() : fEpsilon(), fOrder() {
-	}
+struct QuPerturbation2DImpl : ScatteringSolver2DImpl, PerturbationCommon {
 
 	virtual void InitPerturbation2D(
 		std::function<Complex(Real, Real)> const & v,
@@ -37,15 +34,5 @@ struct QuPerturbation2DImpl : ScatteringSolver2DImpl {
 	std::shared_ptr<FourierTransform2D> fFFT;
 	std::shared_ptr<FourierTransform2D> fInvFFT;
 
-	PerturbationOptions fPerturbationOptions;
-	int const fOrder;
-	Real const fEpsilon;
-	PsiVector fPsiK;
-
-
-	std::vector<Real> fVasb;
-
-	PsiVector ftmp1;
-	PsiVector ftmp2;
 
 };

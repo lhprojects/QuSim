@@ -6,50 +6,43 @@
 #include "FourierTransform.h"
 #include "FourierTransformOptions.h"
 
-struct SplittingMethod2D : EvolverImpl2D {
-	
+struct SplittingMethod2D : QuEvolver2DImpl
+{
+	ComplexType const* const fExpVDt_0D5 = nullptr;     // exp(-I V dt)
+	ComplexType const* const fExpVDt_C1 = nullptr;      // exp(-I V dt)
+	ComplexType const* const fExpVDt_C2 = nullptr;      // exp(-I V dt)
 
-	Eigen::MatrixXcd fExpV0Dot5Dt;
-	Eigen::MatrixXcd fExpTDt;
-	Eigen::MatrixXcd fExpTD1Dt;
-	Eigen::MatrixXcd fExpTD2Dt;
-	Eigen::MatrixXcd fVPsi;
-	Eigen::MatrixXcd fTVPsi;
-	Eigen::MatrixXcd fVTVPsi;
-	Real fD1;
-	Real fD2;
+	ComplexType const* const fExpTDt = nullptr;         // exp(-I T dt)
+	ComplexType const* const fExpTDt_D1 = nullptr;      // exp(-I T dt)
+	ComplexType const* const fExpTDt_D2 = nullptr;      // exp(-I T dt)
+
+	bool fCacheExp = true;
 
 	// period only
-	mutable Eigen::MatrixXcd fFTPsi;
+	mutable Complex *fFTPsi;
 	mutable Eigen::VectorXcd fPsiYIn;
 	mutable Eigen::VectorXcd fPsiYOut;
 	FourierTransformOptions fFourierTransformOptions;
 	std::shared_ptr<FourierTransform2D > fft;
 	std::shared_ptr<FourierTransform2D > inv_fft;
 
-
-	SplittingMethod2D()
-	{
-		fNx = 0;
-		fNy = 0;
-	}
-
-	void initSystem2D(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
+	void InitSystem2D(std::function<Complex(Real, Real)> const &psi,
+		bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		std::function<Complex(Real, Real)> const &vs, Real x0, Real x1, size_t nx,
 		Real y0, Real y1, size_t ny,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar, OptionsImpl const &opts) override;
 
-	void update_psi() override;
+	void UpdatePsi() override;
 	Real CalKinEn() const override;
 
 private:
-	void initExpV();
-	void initExpT();
-	// vpsi = exp(-i/hbar V Dt) psi
-	void ExpV(Eigen::MatrixXcd &vpsi, Eigen::MatrixXcd const &psi, Real t);
-	void ExpT(Eigen::MatrixXcd &tpsi, Eigen::MatrixXcd const &psi, Real tt);
+	void InitExpV();
+	void InitExpT();
+public:
+	void ExpV(ComplexType *psi, RealType tt) const;
+	void ExpT(ComplexType* psi, RealType tt) const;
 
 
 };

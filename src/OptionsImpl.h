@@ -65,8 +65,6 @@ struct OptionsImpl {
     template<class V>
     std::remove_cv_t< std::remove_reference_t<V> > Get(std::string const& k) const;
 
-    template<class V>
-    bool Get(std::string const& k, V& v) const;
 
     bool Contains(std::string const& k) const;
 
@@ -77,6 +75,10 @@ struct OptionsImpl {
         return this->GetDefault_<PureType>(k, std::forward<V>(v));
     }
 
+    // return true, if we have the key and the type is right
+    // note `int a; Get("", a)` may have linking error, if the `int` is not the same the `Int`
+    template<class V>
+    bool Get(std::string const& k, V& v) const;
 private:
 
     template<class PureType>

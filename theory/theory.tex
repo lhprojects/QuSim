@@ -400,19 +400,6 @@ Let's discuss the solution of Eq. \ref{eq:scattering_abs} and Eq. \ref{eq:scatte
 Finally we can conclude the scattering solution is found.
 
 
-In theory side. Often a homogenous absorbtion layer $-I\epsilon$ are added. The solution of plane wave function is
-The equation will be
-\begin{align}
-(E - V + I\epsilon -(-\hbar^2/2m)\nabla^2)\Delta\psi &= V\psi_0\\
-\text{what ever boundary condition}
-\end{align}
-It looks like adding $I\epsilon$ to energy. The solution is
-$$
-e^{I k_\text{complex} x}, k_\text{complex} = \sqrt{2m(E+I\epsilon)}/\hbar =  p(1+1/2\epsilon/E)
-$$
-The absorbtion will overlap with potential. we need the absorbtion layer is thin enough, and thus the wave function will not be absorbed much in potential region. However, we need also the size of space large enough to let wave function to be absorbed at the boundary.
-Four numerical computation, we need $$pL_\text{potential} \epsilon/E \ll 1,$$ $$ p L_\text{space}\epsilon/E \gg 1.$$
-For theory treatment, we need $L_\text{space}\rightarrow \infty$ \textbf{then} $\epsilon \rightarrow 0$. just as theorists did.
 
 \subsection{Inverse Matrix Method}
 To solve the Eq. \ref{eq:scattering_abs}. We can descries the space, and inverse the spare matrix directly. We call this method Inverse matrix method.
@@ -433,40 +420,71 @@ We can overcome the problem. by rewrite Eq. \ref{eq:scattering_abs} to
 \end{align}
 It is obvious that the plane wave solution is $0$ for $V_\text{abs} = 0$. But now problem arise. We just can not decries the $\Delta\psi$ precisely at the boundary. And we will has more reflection due to round error and discrete error.
 
-\subsection{Born Series}
-We can think the potential is a perturbation of free system.
-
-In the naive born series, I want to simulate the way theorist did. We use the iterative solution
-$$
-(E + I\epsilon-(-\hbar^2/2m)\nabla^2)\Delta\psi = V(\psi_0 + V\Delta \psi)
-$$
-In theoretical treatment, we calculate the $\psi$ analytically and let $\epsilon \rightarrow 0$ in the final state.
-In numerical treatment, we require
-$$pL_\text{potential} \epsilon/E \ll 1,$$ $$ p L_\text{space}\epsilon/E \gg 1.$$
-The precision of this method is quite limited, since if we want $\epsilon$ to be sufficiently small, we need the size of space to be extremal large.
 
 
-To reduce the size of space, we need the absorbtion layer. We can write down the iterative solution
+
+\subsection{Perturbation}
+We can think the potential is a perturbation of the free system.
+
+
+\subsubsection{Naive Born seriers}
+In the naive born series, I want to simulate the way theorist did.
+A homogenous absorbtion potential $-I\epsilon$ are added to the left ride of equation.
+We will not add the absorbtion potential because we though the $V\psi_0$ to the as a single term as the source.
+The equation is
 $$
-(E -(-\hbar^2/2m)\nabla^2)\Delta\psi = V\psi_0 + (V+V_\text{abs})\Delta \psi
+(E -V + I\epsilon - (-\hbar^2/2m)\nabla^2)\Delta\psi \approx V\psi_0
 $$
-However, the left side is not invertible, we add additional absorbtion term $-I\epsilon$, too keep equation exact. we need add this term on the right side too.
+The iterative solution is
+
+\begin{align}
+(E + I\epsilon -(-\hbar^2/2m)\nabla^2)\Delta\psi &= V(\psi_0 + \Delta\psi)
+\end{align}
+
+It looks like adding $I\epsilon$ to energy. The solution is
 $$
-(E + I\epsilon-(-\hbar^2/2m)\nabla^2)\Delta\psi = V\psi_0 + (V+V_\text{abs} + I\epsilon)\Delta \psi
+e^{I k_\text{c} x}, k_\text{c} = \sqrt{2m(E+I\epsilon)}/\hbar =  k(1+(1/2)\epsilon/E)
 $$
-The $\epsilon$ need not be very small. and It should not be very small. so that the left side can be invertible.
+The absorbtion will overlap with potential. we need the absorbtion layer is thin enough, and thus the wave function will not be absorbed much in potential region. However, we need also the size of space large enough to let wave function to be absorbed at the boundary.
+
+In theoretical treatment, we calculate the $\Delta\psi$ analytically with $L_{\rm space}=+\infty$ and finite $\epsilon$.
+\textbf{Then} let $\epsilon \rightarrow 0$ in the final of the calculation. 
+
+Four numerical computation, we need $$kL_\text{potential} \epsilon/E \ll 1,$$ $$ k L_\text{space}\epsilon/E \gg 1.$$
 Let's define
 $$
 G_0 = (E + I\epsilon-(-\hbar^2/2m)\nabla^2)^{-1}
 $$
-The inverse can be done in momentum space.
 Thus
 $$
-\Delta\psi = G_0(V\psi_0 + (V+V_\text{abs} + I\epsilon)\Delta \psi)
+\Delta\psi \approx G_0(V\psi_0 + V\Delta \psi)
 $$
 
+
+
+
 \subsubsection{Preconditioner}
-But this expression may not converge. The trick here is that we use a mix of new $\Delta \psi$ and the old $\Delta \psi$.
+
+In the Naive Born seriers, the precision is limited by the finite size of $\epsilon$.
+We want $\epsilon$ can be sufficiently small, however this need the size of space to be extremal large. To reduce the size of space,
+we need the absorbtion layer at the boundary.
+
+We rewrite the equation as
+\begin{equation}
+(E - (-\hbar^2/2m)\nabla^2)\Delta\psi = V\psi_0 + (V + I V_\text{abs})\Delta \psi
+\end{equation}
+To let term in $()$ invertable numerically, we add the $I\epsilon\Delta\psi$ term to both side of the equation
+$$
+(E + I \epsilon - (-\hbar^2/2m)\nabla^2)\Delta\psi = V\psi_0 + (V + I V_\text{abs} + I \epsilon)\Delta \psi
+$$
+
+The $\epsilon$ need not be very small. and It should not be very small. so that the left side can be invertible. Thus
+$$
+\Delta\psi = G_0(V\psi_0 + (V+I V_\text{abs} + I\epsilon)\Delta \psi)
+$$
+
+
+But this iterative solution may not converge. The trick here is that we use a mix of new $\Delta \psi$ and the old $\Delta \psi$.
 $$\Delta\psi = \gamma(x) G_0(V\psi_0 + (V+IV_\text{abs} + I\epsilon)\Delta \psi) + (1-\gamma(x))\Delta \psi$$
 It is obviously the fix-point don't change. for a bias $\delta\psi$ of $\Delta\psi$. then the update equation of $\delta\psi$ is
 $$
@@ -852,17 +870,29 @@ j=0..N-1
 $$
 
 $$
-k=1...N-1
+k=0...N-1
 $$
 
 Eigen value
 $$
-E_k = k\pi/(N a)
+p_k = k\pi/(N a)
 $$
 
 $$
 \sum_j \psi_j(k)\psi_j(k) = N/2
 $$
+
+$$
+\sum_j \psi_j(k)\psi_j(k) = 
+\sum_{0 \le j<N}\sin^2(jk\pi/N)
+=\sum_{0\le j<N}1/2(1-\cos(2jk\pi/N))
+=N/2
+$$
+
+$$
+\sum_j \psi_j(k_1)\psi_j(k_2) = \delta_{k1,k2} N/2
+$$
+
 
 $$
 \Psi(j) = \sum_{k=1}^{N-1} \Phi(k) \psi_k(j)
@@ -885,7 +915,12 @@ $$
 $$
 
 $$
-\Phi(k) = \frac{1}{Ni}\left(\sum_j^{N-1} \Psi(j)\exp(ijk2\pi/2N) - \sum_{N+1}^{2N} \Psi(2N-j)\exp(jk2\pi/2N))\right)
+\Phi(k) = \frac{1}{Ni}\left(\sum_j^{N-1} \Psi(j)\exp(ijk2\pi/2N) - \sum_{j=N+1}^{2N} \Psi(2N-j)\exp(jk2\pi/2N))\right)
+$$
+
+by
+$$
+\Phi(0)=0
 $$
 
 by define
@@ -912,7 +947,7 @@ $$
 $$
 
 $$
-\Phi(k) = \frac{1}{Ni} {\rm inv fft}(2N, \Psi^\prime(j), k)
+\Phi(k) = \frac{1}{iN} {\rm inv fft}(2N, \Psi^\prime(j), k)
 $$
 
 
@@ -921,6 +956,6 @@ $$
 $$
 
 $$
-\Psi(j) = \frac{1}{2i} {\rm inv fft}(2N, \Phi^\prime(k), j)
+\Psi(j) = \frac{}{2i} {\rm inv fft}(2N, \Phi^\prime(k), j)
 $$
 \end{document}

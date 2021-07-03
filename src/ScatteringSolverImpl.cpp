@@ -1,11 +1,29 @@
 #include "ScatteringSolverImpl.h"
+#include "Utils.h"
+#include "DeviceType.h"
+void ScatteringSolverImpl::InitScatteringSolver(Real en, SolverMethod met, Real mass, Real hbar, size_t n,
+	OptionsImpl const& opts)
+{
+
+	const_cast<Real&>(fE) = en;
+	const_cast<SolverMethod&>(fMet) = met;
+	const_cast<Real&>(fMass) = mass;
+	const_cast<Real&>(fHbar) = hbar;
+	const_cast<OptionsImpl&>(fOpts) = opts;
+	mutable_cast(fN) = n;
+	const_cast<Real&>(fK0) = sqrt(2 * fMass * fE) / fHbar;
+
+    mutable_cast(fDeviceType) = GetDeviceType(opts);
+    mutable_cast(fDevice) = Device::Create(fDeviceType);
+}
 
 void ScatteringSolver1DImpl::InitScatteringSolver1D(std::function<Complex(Real)> const & v,
 	Real x0, Real x1, size_t n, Real en, Real direction,
 	SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
 {
-	InitScatteringSolver(en, met, mass, hbar, opts);
+	InitScatteringSolver(en, met, mass, hbar, n, opts);
 
+	mutable_cast(fN) = n;
 	const_cast<size_t&>(fNx) = n;
 	const_cast<Real&>(fX0) = x0;
 	const_cast<Real&>(fDx) = (x1 - x0) / n;
@@ -16,21 +34,17 @@ void ScatteringSolver1DImpl::InitScatteringSolver1D(std::function<Complex(Real)>
 	const_cast<Real&>(fK0) = sqrt(2 * fMass * fE) / fHbar;
 
 	InitPotential();
-
-	const_cast<PsiVector&>(fPsi0X).resize(fNx);
-	for (size_t i = 0; i < fNx; ++i) {
-		const_cast<PsiVector&>(fPsi0X)[i] = exp(fDirection * fK0 * GetX(i) * I);
-	}
-	fPsiX.resize(fNx);
+	InitPsi();
 }
 
 void ScatteringSolver1DImpl::ComputeRT() {
 	// calculate in real space
+
 	Complex r = 0;
 	Complex t = 0;
 	for (size_t i = 0; i < fNx; ++i) {
-		r += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(I * (-fDirection*fK0)*(-GetX(i)));
-		t += (fPsi0X[i] + fPsiX[i])*fV[i] * exp(I * (+fDirection*fK0)*(-GetX(i)));
+		r += (fPsi0X[i] + fPsiX[i])*fV[i].real() * exp(I * (-fDirection*fK0)*(-GetX(i)));
+		t += (fPsi0X[i] + fPsiX[i])*fV[i].real() * exp(I * (+fDirection*fK0)*(-GetX(i)));
 	}
 	fR = abs2(r*fDx*fMass / (fHbar*fHbar*std::abs(fK0) * I));
 	fT = abs2(t*fDx*fMass / (fHbar*fHbar*std::abs(fK0) * I) + Complex(1, 0));
@@ -38,15 +52,26 @@ void ScatteringSolver1DImpl::ComputeRT() {
 
 void ScatteringSolver1DImpl::InitPotential()
 {
-	const_cast<std::vector<Real>&>(fV).resize(fNx);
+	mutable_cast(fV) = fDevice->Alloc<Complex>(fNx);
 
-	for (size_t i = 0; i < fNx; ++i) {
-		Real x = GetX(i);
-		Complex com = fVFunc(x);
-		const_cast<std::vector<Real>&>(fV)[i] = com.real();
-
-	}
+	for_each_global_idx(fX0, fDx, fNx,
+        [&, v = mutable_ptr_cast(fV)](size_t idx, Real x) {
+        v[idx] = fVFunc(x);
+	});
 }
+
+void ScatteringSolver1DImpl::InitPsi()
+{
+	mutable_cast(fPsi0X) = fDevice->Alloc<Complex>(fNx);
+	mutable_cast(fPsiX) = fDevice->Alloc<Complex>(fNx);
+
+	for_each_global_idx(fX0, fDx, fNx,
+		[psi0 = mutable_ptr_cast(fPsi0X), dir=fDirection, kx = fK0](size_t idx, Real x) {
+		psi0[idx] = exp(dir *kx * x * I);
+	});
+
+}
+
 
 
 
@@ -58,7 +83,7 @@ void ScatteringSolver2DImpl::InitScatteringSolver2D(std::function<Complex(Real, 
 	Real directiony,
 	SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
 {
-	InitScatteringSolver(en, met, mass, hbar, opts);
+	InitScatteringSolver(en, met, mass, hbar, nx * ny, opts);
 
 	const_cast<size_t&>(fNx) = nx;
 	const_cast<size_t&>(fNy) = ny;
@@ -67,40 +92,71 @@ void ScatteringSolver2DImpl::InitScatteringSolver2D(std::function<Complex(Real, 
 	const_cast<Real&>(fDx) = (x1 - x0) / nx;
 	const_cast<Real&>(fDy) = (y1 - y0) / ny;
 	const_cast<std::function<Complex(Real, Real)>&>(fVFunc) = v;
+
 	{
 		Real const nm = 1 / sqrt(directionx*directionx + directiony * directiony);
 		directionx *= nm;
 		directiony *= nm;
 	}
-	const_cast<Real&>(fK0X) = fK0 * directionx;
-	const_cast<Real&>(fK0Y) = fK0 * directiony;
 
-	InitPotential();
+	mutable_cast(fK0X) = fK0 * directionx;
+	mutable_cast(fK0Y) = fK0 * directiony;
 
-	const_cast<Eigen::MatrixXcd&>(fPsi0X).resize(fNy, fNx);
-	for (size_t i = 0; i < fNx; ++i) {
-		for (size_t j = 0; j < fNy; ++j) {
-			const_cast<Eigen::MatrixXcd&>(fPsi0X)(j, i) = exp((fK0X * GetX(i) + fK0Y * GetY(j)) * I);
-		}
-	}
-	fPsiX.resize(fNy, fNx);
-	flastPsiX.resize(fNy, fNx);
+    InitPotential();
+    InitPsi();
+
+	mutable_cast(fLastPsiX) = fDevice->Alloc<ComplexType>(fN);
 	fNormDeltaPsi = 0;
 }
 
 void ScatteringSolver2DImpl::InitPotential()
 {
-	const_cast<Eigen::MatrixXd&>(fV).resize(fNy, fNx);
+	mutable_cast(fV) = fDevice->Alloc<ComplexType>(fN);
+	if (fDevice->OnMainMem()) {
+        mutable_cast(fVHost) = fV;
+    } else {
+        mutable_cast(fVHost) = (ComplexType*)malloc(sizeof(ComplexType) * fN);
+	}
 
-	for (size_t i = 0; i < fNx; ++i) {
-		for (size_t j = 0; j < fNy; ++j) {
-			Real x = GetX(i);
-			Real y = GetY(j);
-			Complex com = fVFunc(x, y);
-			const_cast<Eigen::MatrixXd&>(fV)(j, i) = com.real();
-		}
+	for_each_global_idx(fX0, fDx, fNx,
+		fY0, fDy, fNy,
+        [&, v = mutable_ptr_cast(fVHost)](size_t idx, Real x, Real y) {
+        v[idx] = fVFunc(x, y);
+	});
+
+	if (!fDevice->OnMainMem()) {
+		fDevice->ToDevice(mutable_ptr_cast(fV), fVHost, fN);
 	}
 }
+
+void ScatteringSolver2DImpl::InitPsi()
+{
+	mutable_cast(fPsi0X) = fDevice->Alloc<ComplexType>(fN);
+	mutable_cast(fPsiX) = fDevice->Alloc<ComplexType>(fN);
+
+	if (!fDevice->OnMainMem()) {
+        mutable_cast(fPsi0XHost) = (ComplexType*)malloc(sizeof(ComplexType) * fN);
+        mutable_cast(fPsiXHost) = (ComplexType*)malloc(sizeof(ComplexType) * fN);
+	} else {
+        mutable_cast(fPsi0XHost) = fPsi0X;
+        mutable_cast(fPsiXHost) = fPsiX;
+	}
+
+    for_each_global_idx(fX0, fDx, fNx,
+        fY0, fDy, fNy,
+        [psi0 = mutable_ptr_cast(fPsi0XHost), kx = fK0X, ky = fK0Y]
+    (size_t idx, Real x, Real y) {
+        psi0[idx] = exp((kx * x + ky * y) * I);
+    });
+
+    memset(fPsiXHost, 0, sizeof(ComplexType) * fN);
+
+	if (!fDevice->OnMainMem()) {
+		fDevice->ToDevice(mutable_ptr_cast(fPsi0X), fPsi0XHost, fN);
+		fDevice->ToDevice(fPsiX, fPsiXHost, fN);
+	}
+}
+
 
 Real ScatteringSolver2DImpl::ComputeXSection(Real cosx, Real cosy)
 {
@@ -117,14 +173,16 @@ Real ScatteringSolver2DImpl::ComputeXSection(Real cosx, Real cosy)
 	// (1st kind Hankel, alpha = 0)(z) ~ sqrt(2/(Pi z)) exp(i k z)
 	//     => : delta psi  = \int psi v exp(i k r)  [(2m / hbar^2)  1/4 sqrt(2/(Pi k r))] dx dy
 
-	for (size_t i = 0; i < fNx; ++i) {
-		for (size_t j = 0; j < fNy; ++j) {
-			r += (fPsi0X(j, i) + fPsiX(j, i))
-				*fV(j, i)
-				* exp(-I * (fK0 * cosx * GetX(i) + fK0 * cosy * GetY(j)));
-		}
-	}
+	Real const kx = fK0 * cosx;
+	Real const ky = fK0 * cosy;
 
+	ForEach2DGrid(fX0, fDx, fNx,
+		fY0, fDy, fNy,
+		[&, kx, ky](size_t idx, size_t, size_t, Real x, Real y) {
+
+            r += (fPsi0X[idx] + fPsiX[idx]) * fV[idx].real() * exp(-I * (kx * x + ky * y));
+
+	});
 	Real dX_dTheta = abs2(r*(2 * fMass) / (fHbar*fHbar)*fDx*fDy*(1. / 4))*(2 / (Pi * fK0));
 
 	return dX_dTheta;
@@ -155,18 +213,19 @@ void ScatteringSolver3DImpl::InitScatteringSolver3D(std::function<Complex(Real, 
 	Real directionx, Real directiony, Real directionz,
 	SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
 {
-	InitScatteringSolver(en, met, mass, hbar, opts);
+	InitScatteringSolver(en, met, mass, hbar, nx*ny*nz, opts);
 
-	const_cast<size_t&>(fNx) = nx;
-	const_cast<size_t&>(fNy) = ny;
-	const_cast<size_t&>(fNz) = nz;
-	const_cast<Real&>(fX0) = x0;
-	const_cast<Real&>(fY0) = y0;
-	const_cast<Real&>(fZ0) = z0;
-	const_cast<Real&>(fDx) = (x1 - x0) / nx;
-	const_cast<Real&>(fDy) = (y1 - y0) / ny;
-	const_cast<Real&>(fDz) = (z1 - z0) / nz;
-	const_cast<std::function<Complex(Real, Real, Real)>&>(fVFunc) = v;
+    const_cast<size_t&>(fNx) = nx;
+    const_cast<size_t&>(fNy) = ny;
+    const_cast<size_t&>(fNz) = nz;
+    const_cast<Real&>(fX0) = x0;
+    const_cast<Real&>(fY0) = y0;
+    const_cast<Real&>(fZ0) = z0;
+    const_cast<Real&>(fDx) = (x1 - x0) / nx;
+    const_cast<Real&>(fDy) = (y1 - y0) / ny;
+    const_cast<Real&>(fDz) = (z1 - z0) / nz;
+    const_cast<std::function<Complex(Real, Real, Real)>&>(fVFunc) = v;
+
 	{
 		Real const nm = 1 / sqrt(directionx * directionx + directiony * directiony + directionz * directionz);
 		directionx *= nm;
@@ -178,39 +237,74 @@ void ScatteringSolver3DImpl::InitScatteringSolver3D(std::function<Complex(Real, 
 	const_cast<Real&>(fK0Z) = fK0 * directionz;
 
 	InitPotential();
-
-	const_cast<Eigen::VectorXcd&>(fPsi0X).resize(fNz*fNy*fNx);
-	const_cast<Eigen::VectorXcd&>(fPsiX).resize(fNz*fNy*fNx);
-	if(fLastPsiXRecord) fLastPsiX.resize(fNx*fNy*fNz);
-
-	for (size_t i = 0; i < fNx; ++i) {
-		for (size_t j = 0; j < fNy; ++j) {
-			for (size_t k = 0; k < fNz; ++k) {
-				const_cast<Eigen::VectorXcd&>(fPsi0X)(Idx(k, j, i))
-					= exp((fK0X * GetX(i) + fK0Y * GetY(j) + fK0Z * GetZ(k)) * I);
-				const_cast<Eigen::VectorXcd&>(fPsiX)(Idx(k, j, i)) = 0;
-			}
-		}
-	}
+	InitPsi();
 }
 
 void ScatteringSolver3DImpl::InitPotential()
 {
-	const_cast<Eigen::VectorXd& >(fV).resize(fNx*fNy*fNz);
+	mutable_cast(fV) = fDevice->Alloc<ComplexType>(fN);
+	if (fDevice->OnMainMem()) {
+		mutable_cast(fVHost) = fV;
+	} else {
+		mutable_cast(fVHost) = (ComplexType*)malloc(sizeof(ComplexType) * fN);
+	}
 
-	for (size_t i = 0; i < fNx; ++i) {
-		for (size_t j = 0; j < fNy; ++j) {
-			for (size_t k = 0; k < fNz; ++k) {
-				Real x = GetX(i);
-				Real y = GetX(j);
-				Real z = GetX(k);
-				ptrdiff_t idx = Idx(k, j, i);
-				Complex com = fVFunc(x, y, z);
-				const_cast<Eigen::VectorXd& >(fV)(idx) = com.real();
-			}
-		}
+	for_each_global_idx(fX0, fDx, fNx,
+		fY0, fDy, fNy,
+		fZ0, fDz, fNz,
+		[&, v = mutable_ptr_cast(fVHost)](size_t idx, Real x, Real y, Real z) {
+			v[idx] = fVFunc(x, y, z);
+	});
+
+	if (!fDevice->OnMainMem()) {
+		fDevice->ToDevice(mutable_ptr_cast(fV), fVHost, fN);
 	}
 }
+
+void ScatteringSolver3DImpl::InitPsi()
+{
+#if 1
+	mutable_cast(fPsi0X) = fDevice->Alloc<ComplexType>(fN);
+#endif
+	mutable_cast(fPsiX) = fDevice->Alloc<ComplexType>(fN);
+
+	if (!fDevice->OnMainMem()) {
+#if 1
+		mutable_cast(fPsi0XHost) = (ComplexType*)malloc(sizeof(ComplexType) * fN);
+#endif
+		mutable_cast(fPsiXHost) = (ComplexType*)malloc(sizeof(ComplexType) * fN);
+	} else {
+#if 1
+		mutable_cast(fPsi0XHost) = fPsi0X;
+#endif
+		mutable_cast(fPsiXHost) = fPsiX;
+	}
+
+#if 1
+	for_each_global_idx(fX0, fDx, fNx,
+		fY0, fDy, fNy,
+		fZ0, fDz, fNz,
+		[&, psi0 = mutable_ptr_cast(fPsi0XHost), kx = fK0X, ky = fK0Y, kz = fK0Z]
+		(size_t idx, Real x, Real y, Real z) {
+		psi0[idx] = exp((kx*x + ky*y + kz*z)*I);
+	});
+#endif
+
+	memset(fPsiXHost, 0, sizeof(ComplexType) * fN);
+
+    if (!fDevice->OnMainMem()) {
+#if 1
+        fDevice->ToDevice(mutable_ptr_cast(fPsi0X), fPsi0XHost, fN);
+#endif
+        fDevice->ToDevice(fPsiX, fPsiXHost, fN);
+    }
+
+	if (fLastPsiXRecord) {
+		mutable_cast(fLastPsiX) = fDevice->Alloc<ComplexType>(fN);
+		fDevice->SetZero(mutable_ptr_cast(fLastPsiX), fN);
+	}
+}
+
 
 
 Real ScatteringSolver3DImpl::ComputeXSection(Real cosx, Real cosy, Real cosz)
@@ -228,18 +322,33 @@ Real ScatteringSolver3DImpl::ComputeXSection(Real cosx, Real cosy, Real cosz)
 	// G = 1/(4 Pi) exp(i k z) / z
 	//     => : delta psi  = \int psi v exp(i k r) / r   1/(4 Pi) * [(2m / hbar^2) dx dy dz
 
-	for (size_t i = 0; i < fNx; ++i) {
-		for (size_t j = 0; j < fNy; ++j) {
-			for (size_t k = 0; k < fNz; ++k) {
-				r += (fPsi0X(Idx(k, j, i)) + fPsiX(Idx(k, j, i)))
-					*fV(Idx(k, j, i))
-					* exp(-I * (fK0 * cosx * GetX(i) + fK0 * cosy * GetY(j) + fK0 * cosz * GetZ(k)));
-			}
-		}
-	}
+	Real kx = fK0 * cosx;
+	Real ky = fK0 * cosy;
+	Real kz = fK0 * cosz;
+
+#if 1
+	r = fDevice->Xsection3D(fPsi0X, fPsiX, fV,
+		kx, ky, kz,
+		fX0, fY0, fZ0,
+		fDx, fDy, fDz,
+		fNx, fNy, fNz);
+#else
+    for_each_global_idx(fX0, fDx, fNx,
+        fY0, fDy, fNy,
+        fZ0, fDz, fNz,
+        [&r, psi0 = fPsi0XHost, psi = fPsiXHost, v = fVHost, kx, ky, kz,
+        kx0 = fK0X, ky0 = fK0Y, kz0 = fK0Z]
+    (size_t idx, Real x, Real y, Real z) {
+#if 0
+            auto psi0_ = psi0[idx];
+#else
+            auto psi0_ = exp(QuI * (x * kx0 + y * ky0 + z * kz0));
+#endif
+            r += (psi0_ + psi[idx]) * v[idx].real() * exp(-QuI * (kx * x + ky * y + kz * z));
+        });
+#endif
 
 	Real dX_dOmega = abs2(r*(2 * fMass) / (fHbar*fHbar)*fDx*fDy*fDz / (4 * Pi));
-
 	return dX_dOmega;
 }
 

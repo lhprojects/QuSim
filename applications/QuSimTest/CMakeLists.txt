@@ -1,12 +1,12 @@
 cmake_minimum_required (VERSION 3.8)
 
-file(GLOB QuSimTestSources Test.cpp)
+file(GLOB SRC Test.cpp TestFFT.cpp)
 
-set(QuSimTestSources
-${QuSimTestSources}
+set(SRC 
+${SRC}
 ${CMAKE_CURRENT_SOURCE_DIR}/../../src/TestCal.cpp)
 
-message(STATUS "files: ${QuSimTestSources}")
+message(STATUS "files: ${SRC}")
 
-add_executable(QuSimTest ${QuSimTestSources})
+add_executable(QuSimTest ${SRC})
 target_link_libraries(QuSimTest QuSimCore)

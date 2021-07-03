@@ -2,6 +2,7 @@
 
 #include "FourierTransform.h"
 #include "QuSim.h"
+#include "Device.h"
 
 struct FourierTransformOptions {
 
@@ -10,22 +11,32 @@ struct FourierTransformOptions {
 	FourierTransformOptions() : fLib() {
 	}
 
-	void Init(OptionsImpl const &opts)
+	void Init(OptionsImpl const &opts, DeviceType devType)
 	{
-		{
-			FourierTransformLibrary lib = FourierTransformLibrary::KISS;
-			std::string lib_str;
+		FourierTransformLibrary lib = FourierTransformLibrary::KISS;
 
+		if (devType == DeviceType::GPU_CUDA) {
+			std::string lib_str;
 			if (opts.Get("fft_lib", lib_str)) {
-				if (lib_str == "kiss") {
+				if (lib_str != "CUDA") {
+					throw std::invalid_argument("invalid fft_lib: " + lib_str);
+				}
+				lib = FourierTransformLibrary::CUDA;
+			} else {
+				lib = FourierTransformLibrary::CUDA;
+			}
+		} else {
+			std::string lib_str;
+			if (opts.Get("fft_lib", lib_str)) {
+				if (lib_str == "KISS") {
 					lib = FourierTransformLibrary::KISS;
-				} else if (lib_str == "cuda") {
-					lib = FourierTransformLibrary::CUDA;
+				} else if (lib_str == "FFTW") {
+					lib = FourierTransformLibrary::FFTW;
 				} else {
-					throw std::runtime_error("unkown lib");
+					throw std::invalid_argument("invalid fft_lib: " + lib_str);
 				}
 			}
-			const_cast<FourierTransformLibrary&>(fLib) = lib;
 		}
+		const_cast<FourierTransformLibrary&>(fLib) = lib;
 	}
 };

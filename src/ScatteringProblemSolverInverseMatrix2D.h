@@ -1,11 +1,11 @@
 #pragma once
 #define  _CRT_SECURE_NO_WARNINGS
 #include "ScatteringSolverImpl.h"
+#include "ScatteringProblemSolverInverseMatrix.h"
 #include "MatrixSolver.h"
 
-struct ScatteringProblemSolverInverseMatrix2D : ScatteringSolver2DImpl {
+struct ScatteringProblemSolverInverseMatrix2D : ScatteringSolver2DImpl, InverseMatrixMethodCommon {
 
-	ScatteringProblemSolverInverseMatrix2D() : fOrder(), fMatrixSolver() {}
 
 	void InitScatteringSolver2D(
 		std::function<Complex(Real, Real)> const & v,
@@ -25,11 +25,5 @@ struct ScatteringProblemSolverInverseMatrix2D : ScatteringSolver2DImpl {
 
 
 	void Compute() override;
-	
-	SparseMatrixSolver fMatrixSolver;
-	int const fOrder;
-	Eigen::SparseMatrix<Complex> fEMinusH;
-
-
 
 };

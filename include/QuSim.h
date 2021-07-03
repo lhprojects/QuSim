@@ -53,7 +53,7 @@ struct MatrixView {
 	T const & operator()(size_t row, size_t col) const {
 		assert(row < fRows );
 		assert(col < fCols);
-		return fData[row + col*fRows];
+		return fData[col + row *fCols];
 	}
 private:
 	T const * const fData;
@@ -93,12 +93,186 @@ private:
 	size_t const fSize3;
 };
 
+using QuReal = double;
+using QuComplex = std::complex<QuReal>;
+
 using Real = double;
 using Complex = std::complex<Real>;
+using Real32 = float;
+using Complex32 = std::complex<Real32>;
+using Real64 = double;
+using Complex64 = std::complex<Real64>;
+
 using Int = int64_t;
 using UInt = uint64_t;
+
+inline constexpr QuComplex QuI = Complex(0, 1);
+inline constexpr QuReal QuPi = 3.141592653589793238462643383279502884197169399375;
 static constexpr Complex I = Complex(0, 1);
 static constexpr Real Pi = 3.141592653589793238462643383279502884197169399375;
+
+template<class R, class Op>
+void for_each_global_idx(R x0, R dx, size_t nx,
+	Op op)
+{
+	for (size_t Ix = 0; Ix < nx; ++Ix) {
+		R X = x0 + dx * Ix;
+		size_t idx = Ix;
+		op(idx, X);
+	}
+}
+
+template<class R, class Op>
+void for_each_global_idx(R x0, R dx, size_t nx,
+	R y0, R dy, size_t ny,
+	Op op)
+{
+	for (size_t Ix = 0; Ix < nx; ++Ix) {
+		for (size_t Iy = 0; Iy < ny; ++Iy) {
+
+			R X = x0 + dx * Ix;
+			R Y = y0 + dy * Iy;
+			size_t idx = Ix * ny + Iy;
+			op(idx, X, Y);
+		}
+	}
+}
+
+template<class Op>
+void for_each_global_idx(size_t nx,
+	size_t ny,
+	Op op)
+{
+	for (size_t Ix = 0; Ix < nx; ++Ix) {
+		for (size_t Iy = 0; Iy < ny; ++Iy) {
+
+			size_t idx = Ix * ny + Iy;
+			op(idx);
+		}
+	}
+}
+
+template<class R, class Op>
+void for_each_global_idx(R x0, R dx, size_t nx,
+	R y0, R dy, size_t ny,
+	R z0, R dz, size_t nz,
+	Op op)
+{
+	for (size_t Ix = 0; Ix < nx; ++Ix) {
+		for (size_t Iy = 0; Iy < ny; ++Iy) {
+			for (size_t Iz = 0; Iz < nz; ++Iz) {
+
+				R X = x0 + dx * Ix;
+				R Y = y0 + dy * Iy;
+				R Z = z0 + dz * Iz;
+                size_t idx = CalGlobalIdx(Ix, Iy, Iz, nx, ny, nz);
+                op(idx, X, Y, Z);
+			}
+		}
+	}
+}
+
+template<class R, class Op>
+void for_each_2d_idx(R x0, R dx, size_t nx,
+	R y0, R dy, size_t ny,
+	Op op)
+{
+	for (size_t Ix = 0; Ix < nx; ++Ix) {
+		for (size_t Iy = 0; Iy < ny; ++Iy) {
+
+			R X = x0 + dx * Ix;
+			R Y = y0 + dy * Iy;
+			op(Ix, Iy, X, Y);
+		}
+	}
+}
+
+template<class R, class Op>
+void ForEach2DGrid(R x0, R dx, size_t nx,
+	R y0, R dy, size_t ny,
+	Op op)
+{
+	for (size_t Ix = 0; Ix < nx; ++Ix) {
+		for (size_t Iy = 0; Iy < ny; ++Iy) {
+
+			R X = x0 + dx * Ix;
+			R Y = y0 + dy * Iy;
+			size_t idx = CalGlobalIdx(Ix, Iy, nx, ny);
+			op(idx, Ix, Iy, X, Y);
+		}
+	}
+}
+
+inline size_t CalGlobalIdx(size_t ix, size_t nx)
+{
+	assert(ix < nx);
+	return ix;
+}
+
+inline size_t CalGlobalIdx(size_t ix, size_t iy, size_t nx, size_t ny)
+{
+	assert(ix < nx);
+	assert(iy < ny);
+	return iy + ix * ny;
+}
+inline size_t CalGlobalIdx(size_t ix, size_t iy, size_t iz,
+	size_t nx, size_t ny, size_t nz)
+{
+	assert(ix < nx);
+	assert(iy < ny);
+	assert(iz < nz);
+	return (iy + ix * ny)*nz + iz;
+}
+
+template<class Op>
+void ForEach2DIdx(size_t nx, size_t ny, Op op)
+{
+    for (size_t Ix = 0; Ix < nx; ++Ix) {
+        for (size_t Iy = 0; Iy < ny; ++Iy) {
+            auto Idx = CalGlobalIdx(Ix, Iy, nx, ny);
+            op(Idx, Ix, Iy);
+        }
+    }
+}
+
+template<class Op>
+void ForEach3DIdx(size_t nx, size_t ny, size_t nz, Op op)
+{
+    for (size_t Ix = 0; Ix < nx; ++Ix) {
+        for (size_t Iy = 0; Iy < ny; ++Iy) {
+            for (size_t Iz = 0; Iz < nz; ++Iz) {
+                auto Idx = CalGlobalIdx(Ix, Iy, Iz, nx, ny, nz);
+                op(Idx, Ix, Iy, Iz);
+			}
+		}
+	}
+}
+
+template<class R, class Op>
+void for_each_3d_idx(R x0, R dx, size_t nx,
+	R y0, R dy, size_t ny,
+	R z0, R dz, size_t nz,
+	Op op)
+{
+	for (size_t Ix = 0; Ix < nx; ++Ix) {
+		for (size_t Iy = 0; Iy < ny; ++Iy) {
+			for (size_t Iz = 0; Iz < nz; ++Iz) {
+
+				R X = x0 + dx * Ix;
+				R Y = y0 + dy * Iy;
+				R Z = z0 + dz * Iz;
+				op(Ix, Iy, Iz, X, Y, Z);
+			}
+		}
+	}
+}
+
+// wave length
+template<class R>
+inline R QuCalLambda(R mass, R en, R hbar)
+{
+	return 2 * Pi / (sqrt(2 * mass * en) / hbar);
+}
 
 struct OptionsImpl;
 struct Options {
@@ -163,7 +337,30 @@ struct Options {
 
 	inline Options &Cuda()
 	{
-		SetString("fft_lib", "cuda");
+		SetString("device", "GPU_CUDA");
+		return *this;
+	}
+
+	inline Options& CpuSeq()
+	{
+		SetString("device", "GPU_SEQ");
+		return *this;
+	}
+	inline Options& CpuParVec()
+	{
+		SetString("device", "CPU_PAR_VEC");
+		return *this;
+	}
+
+	inline Options& CpuPar()
+	{
+		SetString("device", "CPU_PAR");
+		return *this;
+	}
+
+	inline Options& CpuVec()
+	{
+		SetString("device", "CPU_VEC");
 		return *this;
 	}
 
@@ -188,6 +385,12 @@ struct Options {
 	inline Options &MatrixSolverBiCGSTAB()
 	{
 		SetString("matrix_solver", "BiCGSTAB");
+		return *this;
+	}
+
+	inline Options& MatrixSolverBiCGSTABMaxIters(Real iters)
+	{
+        SetReal("matrix_solver_max_iters", iters);
 		return *this;
 	}
 
@@ -220,6 +423,13 @@ struct Options {
 		return *this;
 	}
 
+	inline Options& ComplexPotential(bool cp = true)
+	{
+		SetBool("complex_potential", cp);
+		return *this;
+	}
+	
+
 	EXPORT_FUNC Options();
 	EXPORT_FUNC Options(Options const &);
 	EXPORT_FUNC Options& operator=(Options const &);
@@ -244,14 +454,19 @@ inline Real abs2(Complex const &c)
 {
 	return real(c)*real(c) + imag(c)*imag(c);
 }
-
+inline Real abs2(Real const& c)
+{
+	return c * c;
+}
 
 enum class BoundaryCondition {
-	InfiniteWall,
 	Period,
+	InfiniteWall,
 };
 
 enum class SolverMethod {
+	Unknown,
+
 	// for evolver only & H is time independent
 	SplittingMethodO2,
 	SplittingMethodO4,
@@ -272,7 +487,7 @@ enum class SolverMethod {
 
 
 struct Cal;
-struct EvolverImpl;
+struct QuEvolverImpl;
 struct IVPSolverImpl;
 struct ScatteringSolverImpl;
 
@@ -320,7 +535,6 @@ struct EXPORT_STRUCT Evolver {
 	Real Time();
 	Real PotEn();
 	Real KinEn();
-	Real EnPartialT();
 	SolverMethod GetMethod();
 
 	Evolver(Evolver const &) = delete;
@@ -328,7 +542,7 @@ struct EXPORT_STRUCT Evolver {
 	~Evolver();
 protected:
 	Evolver();
-	EvolverImpl *fImpl;
+	QuEvolverImpl *fImpl;
 };
 
 struct EXPORT_STRUCT Evolver1D : Evolver {
@@ -344,8 +558,12 @@ struct EXPORT_STRUCT Evolver1D : Evolver {
 	VectorView<Real> GetV();
 	Real Xavg();
 	size_t GetN();
-	Real NormLeft();
-	Real NormRight();
+
+	Real GetX0();
+	Real GetX1();
+
+	using Evolver::Norm2;
+	Real Norm2(Real x0, Real x1);
 
 	Evolver1D();
 
@@ -435,7 +653,7 @@ struct EXPORT_STRUCT QuScatteringProblemSolver1D : QuScatteringProblemSolver {
 
 	VectorView<Complex> GetPsi();
 	VectorView<Complex> GetPsi0();
-	VectorView<Real> GetV();
+	VectorView<Complex> GetV();
 
 	size_t GetNPoints();
 	Real GetT();
@@ -484,6 +702,7 @@ struct EXPORT_STRUCT QuPerturbation1D : QuScatteringProblemSolver1D {
 	Real GetEnergyGap();
 	Real GetEpsilon();
 	Real GetEpsilonBoundaryError();
+	Real GetEpsilonDecayLength();
 
 };
 
@@ -493,7 +712,7 @@ struct EXPORT_STRUCT QuScatteringProblemSolver2D : QuScatteringProblemSolver {
 	// scattering part of wave function
 	MatrixView<Complex> GetPsi();
 
-	MatrixView<Real> GetV();
+	MatrixView<Complex> GetV();
 
 	Real ComputeXSection(Real cosx, Real cosy);
 	Real ComputeTotalXSection(Int n);
@@ -540,13 +759,14 @@ struct EXPORT_STRUCT QuPerturbation2D : QuScatteringProblemSolver2D {
 		Options const &opts);
 
 	MatrixView<Real> GetVabsb();
-	Real GetDeltaPsiNorm();
+    // |Psi - LastPsi|^2 / |Psi|^2
+    Real GetDeltaPsiNorm();
 };
 
 struct EXPORT_STRUCT QuScatteringProblemSolver3D : QuScatteringProblemSolver {
 
 	Tensor3View<Complex> GetPsi();
-	Tensor3View<Real> GetV();
+	Tensor3View<Complex> GetV();
 
 	Real ComputeXSection(Real cosx, Real cosy, Real cosz);
 	Real ComputeTotalXSection(Int npsi, Int ntheta);

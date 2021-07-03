@@ -1,6 +1,7 @@
 #include "SolverImpl.h"
 #include "Matrix2.h"
 #include "Linear.h"
+#include "Utils.h"
 
 SolverImpl1D::SolverImpl1D()
 {
@@ -16,10 +17,10 @@ void SolverImpl1D::initSystem1D(std::function<Complex(Real)> const & v,
 	initSystem(en, mass, hbar, met, opts);
 
 	fSmallRoundError = opts.GetBool("small_round_error", true);
-	fNPoints = n;
-	fNBins = n - 1;
-	fX0 = x0;
-	fDx = (x1 - x0) / fNBins;
+	mutable_cast(fNPoints) = n;
+	mutable_cast(fNBins) = n - 1;
+	mutable_cast(fX0) = x0;
+	mutable_cast(fDx) = (x1 - x0) / fNBins;
 	fVFunc = v;
 
 	if (met == SolverMethod::ImplicitMidpointMethod) {

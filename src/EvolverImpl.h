@@ -3,246 +3,154 @@
 //#define _SCL_SECURE_NO_WARNINGS
 
 #include "QuSim.h"
-#include "eigen/Eigen/Dense"
 #include <functional>
 #include "Linear.h"
+#include "Device.h"
 #include "OptionsImpl.h"
+#include "Utils.h"
 
-struct EvolverImpl
+
+struct QuEvolverImpl
 {
-	Complex fDt;
-	bool fFNES;
+	using RealType = Real;
+	using ComplexType = Complex;
 
-	Real fMass;
-	Real fHbar;
+    RealType* const fV = nullptr;
+	RealType* const fVHost = nullptr;
+	ComplexType* const fPsi = nullptr;
+    ComplexType* const fPsiHost = nullptr;
+    UInt fStep;
 
-	BoundaryCondition fBoundaryCondition;
-	SolverMethod fSolverMethod;
+	DeviceType const fDeviceType = DeviceType::CPU_SEQ;
+	std::unique_ptr<Device> const fDevice;
+	Complex const fDt;
+	// force normalize
+	bool const fFNES = false;
 
-	bool fFN;
-	UInt fStep;
+	size_t const fN = 0; // Nx*Ny*Nz
+	Real const fDv = 0;  // Dx*Dy*Dz
+	Real const fMass = 0;
+	Real const fHbar = 0;
 
+	BoundaryCondition const fBoundaryCondition = BoundaryCondition::Period;
+	SolverMethod const fSolverMethod = SolverMethod::Unknown;;
+
+	size_t const fBatchSize = 1;
+	bool const fFN = 0; // force normalization after initialization
 	OptionsImpl const fOpts;
 
-	// init fPsi
-	// init fV
-	// init fN
-	void initSystem(bool force_normalization,
+	void InitSystem(bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar, OptionsImpl const &opts);
+		Real mass, Real hbar,
+		Real dv, size_t n,
+		OptionsImpl const &opts);
 
-	virtual void step() = 0;
-	virtual Real PotEn() = 0;
-	virtual Real KinEn() = 0;
-	virtual Real EnPartialT() = 0;
-	// int abs2(psi) dx for 1D
-	//( sum_i psi_i Dx)
-	// or int abs2(psi) dx dy for 2D
-	//( sum_ij psi_ij Dx Dy)
-	virtual Real Norm2() = 0;
-	virtual ~EvolverImpl() { }
+	Real PotEn() const;
+	Real KinEn() const;
+	Real Norm2() const;
+	Complex Time() const;
 
-	Real Time()
-	{
-		return fStep * abs(fDt);
-	}
+	virtual void Step();
+	virtual void UpdatePsi() = 0;
+	virtual Real CalPotEn() const;
+	virtual Real CalKinEn() const = 0;
+
+	virtual ~QuEvolverImpl();
 
 };
 
-struct EvolverImpl1D : EvolverImpl {
+inline Complex QuEvolverImpl::Time() const
+{
+	return 1.0 * fStep * fDt;
+}
 
-	Real fX0;
-	Real fDx;
-	size_t fN;
+struct QuEvolver1DImpl : QuEvolverImpl
+{
 
-	std::function<Complex(Real)> fVFunc;
-	std::vector<Real> fV;
+	Real const fX1 = 0;
+	Real const fX0 = 0;
+	Real const fDx = 0;
+	size_t const fNx = 0;
 
-	std::function<Complex(Real)> fPsi0Func;
-	std::vector<Complex> fLastLastPsi;
-	std::vector<Complex> fLastPsi;
-	std::vector<Complex> fPsi;
-	
-	EvolverImpl1D()
-	{
-		fN = 0;
-	}
+	std::function<Complex(Real)> const fVFunc;
+	std::function<Complex(Real)> const fPsi0Func;
 
-	Real getX(size_t i)
-	{
-		return fDx * i + fX0;
-	}
-
-	// init fPsi
-	// init fV
-	// init fN
-	virtual void initSystem1D(std::function<Complex(Real)> const & psi, bool force_normalization,
+	virtual void InitSystem1D(std::function<Complex(Real)> const & psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		std::function<Complex(Real)> const &v, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar, OptionsImpl const &opts);
 
-	virtual Real CalPotEn();
-	virtual Real CalKinEn();
-	// update fPsi
-	virtual void update_psi() = 0;
+	RealType GetX(size_t i) const;
+	RealType Xavg() const;
 
-	void step() override;
-	Real PotEn() override;
-	Real KinEn() override;
-	Real EnPartialT() override;
-	Real Norm2() override;
-
-
+	using QuEvolverImpl::Norm2;
+	RealType Norm2(Real x0, Real x1) const;
 private:
-	void initPsi();
-	void initPotential();
-public:
-
-	void Zero(PsiVector &psi)
-	{
-		for (size_t i = 0; i < fN; ++i) {
-			psi[i] = 0.;
-		}
-	}
-
-	void Scale(PsiVector &psi, Complex const &c)
-	{
-		for (size_t i = 0; i < fN; ++i) {
-			psi[i] = psi[i] * c;
-		}
-	}
-
-	void Scale(PsiVector &psi, double c)
-	{
-		for (size_t i = 0; i < fN; ++i) {
-			psi[i] = psi[i] * c;
-		}
-	}
-
-	void Add(PsiVector &psi, PsiVector const &psi1, PsiVector const &psi2)
-	{
-		for (size_t i = 0; i < fN; ++i) {
-			psi[i] = psi1[i] + psi2[i];
-		}
-	}
-
-	void Copy(PsiVector &psi, PsiVector const &psi1)
-	{
-		for (size_t i = 0; i < fN; ++i) {
-			psi[i] = psi1[i];
-		}
-	}
-
-	Real Xavg()
-	{
-		Real norm2 = 0;
-		for (size_t i = 0; i < fN; ++i) {
-			norm2 += abs2(fPsi[i])*getX(i)*fDx;
-		}
-		return norm2 / Norm2();
-	}
-
-	Real Norm2(PsiVector const &psi)
-	{
-		Real norm2 = 0;
-		for (size_t i = 0; i < psi.size(); ++i) {
-			norm2 += abs2(psi[i])*fDx;
-		}
-		return norm2;
-	}
-
-	Real NormLeft()
-	{
-		Real norm2 = 0;
-		for (size_t i = 0; i < fN / 2; ++i) {
-			norm2 += abs2(fPsi[i])*fDx;
-		}
-		if (fN % 2) {
-			norm2 += 0.5*abs2(fPsi[fN / 2])*fDx;
-		}
-		return norm2;
-	}
-
-	Real NormRight()
-	{
-		Real norm2 = 0;
-		for (size_t i = (fN + 1) / 2; i < fN; ++i) {
-			norm2 += abs2(fPsi[i])*fDx;
-		}
-		if (fN % 2) {
-			norm2 += 0.5*abs2(fPsi[fN / 2])*fDx;
-		}
-		return norm2;
-	}
-
+	void InitPsi();
+	void InitPotential();
 };
 
-struct EvolverImpl2D : EvolverImpl {
+inline Real QuEvolver1DImpl::GetX(size_t i) const
+{
+	return fDx * i + fX0;
+}
 
-	Real fX0;
-	Real fDx;
-	Real fY0;
-	Real fDy;
-	size_t fNx;
-	size_t fNy;
-	Eigen::MatrixXd fV;
+
+
+struct QuEvolver2DImpl : QuEvolverImpl {
+
+	Real const fX0 = 0;
+	Real const fDx = 0;
+	Real const fY0 = 0;
+	Real const fDy = 0;
+	size_t const fNx = 0;
+	size_t const fNy = 0;
+
 	std::function<Complex(Real, Real)> fVFunc;
-
 	std::function<Complex(Real, Real)> fPsi0Func;
 	// col major
 	// y major
-	//Eigen::MatrixXcd fLastLastPsi;
-	UInt fLastStep;
-	Eigen::MatrixXcd fLastPsi;
-	Eigen::MatrixXcd fPsi;
 
-	EvolverImpl2D()
-	{
-		fNx = 0;
-		fNy = 0;
-	}
+	Real GetX(size_t i) const;
+	Real GetY(size_t i) const;
+	// x is major
+	// y is minor
+	ptrdiff_t Index(ptrdiff_t i, ptrdiff_t j) const;
+	ptrdiff_t IndexFold(ptrdiff_t i, ptrdiff_t j) const;
 
-	Real getX(size_t i)
-	{
-		return fDx * i + fX0;
-	}
-
-	Real getY(size_t i)
-	{
-		return fDy * i + fY0;
-	}
-
-	// init fPsi
-	// init fV
-	// init fN
-	virtual void initSystem2D(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
+	virtual void InitSystem2D(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		std::function<Complex(Real, Real)> const &v, Real x0, Real x1, size_t nx,
 		Real y0, Real y1, size_t ny,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar, OptionsImpl const &opts);
-	virtual Real CalPotEn() const;
-	virtual Real CalKinEn() const;
-	// update fPsi
-	virtual void update_psi() = 0;
-
-	void step() override;
-	Real PotEn() override { return CalPotEn(); }
-	Real KinEn() override { return CalKinEn(); }
-	Real EnPartialT() override;
-	Real Norm2() override;
 
 private:
-	void initPsi();
-	void initPotential();
-public:
-
-
-
-
-
-
+	void InitPsi();
+	void InitPotential();
 
 };
+
+
+inline Real QuEvolver2DImpl::GetX(size_t i) const
+{
+	return fDx * i + fX0;
+}
+
+inline Real QuEvolver2DImpl::GetY(size_t i) const
+{
+	return fDy * i + fY0;
+}
+
+inline ptrdiff_t QuEvolver2DImpl::Index(ptrdiff_t i, ptrdiff_t j) const
+{
+	return QuIdx(i, j, (ptrdiff_t)fNx, (ptrdiff_t)fNy);
+}
+
+inline ptrdiff_t QuEvolver2DImpl::IndexFold(ptrdiff_t i, ptrdiff_t j) const
+{
+	return QuIdxFold(i, j, (ptrdiff_t)fNx, (ptrdiff_t)fNy);
+}
+

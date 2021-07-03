@@ -166,11 +166,13 @@ void simulate()
 				workerToGUI->data.time = worker->syst->Time();
 				workerToGUI->data.fN = worker->syst->GetN();
 				workerToGUI->data.v = ToVector(worker->syst->GetV());
-				workerToGUI->data.normLeft = worker->syst->NormLeft();
-				workerToGUI->data.normRight = worker->syst->NormRight();
+				Real x0 = worker->syst->GetX0();
+				Real x1 = worker->syst->GetX1();
+                workerToGUI->data.normLeft = worker->syst->Norm2(x0, (x1 + x0) / 2);
+                workerToGUI->data.normRight = worker->syst->Norm2((x1 + x0) / 2, x1);
 				workerToGUI->data.pot = worker->syst->PotEn();
 				workerToGUI->data.kin = worker->syst->KinEn();
-				workerToGUI->data.enPartialTime = worker->syst->EnPartialT();
+				workerToGUI->data.enPartialTime = 0;
 			}
 			PostMessage(hMainWin, WM_DATAREADY, 0, 0);
 			what = messager.GetWhat();
@@ -185,11 +187,13 @@ void simulate()
 				workerToGUI->data.time = worker->syst->Time();
 				workerToGUI->data.fN = worker->syst->GetN();
 				workerToGUI->data.v = ToVector(worker->syst->GetV());
-				workerToGUI->data.normLeft = worker->syst->NormLeft();
-				workerToGUI->data.normRight = worker->syst->NormRight();
+				Real x0 = worker->syst->GetX0();
+				Real x1 = worker->syst->GetX1();
+				workerToGUI->data.normLeft = worker->syst->Norm2(x0, (x1 + x0) / 2);
+				workerToGUI->data.normRight = worker->syst->Norm2((x1 + x0) / 2, x1);
 				workerToGUI->data.pot = worker->syst->PotEn();
 				workerToGUI->data.kin = worker->syst->KinEn();
-				workerToGUI->data.enPartialTime = worker->syst->EnPartialT();
+				workerToGUI->data.enPartialTime = 0;
 			}
 			PostMessage(hMainWin, WM_DATAREADY, 0, 0);
 			what = messager.GetWhat();
@@ -400,8 +404,6 @@ void DrawPotential(Gdiplus::Graphics &graphics,
 
 	Pen      pen4(Color(255, 0, 255, 0));
 	graphics.DrawLines(&pen4, vc.data(), (int)vc.size());
-
-	exp(Complex(0, 1));
 }
 
 void DrawPsi(Gdiplus::Graphics &graphics,
@@ -585,9 +587,13 @@ void InitialASystem1D(Evolver1D &syst)
 		Calculator cal(psiStr.data());
 		deltaT = cal.Evaluate();
 	}
+
 	Options opts;
-#ifdef USE_CUDA
-	opts.Cuda().Batch(5);
+
+#ifdef QUSIM_USE_CUDA
+	if (sl == SolverMethod::SplittingMethodO2 || sl == SolverMethod::SplittingMethodO4) {
+		opts.Cuda().Batch(10);
+	}
 #endif
 	syst.init(FunctorWrapper(psi.c_str()), fn, deltaT, fnes, FunctorWrapper(pot.c_str()),
 		x0, x1, n, bc, sl, mass, hbar, opts);

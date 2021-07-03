@@ -3,9 +3,7 @@
 #include "EvolverImpl.h"
 #include "SplittingMethod1D.h"
 #include "SplittingMethod2D.h"
-#include "EigenMethod.h"
-#include "SplittingMethod1DCUDA.h"
-#include "SplittingMethod2DCUDA.h"
+#include "EigenMethod1D.h"
 #include "GaussLegendreMethod1D.h"
 #include "GaussLegendreMethod2D.h"
 
@@ -40,7 +38,7 @@ Evolver::~Evolver()
 
 void Evolver::step()
 {
-	fImpl->step();
+	fImpl->Step();
 }
 
 Real Evolver::Norm2()
@@ -50,7 +48,7 @@ Real Evolver::Norm2()
 
 Real Evolver::Time()
 {
-	return fImpl->Time();
+	return fImpl->Time().real();
 }
 
 
@@ -62,11 +60,6 @@ Real Evolver::PotEn()
 Real Evolver::KinEn()
 {
 	return fImpl->KinEn();
-}
-
-Real Evolver::EnPartialT()
-{
-	return fImpl->EnPartialT();
 }
 
 SolverMethod Evolver::GetMethod()
@@ -95,14 +88,9 @@ void Evolver1D::init(std::function<Complex(Real)> const &psi, bool force_normali
 	Options const &opts)
 {
 	if (solver == SolverMethod::SplittingMethodO2 || solver == SolverMethod::SplittingMethodO4) {
-
-		if (opts.fOpts->GetString("fft_lib", "") == "cuda") {
-			fImpl = CreateSplittingMethod1DCUDA(*opts.fOpts);
-		} else {
-			fImpl = new SplittingMethod1D();
-		}
+		fImpl = new SplittingMethod1D();
 	} else if (solver == SolverMethod::Eigen) {
-		fImpl = new EigenMethod();
+		fImpl = new QuEigenMethod1D();
 	} else if (solver == SolverMethod::ImplicitMidpointMethod
 		|| solver == SolverMethod::GaussLegendreO4
 		|| solver == SolverMethod::GaussLegendreO6) {
@@ -111,7 +99,7 @@ void Evolver1D::init(std::function<Complex(Real)> const &psi, bool force_normali
 		throw std::runtime_error("unspported solver");
 	}
 
-	static_cast<EvolverImpl1D*>(fImpl)->initSystem1D(psi, force_normalization,
+	static_cast<QuEvolver1DImpl*>(fImpl)->InitSystem1D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, n, b, solver,
 		mass, hbar, *opts.fOpts);
@@ -124,45 +112,40 @@ Evolver1D::Evolver1D() {
 
 VectorView<Complex> Evolver1D::GetPsi()
 {
-	return View(static_cast<EvolverImpl1D*>(fImpl)->fPsi);
+	auto impl = static_cast<QuEvolver1DImpl*>(fImpl);
+	return View(impl->fPsiHost, impl->fNx);
 }
 
 VectorView<Real> Evolver1D::GetV()
 {
-	return View(static_cast<EvolverImpl1D*>(fImpl)->fV);
+	auto impl = static_cast<QuEvolver1DImpl*>(fImpl);
+	return View(impl->fVHost, impl->fNx);
 }
 
 Real Evolver1D::Xavg()
 {
-	return static_cast<EvolverImpl1D*>(fImpl)->Xavg();
+	return static_cast<QuEvolver1DImpl*>(fImpl)->Xavg();
 }
 
 size_t Evolver1D::GetN()
 {
-	return static_cast<EvolverImpl1D*>(fImpl)->fN;
+	return static_cast<QuEvolver1DImpl*>(fImpl)->fN;
 }
 
-Real Evolver1D::NormLeft()
+Real Evolver1D::Norm2(Real x0, Real x1)
 {
-	return static_cast<EvolverImpl1D*>(fImpl)->NormLeft();
+	return static_cast<QuEvolver1DImpl*>(fImpl)->Norm2(x0, x1);
 }
 
-Real Evolver1D::NormRight()
+
+Real Evolver1D::GetX0()
 {
-	return static_cast<EvolverImpl1D*>(fImpl)->NormRight();
+	return static_cast<QuEvolver1DImpl*>(fImpl)->fX0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
+Real Evolver1D::GetX1()
+{
+	return static_cast<QuEvolver1DImpl*>(fImpl)->fX1;
+}
 
 
 
@@ -175,19 +158,8 @@ void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_n
 	Real mass, Real hbar,
 	Options const &opts)
 {
-	if (solver == SolverMethod::SplittingMethodO2) {
-
-		if (opts.fOpts->GetString("fft_lib", "") == "cuda") {
-			fImpl = CreateSplittingMethod2DCUDA(*opts.fOpts);
-		} else {
-			fImpl = new SplittingMethod2D();
-		}
-	} else if (solver == SolverMethod::SplittingMethodO4) {
-		if (opts.fOpts->GetString("fft_lib", "") == "cuda") {
-			fImpl = CreateSplittingMethod2DCUDA(*opts.fOpts);
-		} else {
-			fImpl = new SplittingMethod2D();
-		}
+	if (solver == SolverMethod::SplittingMethodO2 || solver == SolverMethod::SplittingMethodO4) {
+		fImpl = new SplittingMethod2D();
 	} else if (solver == SolverMethod::ImplicitMidpointMethod
 		|| solver == SolverMethod::GaussLegendreO4
 		|| solver == SolverMethod::GaussLegendreO6) {
@@ -196,7 +168,7 @@ void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_n
 		throw std::runtime_error("unsupported solver");
 	}
 
-	static_cast<EvolverImpl2D*>(fImpl)->initSystem2D(psi, force_normalization,
+	static_cast<QuEvolver2DImpl*>(fImpl)->InitSystem2D(psi, force_normalization,
 		dt, force_normalization_each_step,
 		vs, x0, x1, nx,
 		y0, y1, ny,
@@ -207,23 +179,24 @@ void Evolver2D::init(std::function<Complex(Real, Real)> const &psi, bool force_n
 
 MatrixView<Complex> Evolver2D::GetPsi()
 {
-	//double x = Norm2();
-	return View(static_cast<EvolverImpl2D*>(fImpl)->fPsi);
+	auto impl = static_cast<QuEvolver2DImpl*>(fImpl);
+	return View(impl->fPsiHost, impl->fNx, impl->fNy);
 }
 
 MatrixView<Real> Evolver2D::GetV()
 {
-	return View(static_cast<EvolverImpl2D*>(fImpl)->fV);
+	auto impl = static_cast<QuEvolver2DImpl*>(fImpl);
+	return View(impl->fVHost, impl->fNx, impl->fNy);
 }
 
 size_t Evolver2D::GetNx()
 {
-	return static_cast<EvolverImpl2D*>(fImpl)->fNx;
+	return static_cast<QuEvolver2DImpl*>(fImpl)->fNx;
 }
 
 size_t Evolver2D::GetNy()
 {
-	return static_cast<EvolverImpl2D*>(fImpl)->fNy;
+	return static_cast<QuEvolver2DImpl*>(fImpl)->fNy;
 }
 
 
@@ -462,17 +435,20 @@ SolverMethod QuScatteringProblemSolver::GetMethod()
 
 VectorView<Complex> QuScatteringProblemSolver1D::GetPsi()
 {
-	return View(static_cast<ScatteringSolver1DImpl*>(fImpl)->fPsiX);
+	auto impl = static_cast<ScatteringSolver1DImpl*>(fImpl);
+	return View(impl->fPsiX, impl->fNx);
 }
 
 VectorView<Complex> QuScatteringProblemSolver1D::GetPsi0()
 {
-	return View(static_cast<ScatteringSolver1DImpl*>(fImpl)->fPsi0X);
+	auto impl = static_cast<ScatteringSolver1DImpl*>(fImpl);
+	return View(impl->fPsi0X, impl->fNx);
 }
 
-VectorView<Real> QuScatteringProblemSolver1D::GetV()
+VectorView<Complex> QuScatteringProblemSolver1D::GetV()
 {
-	return View(static_cast<ScatteringSolver1DImpl*>(fImpl)->fV);
+	auto impl = static_cast<ScatteringSolver1DImpl*>(fImpl);
+	return View(impl->fV, impl->fNx);
 }
 
 size_t QuScatteringProblemSolver1D::GetNPoints()
@@ -564,6 +540,12 @@ Real QuPerturbation1D::GetEpsilonBoundaryError()
 {
 	return static_cast<QuPerturbation1DImpl*>(fImpl)->GetEpsilonBoundaryError();
 }
+
+Real QuPerturbation1D::GetEpsilonDecayLength()
+{
+	return static_cast<QuPerturbation1DImpl*>(fImpl)->GetEpsilonDecayLength();
+}
+
 /*                    QuPerturbation1D                          */
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -597,17 +579,20 @@ Complex Calculator::Evaluate()
 
 MatrixView<Complex> QuScatteringProblemSolver2D::GetPsi0()
 {
-	return View(static_cast<ScatteringSolver2DImpl*>(fImpl)->fPsi0X);
+	auto impl = static_cast<ScatteringSolver2DImpl*>(fImpl);
+	return View(impl->fPsi0XHost, impl->fNx, impl->fNy);
 }
 
 MatrixView<Complex> QuScatteringProblemSolver2D::GetPsi()
 {
-	return View(static_cast<ScatteringSolver2DImpl*>(fImpl)->fPsiX);
+	auto impl = static_cast<ScatteringSolver2DImpl*>(fImpl);
+	return View(impl->fPsiXHost, impl->fNx, impl->fNy);
 }
 
-MatrixView<Real> QuScatteringProblemSolver2D::GetV()
+MatrixView<Complex> QuScatteringProblemSolver2D::GetV()
 {
-	return View(static_cast<ScatteringSolver2DImpl*>(fImpl)->fV);
+	auto impl = static_cast<ScatteringSolver2DImpl*>(fImpl);
+	return View(impl->fVHost, impl->fNx, impl->fNy);
 }
 
 Real QuScatteringProblemSolver2D::ComputeXSection(Real cosx, Real cosy)
@@ -644,13 +629,6 @@ void QuPerturbation2D::init(std::function<Complex(Real, Real)> const & v, Real x
 		directionx, directiony, met, mass, hbar, *opts.fOpts);
 }
 
-MatrixView<Real> QuPerturbation2D::GetVabsb()
-{
-	return View(static_cast<QuPerturbation2DImpl*>(fImpl)->fVasb.data(),
-		static_cast<QuPerturbation2DImpl*>(fImpl)->fNx,
-		static_cast<QuPerturbation2DImpl*>(fImpl)->fNy);
-}
-
 Real QuPerturbation2D::GetDeltaPsiNorm()
 {
 	return static_cast<QuPerturbation2DImpl*>(fImpl)->fNormDeltaPsi;
@@ -660,13 +638,13 @@ Real QuPerturbation2D::GetDeltaPsiNorm()
 Tensor3View<Complex> QuScatteringProblemSolver3D::GetPsi()
 {
 	auto impl = static_cast<ScatteringProblemSolverInverseMatrix3D*>(fImpl);
-	return View(impl->fPsiX.data(), impl->fNx, impl->fNy, impl->fNz);
+	return View(impl->fPsiX, impl->fNx, impl->fNy, impl->fNz);
 }
 
-Tensor3View<Real> QuScatteringProblemSolver3D::GetV()
+Tensor3View<Complex> QuScatteringProblemSolver3D::GetV()
 {
 	auto impl = static_cast<ScatteringProblemSolverInverseMatrix3D*>(fImpl);
-	return View(impl->fV.data(), impl->fNx, impl->fNy, impl->fNz);
+	return View(impl->fV, impl->fNx, impl->fNy, impl->fNz);
 }
 
 Real QuScatteringProblemSolver3D::ComputeXSection(Real cosx, Real cosy, Real cosz)

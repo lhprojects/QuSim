@@ -1,0 +1,67 @@
+CPU: AMD Ryzen 7 3700X 8-Core Processor
+MSVC, x64, Release
+
+
+
+              benchmark_transform_Dot
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+                 seq     14569 us
+                 par     15019 us
+           par_unseq      3459 us
+           par_unseq      2742 us
+           par_unseq      2978 us
+                 par      3774 us
+                 seq      8082 us
+                 par      3412 us
+           par_unseq      2502 us
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+              benchmark_transform_Exp
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+                 seq     35774 us
+                 par      7271 us
+           par_unseq      6867 us
+           par_unseq      7275 us
+           par_unseq     82523 us
+                 par      6539 us
+                 seq     29107 us
+                 par      6171 us
+           par_unseq      8117 us
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+              benchmark_transform_fill
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+                 seq     14515 us
+                 par      6785 us
+           par_unseq      7100 us
+           par_unseq      7584 us
+           par_unseq      6895 us
+                 par      7717 us
+                 seq      9707 us
+                 par      7399 us
+           par_unseq      6259 us
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+                    benchmark_loop
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+nestedloop   assign ( double)    101829 us
+nestedloop      mul ( double)     93134 us
+nestedloop      exp ( double)   6002186 us
+flatteloop   assign ( double)    109664 us
+flatteloop      mul ( double)    135970 us
+flatteloop      exp ( double)   6071308 us
+ transform_red  mul ( double)     25682 us
+ transform      exp ( double)    739670 us
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+                    benchmark_loop
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+nestedloop   assign (complex)    157890 us
+nestedloop      mul (complex)    117385 us
+nestedloop      exp (complex)   4997424 us
+flatteloop   assign (complex)    173794 us
+flatteloop      mul (complex)    153432 us
+flatteloop      exp (complex)   5096180 us
+ transform_red  mul (complex)     51284 us
+ transform      exp (complex)    561000 us
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -6,11 +6,11 @@
 #include "Linear.h"
 #include "Perburbation.h"
 #include "PerturbationOptions.h"
+#include "Utils.h"
 #include <memory>
 
-struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
-
-	QuPerturbation1DImpl() : fEpsilon(), fOrder(), fSplit() { }
+struct QuPerturbation1DImpl : ScatteringSolver1DImpl, PerturbationCommon
+{
 
 	virtual void InitPerturbation1D(
 		std::function<Complex(Real)> const & v,
@@ -27,9 +27,14 @@ struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 
 	void Compute() override;
 
+	Real GetMomentum()
+	{
+        return sqrt(2 * fMass * fE);
+	}
+
 	Real GetMaxEnergy()
 	{
-		return 0.5 * pow(2 * Pi / fDx * fHbar, 2) / fMass;
+        return 0.5 * QuSqr(GetMaxMomentum()) / fMass;
 	}
 
 	Real GetMaxMomentum()
@@ -39,7 +44,7 @@ struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 
 	Real GetMomentumGap()
 	{
-		return 2 * Pi / (fDx*fNx)*fHbar;
+        return 2 * Pi / (fDx * fNx) * fHbar;
 	}
 
 	Real GetEpsilonMomentumWidth()
@@ -49,27 +54,23 @@ struct QuPerturbation1DImpl : ScatteringSolver1DImpl {
 
 	Real GetEnergyGap()
 	{
-		return sqrt(2 * fMass*fE) / fMass * 2 * Pi / (fDx*fNx)*fHbar;
+        return sqrt(2 * fMass * fE) / fMass * GetMomentumGap();
 	}
-	Real GetEpsilonBoundaryError()
+
+	Real GetEpsilonDecayLength()
 	{
-		return exp(-(fNx*fDx)*sqrt(2*fMass*fE)*fEpsilon/fE);
+        return 2 * Pi / (GetMomentum() / fHbar * fEpsilon / (2 * fE));
 	}
+
+    Real GetEpsilonBoundaryError()
+    {
+        return exp(-(fNx * fDx / 2) * (GetMomentum() / fHbar) * fEpsilon / (2 * fE));
+    }
 
 
 	FourierTransformOptions fFourierTransformOptions;
-	std::shared_ptr<FourierTransform> fFFT;
-	std::shared_ptr<FourierTransform> fInvFFT;
+	std::shared_ptr<FourierTransform1D> fFFT;
+	std::shared_ptr<FourierTransform1D> fInvFFT;
 
-	int const fOrder;
-	Real const fEpsilon;
-	PsiVector fPsiK;
-
-	int const fSplit;
-	PerturbationOptions fPerturbationOptions;
-	std::vector<Real> fVasb;
-
-	PsiVector ftmp1;
-	PsiVector ftmp2;
 
 };

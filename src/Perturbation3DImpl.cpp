@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Perturbation3DImpl.h"
+#include "Utils.h"
 
 void QuPerturbation3DImpl::InitPerturbation3D(std::function<Complex(Real, Real, Real)> const & v,
 	Real x0, Real x1, size_t nx,
@@ -19,108 +20,106 @@ void QuPerturbation3DImpl::InitPerturbation3D(std::function<Complex(Real, Real, 
 		met, mass, hbar, opts);
 
 	fNormDeltaPsi = 0;
-	fFourierTransformOptions.Init(opts);
-	fFFT.reset(FourierTransform3D::Create(fNz, fNy, fNx, false, fFourierTransformOptions.fLib));
-	fInvFFT.reset(FourierTransform3D::Create(fNz, fNy, fNx, true, fFourierTransformOptions.fLib));
-	const_cast<Real&>(fEpsilon) = epsilon;
+	fFourierTransformOptions.Init(opts, fDeviceType);
+    fFFT.reset(FourierTransform3D::Create(fNx, fNy, fNz, false, fFourierTransformOptions.fLib));
+    fInvFFT.reset(FourierTransform3D::Create(fNx, fNy, fNz, true, fFourierTransformOptions.fLib));
 
-	fPsiK.resize(fNz*fNy*fNx);
-
-	fPsiX.setZero();
+    InitPerturbationCommon(opts, epsilon, fN, fDevice.get());
 
 	if (fMet == SolverMethod::BornSerise) {
 
-		const_cast<int&>(fOrder) = (int)opts.GetInt("order", 0);
+		if (fPreconditional) {
 
-		fPerturbationOptions.Init(opts);
-		if (fPerturbationOptions.fPreconditional) {
-
-			{
-				fVasb.resize(fNx*fNy*fNz);
-				Real lambda = 2 * Pi / (sqrt(2 * fMass*fE) / hbar);
-				if (fNx*fDx < 24 * lambda) {
-					throw std::runtime_error("too small size");
-				}
-				if (fNy*fDy < 24 * lambda) {
-					throw std::runtime_error("too small size");
-				}
-				if (fNz*fDz < 24 * lambda) {
-					throw std::runtime_error("too small size");
-				}
-				PerburbationUtility::GaussAsbLayer3D(fNx, fNy, fNz,
-					fDx, fDy, fDz,
-					fVasb.data(),
-					fHbar, mass, fE, 4.0);
-
+			Real lambda = 20/ (sqrt(2 * fMass * fE) / hbar);
+            if (fNx * fDx < lambda) {
+                throw std::runtime_error(std::string("too small size:")
+                    + " lambda: " + std::to_string(lambda)
+                    + " world_size_x: " + std::to_string(fNx * fDx)
+                );
+            }
+            if (fNy * fDy < lambda) {
+                throw std::runtime_error(std::string("too small size:")
+                    + " lambda: " + std::to_string(lambda)
+                    + " world_size_y: " + std::to_string(fNy * fDy)
+                );
+            }
+            if (fNz * fDz < lambda) {
+                throw std::runtime_error(std::string("too small size:")
+                    + " lambda: " + std::to_string(lambda)
+                    + " world_size_z: " + std::to_string(fNz * fDz)
+                );
+            }
+			PerburbationUtility::GaussMAsbLayer3D(fNx, fNy, fNz,
+				fDx, fDy, fDz,
+				mutable_ptr_cast(fVHost),
+				fHbar, mass, fE, 4.0);
+			if (!fDevice->OnMainMem()) {
+				fDevice->ToDevice(mutable_ptr_cast(fV), fVHost, fN);
 			}
 
 			PreconditionalBornSeries pbs;
-			pbs.GetEpsilon(epsilon, fPerturbationOptions.fPreconditioner,
-				fNx*fNy, fV.data(), fVasb.data());
-			const_cast<Real&>(fEpsilon) = epsilon;
-
-			ftmp1.resize(fNx*fNy*fNz);
+			pbs.GetEpsilon(epsilon, fPreconditioner, fNx * fNy * fNz, fV, fDevice.get());
+			mutable_cast(fEpsilon) = epsilon;
 		}
 
 	} else {
 		throw std::runtime_error("not support method!");
 	}
-
-
-
 }
 
 void QuPerturbation3DImpl::Compute()
 {
-	auto X2K = [this](Complex const *psix, Complex *psik) {
-		fFFT->Transform(psix, psik);
-	};
-
-	auto K2X = [this](Complex const *psik, Complex *psix) {
-		fInvFFT->Transform(psik, psix);
-		for (size_t i = 0; i < fNx; ++i) {
-			for (size_t j = 0; j < fNy; ++j) {
-				for (size_t k = 0; k < fNz; ++k) {
-					psix[Idx(k, j, i)] *= 1. / (fNx*fNy*fNz);
-				}
-			}
-		}
-	};
 
 	if (fLastPsiXRecord) {
-		for (size_t i = 0; i < fNx*fNy*fNz; ++i) {
-			fLastPsiX.data()[i] = fPsiX.data()[i];
-		}
+		fDevice->Copy(fLastPsiX, fPsiX, fN);
 	}
 
-	if (fPerturbationOptions.fPreconditional) { // Preconditional Born serise
+	if (fPreconditional) { // Preconditional Born serise
 
 		PreconditionalBornSeries pbs;
 		for (int i = 0; i < fOrder; ++i) {
-			pbs.Update3D(fNx, fNy, fNz, fPsi0X.data(), fPsiX.data(), fPsiK.data(),
-				fV.data(), fVasb.data(), ftmp1.data(), fEpsilon, fE,
+#if 1
+			pbs.Update3D(fNx, fNy, fNz, fPsi0X, fPsiX, fPsiK,
+				fV, fTmpPsi, fEpsilon, fE,
 				fMass, fHbar, fDx, fDy, fDz,
-				X2K, K2X,
-				fPerturbationOptions.fSlow,
-				fPerturbationOptions.fPreconditioner);
+				fSlow,
+				fPreconditioner,
+				fFFT.get(), fInvFFT.get(), fDevice.get());
+#else
+			pbs.Update3D(fNx, fNy, fNz, fPsi0X, fPsiX, fPsiK,
+				fV, fTmpPsi, fEpsilon, fE,
+				fMass, fHbar, fDx, fDy, fDz,
+				fSlow,
+				fPreconditioner,
+				fFFT.get(), fInvFFT.get(), fDevice.get());
+#endif
 		}
 
 	} else { // naive born serise
 		BornSeries bs;
 
 		for (int i = 0; i < fOrder; ++i) {
-			bs.Update3D(fNx, fNy, fNz, fPsi0X.data(), fPsiX.data(),
-				fPsiK.data(), fV.data(), fEpsilon, fE, fMass, fHbar, fDx, fDy, fDz,
-				X2K, K2X);
+#if 1
+			bs.Update3D(fNx, fNy, fNz, fPsi0X, fPsiX,
+				fPsiK, fV, fEpsilon, fE, fMass, fHbar, fDx, fDy, fDz,
+				fFFT.get(), fInvFFT.get(), fDevice.get());
+#else
+			bs.Update3D(fNx, fNy, fNz, fPsi0X, fPsiX,
+				fPsiK, fV, fEpsilon, fE, fMass, fHbar, fDx, fDy, fDz,
+				fFFT.get(), fInvFFT.get(), fDevice.get());
+#endif
 		}
 	}
 
+    if (!fDevice->OnMainMem()) {
+        fDevice->ToHost(fPsiXHost, fPsiX, fN);
+    }
+
 	Real norm = 0;
 	if (fLastPsiXRecord) {
-		for (size_t i = 0; i < fNx * fNy; ++i) {
-			norm += abs2(fPsiX.data()[i] - fLastPsiX.data()[i])*fDx*fDy*fDz;
-		}
-		norm = sqrt(norm);
+		Real norm = fDevice->MinusNorm2(fPsiX, fLastPsiX, fN);
+		Real dfnorm = fDevice->Norm2(fPsiX, fN);
+		fNormDeltaPsi = norm / dfnorm;
 	}
 	fNormDeltaPsi = norm;
 }

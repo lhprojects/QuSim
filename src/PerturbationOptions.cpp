@@ -1,8 +1,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "PerturbationOptions.h"
 #include "OptionsImpl.h"
+#include "Utils.h"
 
-void PerturbationOptions::Init(OptionsImpl const & opts)
+void PerturbationCommon::InitPerturbationCommon(OptionsImpl const & opts,
+	Real epsilon, size_t n, Device *dev)
 {
 
 	const_cast<bool&>(fPreconditional) = opts.GetBool("preconditional", false);
@@ -27,6 +29,22 @@ void PerturbationOptions::Init(OptionsImpl const & opts)
 		const_cast<BornSerisePreconditioner&>(fPreconditioner) = precer;
 
 	}
-	const_cast<Real&>(fSlow) = opts.GetReal("slow", 1);
 
+	mutable_cast(fOrder) = (int)opts.GetInt("order", 1);
+	mutable_cast(fSlow) = opts.GetReal("slow", 1);
+
+	mutable_cast(fDev) = dev;
+	mutable_cast(fEpsilon) = epsilon;
+	mutable_cast(fPsiK) = dev->Alloc<Complex>(n);
+	if (fPreconditional) {
+		mutable_cast(fTmpPsi) = dev->Alloc<Complex>(n);
+	}
+
+}
+
+
+PerturbationCommon::~PerturbationCommon()
+{
+    fDev->SafeFree(mutable_cast(fPsiK));
+    fDev->SafeFree(mutable_cast(fTmpPsi));
 }

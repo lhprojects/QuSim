@@ -1,7 +1,8 @@
 #include "SplittingMethod2D.h"
-//#include "kissfft.hh"
+#include "SplittingUtils.h"
+#include "Utils.h"
 
-void SplittingMethod2D::initSystem2D(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
+void SplittingMethod2D::InitSystem2D(std::function<Complex(Real, Real)> const &psi, bool force_normalization,
 	Complex dt, bool force_normalization_each_step,
 	std::function<Complex(Real, Real)> const &vs, Real x0, Real x1,
 	size_t nx, Real y0, Real y1,
@@ -9,191 +10,129 @@ void SplittingMethod2D::initSystem2D(std::function<Complex(Real, Real)> const &p
 	SolverMethod solver, Real mass, Real hbar,
 	OptionsImpl const &opts)
 {
-	EvolverImpl2D::initSystem2D(psi, force_normalization, dt, force_normalization_each_step,
+	QuEvolver2DImpl::InitSystem2D(psi, force_normalization, dt, force_normalization_each_step,
 		vs, x0, x1, nx, y0, y1, ny,
 		b, solver, mass, hbar, opts);
+	fFourierTransformOptions.Init(opts, fDeviceType);
 
-	fVPsi.resize(fNy, fNx);
-	fTVPsi.resize(fNy, fNx);
-	fVTVPsi.resize(fNy, fNx);
-	fPsiYIn.resize(fNx);
-	fPsiYOut.resize(fNx);
-
-	initExpV();
-	initExpT();
-
-	fFourierTransformOptions.Init(opts);
+	InitExpV();
+	InitExpT();
 
 	if (b == BoundaryCondition::Period) {
-		fFTPsi.resize(fNy, fNx);
+		fFTPsi = fDevice->Alloc<ComplexType>(fN);
 
-		fft.reset(FourierTransform2D::Create(fNy, fNx, false, fFourierTransformOptions.fLib));
-		inv_fft.reset(FourierTransform2D::Create(fNy, fNx, true, fFourierTransformOptions.fLib));
+		fft.reset(FourierTransform2D::Create(fNx, fNy, false, fFourierTransformOptions.fLib));
+		inv_fft.reset(FourierTransform2D::Create(fNx, fNy, true, fFourierTransformOptions.fLib));
 
 	} else {
 		throw std::runtime_error("unsupported boundary condition!");
 	}
 
-	//double x = Norm2();
-
 }
 
-void SplittingMethod2D::update_psi()
+void SplittingMethod2D::UpdatePsi()
 {
-	if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
+	QuUpdatePsi(this);
+}
 
-		ExpV(fVPsi, fPsi, 0.5);
-		//double x1 = fVPsi.squaredNorm();
-		ExpT(fTVPsi, fVPsi, 1.0);
-		//Copy(fTVPsi, fVPsi);
-		ExpV(fPsi, fTVPsi, 0.5);
-		//Copy(fPsi, fVTVPsi);
-		//double x2 = Norm2();
-	} else if(SolverMethod::SplittingMethodO4 == fSolverMethod) {
+void SplittingMethod2D::InitExpV()
+{
+	if (fCacheExp) {
+		if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
+			mutable_cast(fExpVDt_0D5) = fDevice->Alloc<Complex>(fN);
+			ComplexType f = -I / fHbar * fDt * 0.5;
+			fDevice->Exp(mutable_ptr_cast(fExpVDt_0D5), fV, f, fN);
+		} else if (SolverMethod::SplittingMethodO4 == fSolverMethod) {
+			mutable_cast(fExpVDt_C1) = fDevice->Alloc<Complex>(fN);
+			mutable_cast(fExpVDt_C2) = fDevice->Alloc<Complex>(fN);
+			ComplexType f1 = -I / fHbar * fDt * SplitingConstants<Real>::C1;
+			fDevice->Exp(mutable_ptr_cast(fExpVDt_C1), fV, f1, fN);
+			ComplexType f2 = -I / fHbar * fDt * SplitingConstants<Real>::C2;
+			fDevice->Exp(mutable_ptr_cast(fExpVDt_C2), fV, f2, fN);
+		}
+	}
+}
 
-		Real tpow1t = pow(2, 1 / 3.0);
-		Real c1 = 1 / (2 * (2 - tpow1t));
-		Real c2 = (1 - tpow1t) / (2 * (2 - tpow1t));
+void SplittingMethod2D::InitExpT()
+{
+	if (fCacheExp) {
+        RealType const Dkx = 2 * Pi / (fDx * fNx);
+        RealType const Dky = 2 * Pi / (fDy * fNy);
+        RealType const DTx = QuSqr(Dkx * fHbar) / (2 * fMass);
+        RealType const DTy = QuSqr(Dky * fHbar) / (2 * fMass);
+        ComplexType const alpha = -I * fDt / fHbar;
 
-		ExpV(fVPsi, fPsi, c1);
-		ExpT(fTVPsi, fVPsi, fD1);
-		ExpV(fVPsi, fTVPsi, c2);
-		ExpT(fTVPsi, fVPsi, fD2);
-		ExpV(fVPsi, fTVPsi, c2);
-		ExpT(fTVPsi, fVPsi, fD1);
-		ExpV(fPsi, fTVPsi, c1);
+		if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
+			mutable_cast(fExpTDt) = fDevice->Alloc<ComplexType>(fN);
+			fDevice->SetOne(mutable_ptr_cast(fExpTDt), fN);
+			fDevice->MulExpK2D(mutable_ptr_cast(fExpTDt), alpha, DTx, fNx, DTy, fNy);
+		} else if (SolverMethod::SplittingMethodO4 == fSolverMethod) {
+			mutable_cast(fExpTDt_D1) = fDevice->Alloc<ComplexType>(fN);
+			mutable_cast(fExpTDt_D2) = fDevice->Alloc<ComplexType>(fN);
+			fDevice->SetOne(mutable_ptr_cast(fExpTDt_D1), fN);
+			fDevice->SetOne(mutable_ptr_cast(fExpTDt_D2), fN);
+
+			fDevice->MulExpK2D(mutable_ptr_cast(fExpTDt_D1), alpha * SplitingConstants<Real>::D1, DTx, fNx, DTy, fNy);
+			fDevice->MulExpK2D(mutable_ptr_cast(fExpTDt_D2), alpha * SplitingConstants<Real>::D2, DTx, fNx, DTy, fNy);
+		}
+	}
+}
+
+void SplittingMethod2D::ExpV(SplittingMethod2D::ComplexType* psi,
+	SplittingMethod2D::RealType tt) const
+{
+	if (fCacheExp && tt == 0.5 && fExpVDt_0D5) {
+		fDevice->Mul(psi, fExpVDt_0D5, fN);
+	} else if (fCacheExp && tt == SplitingConstants<Real>::C1 && fExpVDt_C1) {
+		fDevice->Mul(psi, fExpVDt_C1, fN);
+	} else if (fCacheExp && tt == SplitingConstants<Real>::C2 && fExpVDt_C2) {
+		fDevice->Mul(psi, fExpVDt_C2, fN);
 	} else {
-		throw std::runtime_error("unspported method");
-	}
-
-}
-
-void SplittingMethod2D::initExpV()
-{
-	if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
-		fExpV0Dot5Dt.resize(fNy, fNx);
-
-		Complex f = -1.0 / fHbar * fDt * 0.5;
-		for (size_t i = 0; i < fNx*fNy; ++i) {
-			fExpV0Dot5Dt.data()[i] = exp(f*fV.data()[i] * I);
-		}
+		ComplexType f = -I / fHbar * fDt * tt;
+		fDevice->MulExp(psi, f, fV, fN);
 	}
 }
 
-void SplittingMethod2D::initExpT()
+void SplittingMethod2D::ExpT(SplittingMethod2D::ComplexType*psi,
+	SplittingMethod2D::RealType tt) const
 {
-	if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
-		fExpTDt.resize(fNy, fNx);
-	} else if (SolverMethod::SplittingMethodO4 == fSolverMethod) {
-		fExpTD1Dt.resize(fNy, fNx);
-		fExpTD2Dt.resize(fNy, fNx);
-	}
+	fft->Transform(psi, fFTPsi);
 
-	Real tpow1t = pow(2, 1 / 3.0);
-	fD1 = 1 / (2 - tpow1t);
-	fD2 = -tpow1t / (2 - tpow1t);
-
-	for (size_t i = 0; i < fNx; ++i) {
-		for (size_t j = 0; j < fNy; ++j) {
-			size_t ii = i > fNx / 2 ? fNx - i : i;
-			size_t jj = j > fNy / 2 ? fNy - j : j;
-			Real kx = ii * 2 * Pi / (fDx * fNx);
-			Real ky = jj * 2 * Pi / (fDy * fNy);
-
-			Real t = fHbar * (kx*kx + ky * ky) / (2 * fMass);
-
-			if (SolverMethod::SplittingMethodO2 == fSolverMethod) {
-				fExpTDt(j, i) = exp(-I * (t * fDt* 1.0));
-			} else if (SolverMethod::SplittingMethodO4 == fSolverMethod) {
-				fExpTD1Dt(j, i) = exp(-I * (t * fDt* fD1));
-				fExpTD2Dt(j, i) = exp(-I * (t * fDt* fD2));
-			}
-
-		}
-	}
-
-}
-
-void SplittingMethod2D::ExpV(Eigen::MatrixXcd &vpsi, Eigen::MatrixXcd const &psi, Real t)
-{
-	if (t == 0.5) { // because exp() is very slow
-		for (size_t i = 0; i < fNx*fNy; ++i) {
-			vpsi.data()[i] = psi.data()[i] * fExpV0Dot5Dt.data()[i];
-		}
+	if (fCacheExp && tt == 1.0 && fExpTDt) {
+		fDevice->Mul(fFTPsi, fExpTDt, fN);
+	} else if (fCacheExp && tt == SplitingConstants<Real>::D1 && fExpTDt_D1) {
+		fDevice->Mul(fFTPsi, fExpTDt_D1, fN);
+	} else if(fCacheExp && tt == SplitingConstants<Real>::D2 && fExpTDt_D2) {
+		fDevice->Mul(fFTPsi, fExpTDt_D2, fN);
 	} else {
-		Complex f = -1.0 / fHbar * fDt * t;
-		for (size_t i = 0; i < fNx*fNy; ++i) {
-			vpsi.data()[i] = psi.data()[i] * exp(f*fV.data()[i] * I);
-		}
+
+        RealType const Dkx = 2 * Pi / (fDx * fNx);
+        RealType const Dky = 2 * Pi / (fDy * fNy);
+        RealType const DTx = QuSqr(Dkx * fHbar) / (2 * fMass);
+        RealType const DTy = QuSqr(Dky * fHbar) / (2 * fMass);
+        ComplexType const alpha = -I * fDt / fHbar;
+
+        fDevice->MulExpK2D(fFTPsi, alpha * tt, DTx, fNx, DTy, fNy);
 	}
+
+    inv_fft->Transform(fFTPsi, psi);
+    fDevice->Scale(psi, 1. / fN, fN);
 
 }
 
-void SplittingMethod2D::ExpT(Eigen::MatrixXcd &tpsi, Eigen::MatrixXcd const &psi, Real tt)
+SplittingMethod2D::RealType
+SplittingMethod2D::CalKinEn() const
 {
-	//double y1 = psi.squaredNorm()*fDx*fDy;
-	fft->Transform(psi.data(), fFTPsi.data());
-	//double y2 = sqrt(fFTPsi.squaredNorm()*fDx*fDy);
-	if (tt == 1.0) {
-		for (size_t i = 0; i < fNx; ++i) {
-			for (size_t j = 0; j < fNy; ++j) {
-				fFTPsi(j, i) *= fExpTDt(j, i);
-			}
-		}
-	} else if (tt == fD1) {
-		for (size_t i = 0; i < fNx; ++i) {
-			for (size_t j = 0; j < fNy; ++j) {
-				fFTPsi(j, i) *= fExpTD1Dt(j, i);
-			}
-		}
-	} else if(tt == fD2){
-		for (size_t i = 0; i < fNx; ++i) {
-			for (size_t j = 0; j < fNy; ++j) {
-				fFTPsi(j, i) *= fExpTD2Dt(j, i);
-			}
-		}
-	} else {
-		for (size_t i = 0; i < fNx; ++i) {
-			for (size_t j = 0; j < fNy; ++j) {
-				size_t ii = i > fNx / 2 ? fNx - i : i;
-				size_t jj = j > fNy / 2 ? fNy - j : j;
-				Real kx = ii * 2 * Pi / (fDx * fNx);
-				Real ky = jj * 2 * Pi / (fDy * fNy);
+	RealType normnorm = fDevice->Norm2(fPsi, fN);
+	fft->Transform(fPsi, fFTPsi);
 
-				Real t = fHbar * (kx*kx + ky * ky) / (2 * fMass);
-				Complex f = exp(-I * (t * fDt* tt));
-				fFTPsi(j, i) *= f;
-			}
-		}
-	}
+	RealType Dkx = 2 * Pi / (fDx * fNx);
+	RealType Dky = 2 * Pi / (fDy * fNy);
+	RealType DTx = QuSqr(Dkx * fHbar) / (2 * fMass);
+	RealType DTy = QuSqr(Dky * fHbar) / (2 * fMass);
 
-
-	inv_fft->Transform(fFTPsi.data(), tpsi.data());
-	//double y5 = sqrt(tpsi.squaredNorm()*fDx*fDy);
-	tpsi *= 1.0 / (fNx * fNy);
-
-	//double y3 = sqrt(tpsi.squaredNorm()*fDx*fDy);
-
-}
-
-Real SplittingMethod2D::CalKinEn() const
-{
-	fft->Transform(fPsi.data(), fFTPsi.data());
-
-	Real en = 0;
-
-	for (size_t i = 0; i < fNx; ++i) {
-		for (size_t j = 0; j < fNy; ++j) {
-			size_t ii = i > fNx / 2 ? fNx - i : i;
-			size_t jj = j > fNy / 2 ? fNy - j : j;
-			Real kx = ii * 2 * Pi / (fDx * fNx);
-			Real ky = jj * 2 * Pi / (fDy * fNy);
-
-			Real e = fHbar*fHbar * (kx*kx + ky * ky) / (2 * fMass);
-			en += abs2(fFTPsi(j, i)) * e;
-		}
-	}
-
-	en /= fFTPsi.squaredNorm();
-	return en;
+	RealType kin = fDevice->Abs2K2D(fFTPsi, DTx, fNx, DTy, fNy);
+	RealType norm2 = fDevice->Norm2(fFTPsi, fN);
+	kin =  kin / norm2;
+	return kin;
 }

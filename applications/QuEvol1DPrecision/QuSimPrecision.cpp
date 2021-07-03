@@ -1,7 +1,7 @@
 
 #include <QuSim.h>
-
 #include <chrono>
+#include "../QuBenchmark/Benchmark.h"
 
 struct Test {
 	SolverMethod met;
@@ -17,18 +17,26 @@ void test_tunneling()
 	printf("Potential: exp(-x*x)\n");
 
 	Options space_O2;
-	space_O2.SetBool("space_O2", true);
+	space_O2.SpaceOrder(2);
 
 	Options space_O4;
-	space_O4.SetBool("space_O2", false);
+	space_O2.SpaceOrder(4);
+
+	Options space_O6;
+	space_O6.SpaceOrder(6);
 
 	Test tests[] = {
-		{ SolverMethod::SplittingMethodO2 , "splitO2", Options() },
+	{ SolverMethod::SplittingMethodO2 , "splitO2", Options() },
 	{ SolverMethod::SplittingMethodO4 , "splitO4", Options() },
-	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", Options() },
+	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", space_O2 },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO4", space_O4 },
+	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO6", space_O6 },
 	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO2", space_O2 },
-	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", Options() },
+	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", space_O4 },
+	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO6", space_O6 },
+	{ SolverMethod::GaussLegendreO6 , "gaussO6+spaceO2", space_O2 },
+	{ SolverMethod::GaussLegendreO6 , "gaussO6+spaceO4", space_O4 },
+	{ SolverMethod::GaussLegendreO6 , "gaussO6+spaceO6", space_O6 },
 	{ SolverMethod::Eigen , "eigen", Options() },
 	};
 
@@ -57,7 +65,7 @@ void test_tunneling()
 		for (; syst.Time() < 64;) {
 			syst.step();
 		}
-		printf("ref 1 %.16f\n", syst.NormRight());
+		printf("ref 1 %.16f\n", syst.Norm2());
 	}
 
 	if (0) {
@@ -68,13 +76,13 @@ void test_tunneling()
 		for (; syst.Time() < 64;) {
 			syst.step();
 		}
-		printf("ref 1 %.16f\n", syst.NormRight());
+		printf("ref 1 %.16f\n", syst.Norm2());
 
 	}
 	double ref = (0.1593774409 + 0.1593774408) / 2;
 
 	for (int i = 0; i < sizeof(tests) / sizeof(Test); ++i) {
-		printf("         Error for %-30s\n", tests[i].name);
+		begin_section(tests[i].name);
 
 
 
@@ -107,46 +115,53 @@ void test_tunneling()
 
 				auto d = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0);
 
-				printf("%+10.1E ", syst.NormRight() - ref);
+				auto x0 = syst.GetX0();
+				auto x1 = syst.GetX1();
+				printf("%+10.1E ", syst.Norm2(0.5*(x0+x1), x1) - ref);
 			}
 			printf("\n");
 		}
 		printf("\n");
 
+		end_section();
 	}
 
 }
 
 void test_speed()
 {
-
 	printf("Test the Speed\n");
 	printf("Inital wave function: C*gauss(x, 0, 5)*exp(I*x)\n");
 	printf("Potential: 0\n");
 
 	Options space_O2;
-	space_O2.SetBool("space_O2", true);
+	space_O2.SpaceOrder(2);
 
 	Options space_O4;
-	space_O4.SetBool("space_O2", false);
+	space_O4.SpaceOrder(4);
 
+	Options space_O6;
+	space_O6.SpaceOrder(6);
 
 	Options cuda = Options().Cuda();
 
-	Options cuda_single = Options().Cuda().CudaPrecisionSingle();
-
 	Test tests[] = {
 	
-#ifdef USE_CUDA
+#ifdef QUSIM_USE_CUDA
 	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda", cuda },
-	{ SolverMethod::SplittingMethodO2 , "splitO2+cuda_single", cuda_single },
+	{ SolverMethod::SplittingMethodO4 , "splitO4+cuda", cuda },
 #endif
 	{ SolverMethod::SplittingMethodO2 , "splitO2+kiss", Options() },
-	{ SolverMethod::SplittingMethodO4 , "splitO4", Options() },
-	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", Options() },
+	{ SolverMethod::SplittingMethodO4 , "splitO4+kiss", Options() },
+	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO2", space_O2 },
 	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO4", space_O4 },
+	{ SolverMethod::ImplicitMidpointMethod , "midpoint+spaceO6", space_O6 },
 	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO2", space_O2 },
-	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", Options() },
+	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO4", space_O4 },
+	{ SolverMethod::GaussLegendreO4 , "gaussO4+spaceO6", space_O6 },
+	{ SolverMethod::GaussLegendreO6 , "gaussO6+spaceO2", space_O2 },
+	{ SolverMethod::GaussLegendreO6 , "gaussO6+spaceO4", space_O4 },
+	{ SolverMethod::GaussLegendreO6 , "gaussO6+spaceO6", space_O6 },
 	{ SolverMethod::Eigen , "eigen", Options() },
 	};
 
@@ -166,10 +181,8 @@ void test_speed()
 		1E-1,
 	};
 
-	double ref = 40;
-
 	for (int i = 0; i < sizeof(tests) / sizeof(Test); ++i) {
-		printf("         Error for %-30s\n", tests[i].name);
+		begin_section(tests[i].name);
 
 
 
@@ -194,22 +207,20 @@ void test_speed()
 					-100, 100, dims[j], BoundaryCondition::Period, tests[i].met, 1, 1,
 					tests[i].opts);
 
-				auto t0 = std::chrono::system_clock::now();
+				double x0 = syst.Xavg();
 				for (; ;) {
-					syst.step();
-					if (syst.Time() > 40 - 1E-6) break;
-				}
-				auto t1 = std::chrono::system_clock::now();
 
-				auto d = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0);
-				//printf("%lf\n", syst.Xavg());
-				//printf("%lf\n", syst.Time());
-				printf("%+10.1E ", syst.Xavg()/ref - 1);
+					syst.step();
+					if (syst.Time() > 0.1) break;
+				}
+                double x1 = syst.Xavg();
+                double vel = (x1 - x0) / syst.Time();
+                printf("%+10.1E ", vel - 1.);
 			}
 			printf("\n");
 		}
 		printf("\n");
-
+		end_section();
 	}
 
 }

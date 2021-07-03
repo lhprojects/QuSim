@@ -2,43 +2,47 @@
 #include "EvolverImpl.h"
 #include "FourierTransform.h"
 #include "FourierTransformOptions.h"
+#include "Device.h"
 #include <memory>
 
+struct SplittingMethod1D : QuEvolver1DImpl
+{
 
-struct SplittingMethod1D : EvolverImpl1D {
-
-	std::vector<Complex> fExpV0Dot5Dt;
-	std::vector<Complex> fVPsi;
-	std::vector<Complex> fTVPsi;
-	std::vector<Complex> fVTVPsi;
+	FourierTransformOptions fFourierTransformOptions;
 
 	// period only
-	std::vector<Complex> fFTPsi;
-	
-	FourierTransformOptions fFourierTransformOptions;
-	std::shared_ptr<FourierTransform> fft_N;
-	std::shared_ptr<FourierTransform> inv_fft_N;
+	mutable std::shared_ptr<FourierTransform1D> fft_N;
+	mutable std::shared_ptr<FourierTransform1D> inv_fft_N;
+	ComplexType *fFTPsi = nullptr;
+
+
 	// infinite wall
-	std::shared_ptr<FourierTransform> inv_fft_2N;
-	std::vector<Complex> fIWPsi;
-	std::vector<Complex> fIWKPsi;
+	mutable std::shared_ptr<FourierTransform1D> inv_fft_2N;
+	ComplexType * const fIWPsi = nullptr;
+	ComplexType * const fIWKPsi = nullptr;
 
 
-	SplittingMethod1D();
+	Delayed fDestructor = [this]() {
+		if (fDevice) {
+			if (fFTPsi) fDevice->Free(fFTPsi);
+			if (fIWPsi) fDevice->Free(fIWPsi);
+			if (fIWKPsi) fDevice->Free(fIWKPsi);
+		}
+	};
 
-	void initSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
+	void InitSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
 		Real mass, Real hbar, OptionsImpl const &opts) override;
 
-	void update_psi() override;
-	Real CalKinEn() override;
+	void UpdatePsi() override;
+	Real CalKinEn() const override;
 
-	void initExpV();
+	void InitExpV();
 	// vpsi = exp(-i/hbar V Dt) psi
-	void ExpV(PsiVector &vpsi, PsiVector const &psi, Real t);
-	void ExpT(PsiVector &tpsi, PsiVector const &psi, Real t);
+	void ExpV(Complex *psi, Real t) const;
+	void ExpT(Complex *psi, Real t) const;
 
 
 };

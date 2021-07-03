@@ -24,3 +24,20 @@ The solver for two-side boundary value problem using `shooting` method is also p
 Solve the 2 D scattering problem for given initial wave function, energy, and potential.
 ![Quantum Scattering for 2 Dimsional Wave Function](screenshot/QuScattering2DExample.png)
 
+
+
+## Q & A
+
+Q: The difference between FFTW3 and KISS
+
+A:  The FFTW3 is about as twice fast as the KISS.
+
+
+
+## Hardware
+
+GPU is supported by GPU_CUDA device. You can utilize GPU by building with CUDA and set options with `Options opts; opts.Cuda();`.
+Multiple-threading is supported by CPU_PAR device. You can utilize multiple-core with `Options opts; opts.CpuPar();`.
+
+Vectorized-instruction is supported by automatic vectorization support of the compiler. The `CpuParVec()` means we will try to use `std::execution::parallel_unsequenced_policy`. But it seems the same as the `std::execution::parallel_policy` . Similar, the `CpuVec()`  is the same as the `CpuSeq()`. However,  for `CpuParVec()` , `CpuVec()` , `CpuPar()` and `CpuSeq()`, the vectorization can be de done because of the automatic vectorization support of the compiler.
+

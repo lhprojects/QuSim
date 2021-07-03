@@ -4,7 +4,6 @@ project ("QuSim")
 option(USE_CUDA "use cuda" OFF)
 if(USE_CUDA)
     add_compile_definitions(QUSIM_USE_CUDA)
-    add_compile_definitions(USE_CUDA)
 endif()
 
 message("Compiler: ${CMAKE_CXX_COMPILER_ID}")
@@ -12,8 +11,14 @@ message("Compiler: ${CMAKE_CXX_COMPILER_ID}")
 set (CMAKE_CXX_STANDARD 17)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    add_compile_options()
-    SET(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+
+    # this can't deal with cuda host compiler correctly
+    
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+
+
     ADD_DEFINITIONS(-DUNICODE)
     ADD_DEFINITIONS(-D_UNICODE)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -40,6 +45,7 @@ add_subdirectory("nana")
 add_subdirectory("QuSimCore")
 add_subdirectory("QuSim")
 add_subdirectory("QuSimTest")
+add_subdirectory("QuBenchmarkLoop")
 
 add_subdirectory("QuCalBenchmark")
 

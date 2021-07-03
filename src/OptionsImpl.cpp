@@ -12,10 +12,12 @@ std::string to_string(Complex c)
 {
     return "(" + std::to_string(c.real()) + "," + std::to_string(c.imag()) + ")";
 }
+
 std::string to_string(std::string s)
 {
     return std::move(s);
 }
+
 
 std::string GetOptionTypeName(OptionType type)
 {
@@ -132,7 +134,7 @@ std::string OptionsImpl::GetString(std::string const &k, std::string const &v) c
 
 std::string OptionsImpl::GetString(std::string const& k, std::string && v) const
 {
-    return GetDefaut<std::string>(v, std::move(v));
+    return GetDefaut<std::string>(k, std::move(v));
 }
 
 bool OptionsImpl::Contains(std::string const& k) const

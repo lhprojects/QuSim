@@ -1,10 +1,12 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <QuSim.h>
-
+#include "../QuBenchmark/Benchmark.h"
 
 void TestInverseMatrix(double p)
 {
-	printf("Test inverse matrix method V(x)=%lf exp(-x*x)\n", p);
+	begin_section("Test Reflaction Ratio fo Inverse Matrix Method");
+	printf("V(x)=%lf exp(-x*x)\n", p);
+
 	auto f = [&](Real x) { return p * exp(-x * x); };
 	Solver1D solver;
 
@@ -18,12 +20,15 @@ void TestInverseMatrix(double p)
 		printf("solver error %.2E\n", solver.GetR() - R);
 	}
 
-	printf("%6s %5s | SpaceO2  SpaceO4  SpaceO6\n", "method", "bins");
+    printf("%6s %5s | %10s %10s %10s\n",
+        "method", "bins",
+        "SpaceO2", "SpaceO4", "SpaceO6");
+
 	for (int i = 0; i < 10; ++i) {
 
 		double x0 = -150;
 		double x1 = 150;
-		size_t n = 500 + 500 * i;
+		size_t n = 500 + 500 * size_t(i);
 
 
 		Options space_o2 = Options().SpaceOrder(2);
@@ -59,20 +64,23 @@ void TestInverseMatrix(double p)
 			inv2.GetR() - solver.GetR(),
 			inv3.GetR() - solver.GetR());
 	}
+	end_section();
 }
 
 void TestMethodOfInverseMatrix()
 {
 
-	printf("Test inverse matrix method\n");
+	begin_section("Test Method of Inversing Matrix");
 	double R = 1 - 0.1355284179587569045304922;
 
-	printf("method bins | LU   DiagonalPre  IncompleteLUTPre  IdentityPre\n");
+    printf("%6s | %10s %10s %10s %10s\n",
+        "Grids", "LU", "DiagonalPre", "IncompleteLUTPre", "IdentityPre");
+
 	for (int i = 0; i < 10; ++i) {
 
 		double x0 = -150;
 		double x1 = 150;
-		size_t n = 500 + 500 * i;
+		size_t n = 500 + 500 * size_t(i);
 
 		Options opt1;
 		opt1.SpaceOrder(6).MatrixSolverLU();
@@ -106,101 +114,67 @@ void TestMethodOfInverseMatrix()
 			SolverMethod::MatrixInverse, 1, 1, opt4);
 		inv4.Compute();
 
-
-		auto geti = [&](double x) -> size_t {  return (size_t)((x - x0) / (x1 - x0) * n); };
-		printf("|psi|   %10.2E %10.2E %10.2E %10.2E\n",
-			abs2(inv1.GetPsi()[geti(-10)]) - R,
-			abs2(inv2.GetPsi()[geti(-10)]) - R,
-			abs2(inv3.GetPsi()[geti(-10)]) - R,
-			abs2(inv4.GetPsi()[geti(-10)]) - R);
+        printf("%6d | % 10.2E % 10.2E % 10.2E % 10.2E\n",
+            (int)n,
+            abs(inv1.GetR() - R),
+            abs(inv2.GetR() - R),
+            abs(inv3.GetR() - R),
+            abs(inv4.GetR() - R));
 	}
+
+	end_section();
 }
 
-void TestNaiveBornSerise()
+void TestNaiveBornSerise(double p)
 {
 
-	printf("Test TBornNaiveSerise\n");
+	begin_section("Test NaiveBornSerise");
+	printf("V(x) = %.2f * exp(-x*x)\n", p);
+
+	auto vfunc = [=](double x) {
+		return p * exp(-x * x);
+	};
+
 	Solver1D solver;
-	solver.init(FunctorWrapper("0.1*exp(-x*x)"), -10, 10, 20000, 0.5, 1, I,
+	solver.init(vfunc, -10, 10, 20000, 0.5, 1, I,
 		SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, Options());
 	solver.Compute();
 
-	for (int i = 0; i < 10; ++i) {
-		QuPerturbation1D per;
 
+	QuPerturbation1D per;
+	Options opts;
+	opts.Order(1);
+	double epsilon = 0.01;
+    per.init(vfunc, -2000, 2000, 20000, 0.5, epsilon,
+        1, SolverMethod::BornSerise, 1, 1, opts);
 
-		Options opts;
-		opts.Order(i);
+	for (int i = 0; i < 20; ++i) {
 
-		per.init(FunctorWrapper("0.1*exp(-x*x)"), -1000, 1000, 20000, 0.5, 0.01,
-			1, SolverMethod::BornSerise, 1, 1, opts);
 
 		if (i == 0) {
-			printf("  Max Momentum %lf\n", per.GetMaxMomentum());
-			printf("  Max Energy %lf\n", per.GetMaxEnergy());
 
-			printf("  Momentum Gap %lf\n", per.GetMomentumGap());
-			printf("  Energy Gap %lf\n", per.GetEnergyGap());
-
-			printf("  Epsilon %lf\n", per.GetEpsilon());
-			printf("  Epsilon Momentum Width %lf\n", per.GetEpsilonMomentumWidth());
-
-			printf("  Momentum Gap / Epsilon Momentum Width %lf\n", per.GetMomentumGap() / per.GetEpsilonMomentumWidth());
-			printf("  Energy Gap / Epsilon %lf\n", per.GetEnergyGap() / per.GetEpsilon());
-			printf("  Epsilon Boundary Error %lf\n", per.GetEpsilonBoundaryError());
-
+            printf("  Energy Gap                %lf\n", per.GetEnergyGap());
+            printf("  Epsilon                   %lf\n", per.GetEpsilon());
+            printf("  Energy Gap / Epsilon      %lf\n", per.GetEnergyGap() / per.GetEpsilon());
+			printf("  Epsilon Decay Length      %lf\n", per.GetEpsilonDecayLength());
+			printf("  Epsilon Boundary Error    %lf\n", per.GetEpsilonBoundaryError());
+			printf("%5s\n", "Grids");
 		}
 
 		per.Compute();
-		printf("  R O%d %g (Exact %g)\n", 1 + i, per.GetR(),solver.GetR());
+		printf("%5d %10.3E (Exact %10.3E)\n", 1 + i, per.GetR(), solver.GetR());
 
 	}
 
-}
-
-
-void testNaiveBornSerise(Real p, int n = 100)
-{
-	printf("Test NaiveBornSerise %lf\n", p);
-	printf("%6s\n", "Order");
-
-	Real v0 = p;
-	auto vfunc = [&](Real x) { return v0 * exp(-x * x); };
-
-	Solver1D solver;
-	{
-
-		Options opts = Options().SmallRoundError(true);
-
-		solver.init(vfunc, -10, 10, 2000, 0.5, 1, I,
-			SolverMethod::ExplicitRungeKuttaO4Classical, 1, 1, opts);
-		solver.Compute();
-	}
-
-	QuPerturbation1D per1;
-	Options opts;
-	opts.Order(1);
-	per1.init(vfunc, -5000, 5000, 200000, 0.5, 0.002,
-		1, SolverMethod::BornSerise, 1, 1, opts);
-
-
-	for (int i = 0; i < n; ++i) {
-
-		printf("%6d | ", i);
-
-		per1.Compute();
-		printf(" %8.3E %8.3E", per1.GetR(), solver.GetR());
-		printf("\n");
-
-	}
-
+	end_section();
 }
 
 
 void testPerburbation()
 {
+	begin_section("Test Perturbation for various potential");
 	printf("%10s | %10s %10s %10s %10s %10s %10s | %10s\n",
-		    "V0", "NaivO1", "NaivO2", "NaivO10", "NaivO3Sp3", "PreO5", "PreO20", "Exact");
+		    "V0", "NaivO1", "NaivO2", "NaivO10", "NaivO2Sp2", "PreO5", "PreO20", "Exact");
 	for (int i = 0; i < 10; ++i) {
 
 		Real v0 = 0.05 + 0.1*i;
@@ -229,7 +203,7 @@ void testPerburbation()
 		per3.Compute();
 
 		QuPerturbation1D per4;
-		Options o4 = Options().Order(3).SplitN(3);
+		Options o4 = Options().Order(2).SplitN(3);
 		per4.init(vfunc, -5000, 5000, 200000, 0.5, 0.002,
 			1, SolverMethod::BornSerise, 1, 1, o4);
 		per4.Compute();
@@ -250,7 +224,7 @@ void testPerburbation()
 			v0, per1.GetR(), per2.GetR(), per3.GetR(), per4.GetR(), per5.GetR(), per6.GetR(),
 			solver.GetR());
 	}
-
+	end_section();
 }
 
 void testPerburbativeConditioner(char const *name, Real p, int n = 100)
@@ -307,9 +281,11 @@ int main()
 
 	TestInverseMatrix(0.1);
 	TestInverseMatrix(1);
+
 	TestMethodOfInverseMatrix();
-	TestNaiveBornSerise();
-	testNaiveBornSerise(0.4);
+
+	TestNaiveBornSerise(0.1);
+	TestNaiveBornSerise(0.4);
 
 	testPerburbation();
 

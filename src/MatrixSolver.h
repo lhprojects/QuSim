@@ -17,21 +17,25 @@ enum class MatrixSolverMethod {
 	BiCGSTAB,
 };
 
+// Only RowMajor can be paralled for BiXXXXX algorithm
+using QuSparseMatrix = Eigen::SparseMatrix<Complex, Eigen::RowMajor>;
 struct SparseMatrixSolver {
 
 	SparseMatrixSolver();
 	void Init(OptionsImpl const &opts);
-	void Solve(Eigen::SparseMatrix<Complex> const & m,
-		Eigen::VectorXcd const &x,
-		Eigen::VectorXcd &v1);
 
+	// m*x = b
+	void Solve(QuSparseMatrix const & m,
+		Complex const *b,
+		Complex *x, size_t xsz);
 private:
 	MatrixSolverMethod fMatrixSolver;
 	Preconditioner fPreconditioner;
+	double const fMaxIters = 0;
 
-	Eigen::SparseLU< Eigen::SparseMatrix<Complex> > fSparseLU;
-	Eigen::BiCGSTAB< Eigen::SparseMatrix<Complex>, Eigen::DiagonalPreconditioner<Complex> > fBiCGSTAB_diag;
-	Eigen::BiCGSTAB< Eigen::SparseMatrix<Complex>, Eigen::IdentityPreconditioner > fBiCGSTAB_ident;
-	Eigen::BiCGSTAB< Eigen::SparseMatrix<Complex>, Eigen::IncompleteLUT<Complex> > fBiCGSTAB_ilu;
+	Eigen::SparseLU< QuSparseMatrix > fSparseLU;
+	Eigen::BiCGSTAB< QuSparseMatrix, Eigen::DiagonalPreconditioner<Complex> > fBiCGSTAB_diag;
+	Eigen::BiCGSTAB< QuSparseMatrix, Eigen::IdentityPreconditioner > fBiCGSTAB_ident;
+	Eigen::BiCGSTAB< QuSparseMatrix, Eigen::IncompleteLUT<Complex> > fBiCGSTAB_ilu;
 
 };

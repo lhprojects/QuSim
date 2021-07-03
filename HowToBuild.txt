@@ -11,19 +11,26 @@ git submodule update --init --recursive
 1. Build QuSim WITHOUT CUDA
 
 (1). Create & goto a new folder, e.g. <QuSim>/build
-(2). Invoke cmake, e.g. `cmake -S ../applications`
+(2). Invoke cmake, e.g. `cmake -S ../applications` (`cmake -S ..\applications` on Windows)
 (3). Open QuSim.sln
 
 2. Build QuSim WITH CUDA
 
 (1). Install CUDA
-If you have much experience of CUDA and Visual Studio. You can modify the cmake to support other Visual Studio and CUDA.
-Your NVDIA GPU & NVDIA DRIVER version & CUDA version & Visual studio should be compatible with each other.
+If you have much experience of CUDA and Visual Studio. You can modify the cmake to support other Visual Studio and CUDA version.
+Your NVDIA GPU & NVDIA DRIVER version & CUDA version & Visual studio version should be compatible with each other.
 
 The following versions has been tested:
 3060Ti &NVDIA DRIVER(27.21.14.6172 In Device Manager or 466.?) & CUDA 11.0 & VS2019(Version 16.9.5)
 
 Normally, newer GPU CARD require newer driver version require newer cuda version require newer visual studio version.
+
 (2). Create & goto a new folder, e.g. <QuSim>/build
 (3). Invoke cmake, e.g. `cmake -S ../applications -DUSE_CUDA=ON`
 (4). Open QuSim.sln
+
+3. Build QuSim With OpenMP
+By default the Eigen matrix library is single-threading. Some module of Eigen support OpenMP.
+To enable OpenMP, you need to add option `-DUSE_OPENMP=ON`
+
+

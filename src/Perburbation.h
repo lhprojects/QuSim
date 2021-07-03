@@ -7,113 +7,63 @@ PeReal const PI = 3.141592653589793;
 #include <complex>
 typedef std::complex<PeReal> PeComp;
 
+#include "Device.h"
+#include "QuSim.h"
+#include "FourierTransform.h"
 
 namespace PerburbationUtility {
 
-	inline PeComp ITime(PeComp const &c)
+	template<class R>
+	static R CalDp2Div2M(R dx, size_t n, R hbar, R mass)
 	{
-		// I * (re, im) = (-im, re)
-		return PeComp(-imag(c), real(c));
-	}
-	inline PeComp ITime(PeReal re, PeReal im)
-	{
-		// I * (re, im) = (-im, re)
-		return PeComp(-im, re);
+		R Dpx = 2 * QuPi / (dx * n) * hbar;
+		R Dpx2Div2M = Dpx * Dpx / (2 * mass);
+		return Dpx2Div2M;
 	}
 
-	inline void Add(PeComp const *a, PeComp *b, size_t sz)
+	template<class R>
+	static R CalLambda(R e, R mass, R hbar)
 	{
-		for (size_t i = 0; i < sz; ++i) {
-			b[i] += a[i];
-		}
+		return 2 * PI / (sqrt(2 * e * mass) / hbar);
 	}
 
-	inline void Mul(PeComp const *a, PeComp *b, size_t sz)
-	{
-		for (size_t i = 0; i < sz; ++i) {
-			b[i] *= a[i];
-		}
-	}
+	inline size_t fold_half(size_t i, size_t n) {
+		if (i < n / 2) return i;
+		else return n - i;
+	};
 
-	inline void Mul(PeReal const *a, PeComp *b, size_t sz)
-	{
-		for (size_t i = 0; i < sz; ++i) {
-			b[i] *= a[i];
-		}
-	}
+    // total width = 20 / k0 = 3.3 lambda
+    inline PeReal cal_v10(PeReal x, PeReal k0, PeReal e0)
+    {
+        // for e=0.5 e0:  relfaction=2.0E-6, through=1.9E-4
+        // for e=0.2 e0:  relfaction=5.3E-4, through=9.7E-6
+        x *= k0;
+        return (-e0) * ((1 - 0.01 * x * x) > 0 ? exp(-0.03 * x * x * 1. / sqrt(1 - 0.01 * x * x)) : 0);
+    };
 
-	inline void Mul(PeReal const *re, PeReal const *im, PeComp *b, size_t sz)
-	{
-		for (size_t i = 0; i < sz; ++i) {
-			b[i] *= PeComp(re[i], im[i]);
-		}
-	}
+    // total width = 30 / k0 = 5.0 lambda
+    inline PeReal cal_v15(PeReal x, PeReal k0, PeReal e0)
+    {
+        // for e=0.5 e0:  relfaction=1.1E-7, through=4.6E-5
+        // for e=0.2 e0:  relfaction=1.5E-4, through=8.7E-7
+        x *= k0;
+        return (-0.8 * e0) * ((1 - x * x / (15. * 15)) > 0 ? exp(-0.015 * x * x * 1. / sqrt(1 - x * x / (15. * 15))) : 0);
+    };
 
-	// psik = G0 * psik
-	inline void Green01D(PeComp *psik, PeReal hbar, PeReal mass, PeReal e, PeReal epsilon,
-		size_t n, PeReal dx)
-	{
-		PeReal dp = hbar * 2 * PI / (n * dx);
-		PeReal divByTwoMass = PeReal(1) / (PeReal(2) * mass);
-		for (size_t i = 0; i < n; ++i) {
-			PeReal p = (i < n / 2) ? (i * dp) : ((n - i) *dp);
-			PeReal t = p * p * divByTwoMass;
-			PeComp g0 = PeReal(1) / (e - t + PeComp(0, epsilon));
-			psik[i] = g0 * psik[i];
-		}
-	}
-
-	// psik = G0 * psik
-	inline void Green02D(PeComp *psik, PeReal hbar, PeReal mass, PeReal e, PeReal epsilon,
-		size_t nx, size_t ny, PeReal dx, PeReal dy)
-	{
-		PeReal dpx = hbar * 2 * PI / (nx * dx);
-		PeReal dpy = hbar * 2 * PI / (ny * dy);
-		PeReal divByTwoMass = PeReal(1) / (PeReal(2) * mass);
-		for (size_t i = 0; i < nx; ++i) {
-			for (size_t j = 0; j < ny; ++j) {
-				PeReal px = (i < nx / 2) ? (i * dpx) : ((nx - i) *dpx);
-				PeReal py = (j < ny / 2) ? (j * dpy) : ((ny - j) *dpy);
-				PeReal t = (px * px + py * py) * divByTwoMass;
-
-				PeComp g0 = PeReal(1) / (e - t + PeComp(0, epsilon));
-				psik[i*ny + j] = g0 * psik[i*ny + j];
-			}
-		}
-	}
-
-	// psik = G0 * psik
-	inline void Green03D(PeComp *psik, PeReal hbar, PeReal mass, PeReal e, PeReal epsilon,
-		size_t nx, size_t ny, size_t nz,
-		PeReal dx, PeReal dy, PeReal dz)
-	{
-		PeReal dpx = hbar * 2 * PI / (nx * dx);
-		PeReal dpy = hbar * 2 * PI / (ny * dy);
-		PeReal dpz = hbar * 2 * PI / (nz * dz);
-		PeReal divByTwoMass = PeReal(1) / (PeReal(2) * mass);
-		for (size_t i = 0; i < nx; ++i) {
-			PeReal px = (i < nx / 2) ? (i * dpx) : ((nx - i) *dpx);
-
-			for (size_t j = 0; j < ny; ++j) {
-				PeReal py = (j < ny / 2) ? (j * dpy) : ((ny - j) *dpy);
-
-				for (size_t k = 0; k < ny; ++k) {
-					PeReal pz = (k < nz / 2) ? (k * dpz) : ((nz - k) *dpz);
-
-					PeReal t = (px * px + py * py + pz * pz) * divByTwoMass;
-
-					PeComp g0 = PeReal(1) / (e - t + PeComp(0, epsilon));
-					psik[(i*ny + j)*nz + k] = g0 * psik[(i*ny + j)*nz + k];
-				}
-			}
-		}
-	}
+    // total width = 40 / k0 = 6.4 lambda
+    inline PeReal cal_v20(PeReal x, PeReal k0, PeReal e0)
+    {
+        // for e=0.5 e0:  relfaction=6.4E-8, through=3.1E-6
+        // for e=0.2 e0:  relfaction=1.8E-4, through=1.5E-8
+        x *= k0;
+        return (-0.7 * e0) * ((1 - x * x / (20. * 20)) > 0 ? exp(-0.007 * x * x * 1. / sqrt(1 - x * x / (20. * 20))) : 0);
+    };
 
 	inline void GaussAsbLayer1D(size_t nx, PeReal dx,
-		PeReal *v, PeReal hbar, PeReal mass, PeReal e,
+		PeComp *v, PeReal hbar, PeReal mass, PeReal e,
 		PeReal alpha)
 	{
-		PeReal lambda = 2 * PI / (sqrt(2 * e * mass) / hbar);
+		PeReal lambda = CalLambda(e, mass, hbar);
 		PeReal betax = dx / (alpha * lambda);
 		for (size_t i = 0; i < nx; ++i) {
 			PeReal xx;
@@ -123,17 +73,35 @@ namespace PerburbationUtility {
 			} else {
 				xx = (nx - i) * betax;
 			}
-			v[i] = -e * exp(-(xx * xx));
+
+            v[i].imag(v[i].imag() - e * exp(-(xx * xx)));
+		}
+	}
+
+	inline void GaussMAsbLayer1D(size_t nx, PeReal dx,
+        PeComp* v, PeReal hbar, PeReal mass, PeReal e,
+        PeReal alpha)
+    {
+        PeReal k0 = sqrt(2 * mass * e) / hbar;
+        for (size_t i = 0; i < nx; ++i) {
+            PeReal xx;
+            PeReal x = fold_half(i, nx) * dx;
+            auto idx = CalGlobalIdx(i, nx);
+
+            v[idx].imag(v[idx].imag() +
+                (cal_v15(x, k0, e)));
+
 		}
 	}
 
 	inline void GaussAsbLayer2D(size_t nx, size_t ny, PeReal dx, PeReal dy,
-		PeReal *v, PeReal hbar, PeReal mass, PeReal e,
+		PeComp *v, PeReal hbar, PeReal mass, PeReal e,
 		PeReal alpha)
 	{
-		PeReal lambda = 2 * PI / (sqrt(2 * e * mass) / hbar);
+		PeReal lambda = CalLambda(e, mass, hbar);
 		PeReal betax = dx / (alpha * lambda);
 		PeReal betay = dy / (alpha * lambda);
+
 		for (size_t i = 0; i < nx; ++i) {
 			for (size_t j = 0; j < ny; ++j) {
 				PeReal xx;
@@ -151,18 +119,67 @@ namespace PerburbationUtility {
 					yy = (ny - j) * betay;
 				}
 
-				v[i*ny + j] = -e * (exp(-xx * xx) + exp(-yy * yy));
+                auto idx = i * ny + j;
+                v[idx].imag(v[idx].imag() - e * (exp(-xx * xx) + exp(-yy * yy)));
 			}
 		}
 
 	}
 
-	inline void GaussAsbLayer3D(size_t nx, size_t ny, size_t nz,
-		PeReal dx, PeReal dy, PeReal dz,
-		PeReal *v, PeReal hbar, PeReal mass, PeReal e,
+	inline void GaussMAsbLayer2D(size_t nx, size_t ny, PeReal dx, PeReal dy,
+		PeComp* v, PeReal hbar, PeReal mass, PeReal e,
 		PeReal alpha)
 	{
-		PeReal lambda = 2 * PI / (sqrt(2 * e * mass) / hbar);
+		PeReal k0 = sqrt(2 * mass * e) / hbar;
+
+		for (size_t i = 0; i < nx; ++i) {
+			for (size_t j = 0; j < ny; ++j) {
+
+				PeReal x = fold_half(i, nx) * dx;
+				PeReal y = fold_half(j, ny) * dy;
+				auto idx = CalGlobalIdx(i, j, nx, ny);
+
+                v[idx].imag(v[idx].imag() +
+                    (cal_v15(x, k0, e) + cal_v15(y, k0, e)));
+			}
+		}
+	}
+
+	inline void GaussMAsbLayer3D(size_t nx, size_t ny, size_t nz,
+		PeReal dx, PeReal dy, PeReal dz,
+		PeComp* v, PeReal hbar, PeReal mass, PeReal e,
+		PeReal alpha)
+	{
+		PeReal k0 = sqrt(2 * mass * e) / hbar;
+
+        for (size_t i = 0; i < nx; ++i) {
+            for (size_t j = 0; j < ny; ++j) {
+                for (size_t k = 0; k < nz; ++k) {
+
+                    PeReal x = fold_half(i, nx) * dx;
+                    PeReal y = fold_half(j, ny) * dy;
+                    PeReal z = fold_half(k, nz) * dz;
+
+                    auto idx = CalGlobalIdx(i, j, k, nx, ny, nz);
+
+                    if (0) {
+                        v[idx].imag(v[idx].imag() +
+                            (cal_v10(x, k0, e) + cal_v10(y, k0, e) + cal_v10(z, k0, e)));
+                    } else {
+                        v[idx].imag(v[idx].imag() +
+                            (cal_v15(x, k0, e) + cal_v15(y, k0, e) + cal_v15(z, k0, e)));
+                    }
+                }
+            }
+        }
+	}
+
+	inline void GaussAsbLayer3D(size_t nx, size_t ny, size_t nz,
+		PeReal dx, PeReal dy, PeReal dz,
+		PeComp*v, PeReal hbar, PeReal mass, PeReal e,
+		PeReal alpha)
+	{
+		PeReal lambda = CalLambda(e, mass, hbar);
 		PeReal betax = dx / (alpha * lambda);
 		PeReal betay = dy / (alpha * lambda);
 		PeReal betaz = dz / (alpha * lambda);
@@ -190,8 +207,8 @@ namespace PerburbationUtility {
 					} else {
 						zz = (nz - k) * betaz;
 					}
-
-					v[(i*ny + j)*nz + k] = -e * (exp(-xx * xx) + exp(-yy * yy) + exp(-zz * zz));
+					auto idx = (i * ny + j) * nz + k;
+                    v[idx].imag(v[idx].imag() - e * (exp(-xx * xx) + exp(-yy * yy) + exp(-zz * zz)));
 				}
 			}
 		}
@@ -209,72 +226,63 @@ struct BornSeries {
 	// (E - T + i eps) deltaPsi = V (psi0 + deltaPsi) replace `with scattering condition` with `eps -> +0`
 	// deltaPsi = (E - T + i eps)^-1 V (psi0 + deltaPsi)
 	// deltaPsi = G0 V (psi0 + deltaPsi)
-	template<class F1, class F2, class F3>
-	void Update(size_t n,    //	   in: x dimension
-		PeComp const *psi0x, //	   in: psi0
-		PeComp *deltaPsix,   // inout: deltaPsi = psi - psi0
-		PeComp *deltaPsik,   //   out: deltaPsi
-		PeReal const *V,     //    in: real potential
-		F1 const &G0,        //    in: (E - T + i eps)^-1
-		F2 const &X2K,       //    in:
-		F3 const &K2X)       //    in:
-	{
-		using namespace PerburbationUtility;
 
-		Add(psi0x, deltaPsix, n);
-		Mul(V, deltaPsix, n);
-		X2K(deltaPsix, deltaPsik);
-		G0(deltaPsik);
-		K2X(deltaPsik, deltaPsix);
-	}
-
-	template<class F1, class F2>
 	void Update1D(size_t n,    //    in:
-		PeComp const *psi0x,   //    in:
-		PeComp *deltaPsix,     // inout: psi - psi0, could be zeros
-		PeComp *deltaPsik,     //    out: 
-		PeReal const *V,       //    in: real potential
+		PeComp const* psi0x,   //    in:
+		PeComp* deltaPsix,     //inout: psi - psi0, could be zeros
+		PeComp* deltaPsik,     //    out: 
+		PeComp const* V,       //    in: real potential
 		PeReal epsilon,        //    in: should be tiny
 		PeReal e,              //    in: energy
 		PeReal mass,           //    in: mass
 		PeReal hbar,           //    in: hbar
 		PeReal dx,             //    in: delta x
-		F1 const &X2K,         //    in:
-		F2 const &K2X)         //    in:
+		FourierTransform1D* fft,
+		FourierTransform1D* invfft,
+		Device *dev)           //    in:
 	{
-		auto G0 = [&](PeComp *psik) {
-			PerburbationUtility::Green01D(psik, hbar, mass, e, epsilon, n, dx);
-		};
-		Update(n, psi0x, deltaPsix, deltaPsik, V, G0, X2K, K2X);
+		using namespace PerburbationUtility;
+		PeReal Dpx2Div2M = CalDp2Div2M(dx, n, hbar, mass);
+
+        dev->AddMul(deltaPsix, psi0x, V, n);
+        fft->Transform(deltaPsix, deltaPsik);
+        dev->G01D(deltaPsik, e, epsilon, Dpx2Div2M, n);
+        dev->Scale(deltaPsik, 1. / n, n);
+        invfft->Transform(deltaPsik, deltaPsix);
+
 	}
 
-	template<class F1, class F2>
 	void Update2D(size_t nx, size_t ny,
 		PeComp const *psi0x,
 		PeComp *deltaPsix,
 		PeComp *deltaPsik,
-		PeReal const *V,
+		PeComp const *V,
 		PeReal epsilon,
 		PeReal e,
 		PeReal mass,
 		PeReal hbar,
 		PeReal dx,
 		PeReal dy,
-		F1 const &X2K,
-		F2 const &K2X)
+		FourierTransform2D* fft,
+		FourierTransform2D* invfft,
+		Device* dev)
 	{
-		auto G0 = [&](PeComp *psik) {
-			PerburbationUtility::Green02D(psik, hbar, mass, e, epsilon, nx, ny, dx, dy);
-		};
-		Update(nx*ny, psi0x, deltaPsix, deltaPsik, V, G0, X2K, K2X);
+		using namespace PerburbationUtility;
+		PeReal Dpx2Div2M = CalDp2Div2M(dx, nx, hbar, mass);
+		PeReal Dpy2Div2M = CalDp2Div2M(dy, ny, hbar, mass);
+
+        dev->AddMul(deltaPsix, psi0x, V, nx * ny);
+        fft->Transform(deltaPsix, deltaPsik);
+        dev->G02D(deltaPsik, e, epsilon, Dpx2Div2M, Dpy2Div2M, nx, ny);
+        dev->Scale(deltaPsik, 1. / (nx * ny), nx * ny);
+		invfft->Transform(deltaPsik, deltaPsix);
 	}
 
-	template<class F1, class F2>
 	void Update3D(size_t nx, size_t ny, size_t nz,
 		PeComp const *psi0x,
 		PeComp *deltaPsix,
 		PeComp *deltaPsik,
-		PeReal const *V,
+		PeComp const *V,
 		PeReal epsilon,
 		PeReal e,
 		PeReal mass,
@@ -282,13 +290,20 @@ struct BornSeries {
 		PeReal dx,
 		PeReal dy,
 		PeReal dz,
-		F1 const &X2K,
-		F2 const &K2X)
+		FourierTransform3D* fft,
+		FourierTransform3D* invfft,
+		Device* dev)
 	{
-		auto G0 = [&](PeComp *psik) {
-			PerburbationUtility::Green03D(psik, hbar, mass, e, epsilon, nx, ny, nz, dx, dy, dz);
-		};
-		Update(nx*ny*nz, psi0x, deltaPsix, deltaPsik, V, G0, X2K, K2X);
+		using namespace PerburbationUtility;
+		PeReal Dpx2Div2M = CalDp2Div2M(dx, nx, hbar, mass);
+        PeReal Dpy2Div2M = CalDp2Div2M(dy, ny, hbar, mass);
+        PeReal Dpz2Div2M = CalDp2Div2M(dz, nz, hbar, mass);
+
+        dev->AddMul(deltaPsix, psi0x, V, nx * ny * nz);
+        fft->Transform(deltaPsix, deltaPsik);
+		dev->G03D(deltaPsik, e, epsilon, Dpx2Div2M, Dpy2Div2M, Dpz2Div2M, nx, ny, nz);
+        dev->Scale(deltaPsik, 1. / (nx * ny * nz), nx * ny * nz);
+		invfft->Transform(deltaPsik, deltaPsix);
 	}
 
 };
@@ -300,61 +315,51 @@ enum class BornSerisePreconditioner {
 	Hao2,
 };
 
+
 struct PreconditionalBornSeries {
 
-	void GetEpsilon(PeReal &epsilon, BornSerisePreconditioner pre, size_t n, PeReal const *reV, PeReal const *imV)
+	template<class U>
+	PeReal Abs2(U u)
 	{
+		return u.real() * u.real() + u.imag() * u.imag();
+	}
 
-		PeReal minEpsilon = 0;
-		if (pre == BornSerisePreconditioner::Identity) {
-			PeReal A = 0;
-			PeReal A2 = 0;
-			PeReal V2 = 0;
-			for (int i = 0; i < n; ++i) {
-				A += imV[i];
-				A2 += imV[i] * imV[i];
-				V2 += reV[i] * reV[i];
-			}
-			A2 /= n;
-			V2 /= n;
-			A /= n;
+	void GetEpsilon(PeReal &epsilon, BornSerisePreconditioner pre,
+		size_t n, PeComp const *v, Device *dev)
+	{
+        PeReal minEpsilon = 0;
+        if (pre == BornSerisePreconditioner::Identity) {
+            PeReal A = dev->SumImag(v, n);
+            PeReal A2 = dev->Norm2(v, n);
+            minEpsilon = 0.5 * A2 / (-A);
+        } else {
+			minEpsilon = dev->Max(v, n);
+        }
 
-			minEpsilon = 0.5*(A2 + V2) / (-A);
-			//input > 0.5 (A2 + V2) / (-A) 
-			//epsilon = (A2 + V2) / (-A);
-			//printf("%f %f %f\n", A2, V2, epsilon);
-			//printf("%f\n", 1 - A*A/(A2+V2));
-		}
-		else {
-			for (int i = 0; i < n; ++i) {
-				if (abs(PeComp(reV[i], imV[i])) > minEpsilon) {
-					minEpsilon = abs(PeComp(reV[i], imV[i]));
-				}
-			}
-		}
-		if (epsilon < minEpsilon) {
-			epsilon = 2 * minEpsilon;
-		}
+        if (epsilon < minEpsilon) {
+            epsilon = minEpsilon;
+        }
 	}
 
 	// S = V psi0
 	// deltaPsi = psi - psi0
 	// ReV = Re(V)
 	// ImV = Im(V)
-	template<class F1, class F2, class F3>
-	void Update(size_t n,
-		PeComp const *psi0x,
-		PeComp *deltaPsix,
-		PeComp *deltaPsik,
-		PeReal const *reV,
-		PeReal const *imV,
-		PeComp *tmp,
-		PeReal epsilon,
-		F1 const &G0,
-		F2 const &X2K,
-		F3 const &K2X,
-		PeReal const slow,
-		BornSerisePreconditioner preconditioner)
+    template<class F1, class F2, class F3>
+    void Update(size_t n,
+        PeComp const* psi0x,
+        PeComp* deltaPsix,
+        PeComp* deltaPsik,
+		PeComp const* v,
+        PeComp* tmp,
+        PeReal epsilon,
+        F1 const& G0,
+        F2 const& X2K,
+        F3 const& K2X,
+        PeReal const slow,
+        BornSerisePreconditioner preconditioner,
+        Device* dev
+		)
 	{
 		// new psi = (gamma G V - gamma + 1) psi  + gamma G S
 		// new psi = gamma G (V psi + S) + (1 - gamma) psi
@@ -387,75 +392,73 @@ struct PreconditionalBornSeries {
 		//     0 = 1 -  1/2 gamma (1 + I V0 / epsilon)
 		/////////////////////////////////////////
 
-
-		using namespace PerburbationUtility;
-		for (size_t i = 0; i < n; ++i) {
-			tmp[i] = PeComp(reV[i], imV[i] + epsilon) * deltaPsix[i] + reV[i] * psi0x[i];
-		}
-		X2K(tmp, deltaPsik);
+        // tmp = (deltaPsix + psi0x)*(v + I epsilon) + v.real()*psi0x
+        dev->Add3(tmp, deltaPsix, psi0x, v, epsilon, n);
+		
+        X2K(tmp, deltaPsik);
 		G0(deltaPsik);
 		K2X(deltaPsik, tmp);
-		if (preconditioner == BornSerisePreconditioner::Identity) {
-			for (size_t i = 0; i < n; ++i) {
-				PeReal gamma = slow;
-				PeReal oneMinusGamma = PeReal(1) - gamma;
-				deltaPsix[i] = gamma * tmp[i] + oneMinusGamma * deltaPsix[i];
-			}
-		} else if (preconditioner == BornSerisePreconditioner::Vellekoop) {
-			for (size_t i = 0; i < n; ++i) {
-				PeComp delta = ITime(reV[i], imV[i]) / epsilon;
-				PeComp gamma = slow * (PeReal(1) - delta);
-				PeComp oneMinusGamma = (PeReal(1) - slow) + slow * delta;
-				deltaPsix[i] = gamma * tmp[i] + oneMinusGamma * deltaPsix[i];
-			}
-		} else if (preconditioner == BornSerisePreconditioner::Hao1) {
-			for (size_t i = 0; i < n; ++i) {
-				PeComp delta = ITime(reV[i], -imV[i]) / epsilon;
-				PeComp gamma = slow * (PeReal(1) - delta);
-				PeComp oneMinusGamma = (PeReal(1) - slow) + slow * delta;
-				deltaPsix[i] = gamma * tmp[i] + oneMinusGamma * deltaPsix[i];
-			}
-		} else if (preconditioner == BornSerisePreconditioner::Hao2) {
-			for (size_t i = 0; i < n; ++i) {
-				PeComp f = PeReal(1) + ITime(reV[i], imV[i]) / epsilon;
-				PeComp gamma = PeReal(2) * slow / f;
-				PeComp oneMinusGamma = PeReal(1) - gamma;
-				deltaPsix[i] = gamma * tmp[i] + oneMinusGamma * deltaPsix[i];
-			}
-		}
-	}
 
-	template<class F1, class F2>
+        if (preconditioner == BornSerisePreconditioner::Identity) {
+			if (slow == 1.) {
+				dev->Scale(deltaPsix, tmp, 1. / n, n);
+			} else {
+				dev->Scale(tmp, 1. / n, n);
+				dev->LinearUpdate(deltaPsix, tmp, slow, n);
+			}
+        } else if (preconditioner == BornSerisePreconditioner::Vellekoop) {
+			dev->Scale(tmp, 1. / n, n);
+			dev->Vellekoop(deltaPsix, tmp, v, slow, epsilon, n);
+        } else if (preconditioner == BornSerisePreconditioner::Hao1) {
+			dev->Scale(tmp, 1. / n, n);
+			dev->Hao1(deltaPsix, tmp, v, slow, epsilon, n);
+        } else if (preconditioner == BornSerisePreconditioner::Hao2) {
+			dev->Scale(tmp, 1. / n, n);
+			dev->Hao2(deltaPsix, tmp, v, slow, epsilon, n);
+        } else {
+            throw std::invalid_argument("Uknown preconditioner");
+        }
+    }
+
 	void Update1D(size_t n,
 		PeComp const *psi0x,
 		PeComp *deltaPsix,
 		PeComp *deltaPsik,
-		PeReal const *reV,
-		PeReal const *imV,
+		PeComp const *v,
 		PeComp *tmp,
 		PeReal epsilon,
 		PeReal e,
 		PeReal mass,
 		PeReal hbar,
 		PeReal dx,
-		F1 const &X2K,
-		F2 const &K2X,
 		PeReal const slow,
-		BornSerisePreconditioner preconditioner)
+		BornSerisePreconditioner preconditioner,
+		FourierTransform1D* fft,
+		FourierTransform1D* invfft,
+		Device* dev)
 	{
+		using namespace PerburbationUtility;
 		auto G0 = [&](PeComp *psik) {
-			PerburbationUtility::Green01D(psik, hbar, mass, e, epsilon, n, dx);
+			PeReal Dp2Div2M = CalDp2Div2M(dx, n, hbar, mass);
+			dev->G01D(psik, e, epsilon, Dp2Div2M, n);
 		};
-		Update(n, psi0x, deltaPsix, deltaPsik, reV, imV, tmp, epsilon, G0, X2K, K2X, slow, preconditioner);
+		
+		auto X2K = [&](PeComp const* psix, PeComp* psik) {
+			fft->Transform(psix, psik);
+		};
+
+		auto K2X = [&](PeComp const* psik, PeComp* psix) {
+			invfft->Transform(psik, psix);
+		};
+
+		Update(n, psi0x, deltaPsix, deltaPsik, v, tmp, epsilon, G0, X2K, K2X, slow, preconditioner, dev);
 	}
 
-	template<class F1, class F2>
 	void Update2D(size_t nx, size_t ny,
 		PeComp const *psi0x,
 		PeComp *deltaPsix,
 		PeComp *deltaPsik,
-		PeReal const *reV,
-		PeReal const *imV,
+		PeComp const* v,
 		PeComp *tmp,
 		PeReal epsilon,
 		PeReal e,
@@ -463,24 +466,35 @@ struct PreconditionalBornSeries {
 		PeReal hbar,
 		PeReal dx,
 		PeReal dy,
-		F1 const &X2K,
-		F2 const &K2X,
 		PeReal const slow,
-		BornSerisePreconditioner preconditioner)
+		BornSerisePreconditioner preconditioner,
+		FourierTransform2D* fft,
+		FourierTransform2D* invfft,
+		Device *dev)
 	{
-		auto G0 = [&](PeComp *psik) {
-			PerburbationUtility::Green02D(psik, hbar, mass, e, epsilon, nx, ny, dx, dy);
-		};
-		Update(nx * ny, psi0x, deltaPsix, deltaPsik, reV, imV, tmp, epsilon, G0, X2K, K2X, slow, preconditioner);
+		using namespace PerburbationUtility;
+		auto G0 = [&](PeComp* psik) {
+            PeReal Dpx2Div2M = CalDp2Div2M(dx, nx, hbar, mass);
+            PeReal Dpy2Div2M = CalDp2Div2M(dy, ny, hbar, mass);
+            dev->G02D(psik, e, epsilon, Dpx2Div2M, Dpy2Div2M, nx, ny);
+        };
+
+        auto X2K = [&](PeComp const* psix, PeComp* psik) {
+            fft->Transform(psix, psik);
+        };
+
+        auto K2X = [&](PeComp const* psik, PeComp* psix) {
+            invfft->Transform(psik, psix);
+        };
+
+        Update(nx * ny, psi0x, deltaPsix, deltaPsik, v, tmp, epsilon, G0, X2K, K2X, slow, preconditioner, dev);
 	}
 
-	template<class F1, class F2>
 	void Update3D(size_t nx, size_t ny, size_t nz,
 		PeComp const *psi0x,
 		PeComp *deltaPsix,
 		PeComp *deltaPsik,
-		PeReal const *reV,
-		PeReal const *imV,
+		PeComp const* v,
 		PeComp *tmp,
 		PeReal epsilon,
 		PeReal e,
@@ -489,17 +503,29 @@ struct PreconditionalBornSeries {
 		PeReal dx,
 		PeReal dy,
 		PeReal dz,
-		F1 const &X2K,
-		F2 const &K2X,
 		PeReal const slow,
-		BornSerisePreconditioner preconditioner)
+		BornSerisePreconditioner preconditioner,
+		FourierTransform3D* fft,
+		FourierTransform3D* invfft,
+		Device *dev)
 	{
-		auto G0 = [&](PeComp *psik) {
-			PerburbationUtility::Green03D(psik, hbar, mass, e, epsilon,
-				nx, ny, nz,
-				dx, dy, dz);
+		using namespace PerburbationUtility;
+		auto G0 = [&](PeComp* psik) {
+			PeReal Dpx2Div2M = CalDp2Div2M(dx, nx, hbar, mass);
+			PeReal Dpy2Div2M = CalDp2Div2M(dy, ny, hbar, mass);
+			PeReal Dpz2Div2M = CalDp2Div2M(dz, nz, hbar, mass);
+			dev->G03D(psik, e, epsilon, Dpx2Div2M, Dpy2Div2M, Dpz2Div2M, nx, ny, nz);
 		};
-		Update(nx * ny, psi0x, deltaPsix, deltaPsik, reV, imV, tmp, epsilon, G0, X2K, K2X, slow, preconditioner);
+
+		auto X2K = [&](PeComp const* psix, PeComp* psik) {
+			fft->Transform(psix, psik);
+		};
+
+		auto K2X = [&](PeComp const* psik, PeComp* psix) {
+			invfft->Transform(psik, psix);
+		};
+
+        Update(nx * ny * nz, psi0x, deltaPsix, deltaPsik, v, tmp, epsilon, G0, X2K, K2X, slow, preconditioner, dev);
 	}
 
 };

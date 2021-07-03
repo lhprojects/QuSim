@@ -1,5 +1,6 @@
 #include "MatrixSolver.h"
 #include "OptionsImpl.h"
+#include "Utils.h"
 
 void SparseMatrixSolver::Init(OptionsImpl const & opts)
 {
@@ -37,15 +38,17 @@ void SparseMatrixSolver::Init(OptionsImpl const & opts)
 		const_cast<Preconditioner&>(fPreconditioner) = prc;
 	}
 
+	mutable_cast(fMaxIters) = opts.GetDefaut("matrix_solver_max_iters", Real(1));
+
 }
 
 SparseMatrixSolver::SparseMatrixSolver() : fMatrixSolver(), fPreconditioner()
 {
 }
 
-void SparseMatrixSolver::Solve(Eigen::SparseMatrix<Complex> const & m,
-	Eigen::VectorXcd const &x,
-	Eigen::VectorXcd &v1)
+void SparseMatrixSolver::Solve(QuSparseMatrix const & m,
+	Complex const *b_,
+	Complex *x, size_t xsz)
 {
 	if (fMatrixSolver == MatrixSolverMethod::LU) {
 		fSparseLU.compute(m);
@@ -55,22 +58,25 @@ void SparseMatrixSolver::Solve(Eigen::SparseMatrix<Complex> const & m,
 		} else if (fPreconditioner == Preconditioner::IncompleteLUT) {
 			fBiCGSTAB_ilu.compute(m);
 		} else if (fPreconditioner == Preconditioner::IdentityPreconditioner) {
-			fBiCGSTAB_ident.compute(m);
+            fBiCGSTAB_ident.compute(m);
 		}
 	}
 
+	Eigen::Map<Eigen::VectorXcd> res(x, xsz);
+	Eigen::Map<const Eigen::VectorXcd> b(b_, xsz);
+
 	if (fMatrixSolver == MatrixSolverMethod::LU) {
-		v1 = fSparseLU.solve(x);
+		res = fSparseLU.solve(b);
 	} else if (fMatrixSolver == MatrixSolverMethod::BiCGSTAB) {
 		if (fPreconditioner == Preconditioner::DiagonalPreconditioner) {
-			fBiCGSTAB_diag.setMaxIterations(500);
-			v1 = fBiCGSTAB_diag.solve(x);
+			fBiCGSTAB_diag.setMaxIterations((Int)(fMaxIters * m.cols() * 2));
+			res = fBiCGSTAB_diag.solve(b);
 		} else if (fPreconditioner == Preconditioner::IncompleteLUT) {
-			fBiCGSTAB_ilu.setMaxIterations(500);
-			v1 = fBiCGSTAB_ilu.solve(x);
+			fBiCGSTAB_ilu.setMaxIterations((Int)(fMaxIters * m.cols() * 2));
+			res = fBiCGSTAB_ilu.solve(b);
 		} else if (fPreconditioner == Preconditioner::IdentityPreconditioner) {
-			fBiCGSTAB_ident.setMaxIterations(500);
-			v1 = fBiCGSTAB_ident.solve(x);
+			fBiCGSTAB_ident.setMaxIterations((Int)(fMaxIters * m.cols() * 2));
+			res = fBiCGSTAB_ident.solve(b);
 		}
 	}
 

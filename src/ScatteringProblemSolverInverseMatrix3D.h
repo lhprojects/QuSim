@@ -2,11 +2,10 @@
 
 #define  _CRT_SECURE_NO_WARNINGS
 #include "ScatteringSolverImpl.h"
+#include "ScatteringProblemSolverInverseMatrix.h"
 #include "MatrixSolver.h"
 
-struct ScatteringProblemSolverInverseMatrix3D : ScatteringSolver3DImpl {
-
-	ScatteringProblemSolverInverseMatrix3D() : fOrder(), fMatrixSolver() {}
+struct ScatteringProblemSolverInverseMatrix3D : ScatteringSolver3DImpl, InverseMatrixMethodCommon {
 
 	virtual void InitScatteringSolver3D(
 		std::function<Complex(Real, Real, Real)> const & v,
@@ -31,11 +30,7 @@ struct ScatteringProblemSolverInverseMatrix3D : ScatteringSolver3DImpl {
 
 	void Compute() override;
 
+private:
 	void InitEMinusH();
-	SparseMatrixSolver fMatrixSolver;
-	int const fOrder;
-	Eigen::SparseMatrix<Complex> fEMinusH;
-
-
 
 };

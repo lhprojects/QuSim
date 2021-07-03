@@ -2,6 +2,7 @@
 #include <assert.h>
 
 #define ASS(x) if(!(x)) { printf("%s failed\n", #x);}
+
 double const Pi = 3.1415926;
 void testCal()
 {

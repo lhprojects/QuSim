@@ -2,15 +2,15 @@
 
 #include "EvolverImpl.h"
 #include "Linear.h"
-#include "eigen/Eigen/Dense"
-#include "eigen/Eigen/Eigenvalues"
+#include <eigen/Eigen/Dense>
+#include <eigen/Eigen/Eigenvalues>
 
 
-struct EigenMethod : EvolverImpl1D {
+struct QuEigenMethod1D : QuEvolver1DImpl {
 
-	EigenMethod();
+	QuEigenMethod1D();
 
-	void initSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
+	void InitSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
 		Complex dt, bool force_normalization_each_step,
 		std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t n,
 		BoundaryCondition b, SolverMethod solver,
@@ -27,6 +27,6 @@ struct EigenMethod : EvolverImpl1D {
 	Eigen::VectorXcd psi;
 	Eigen::VectorXcd psi_eigenspace;
 
-	void update_psi() override;
+	void UpdatePsi() override;
 };
 
