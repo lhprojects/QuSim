@@ -8,41 +8,41 @@
 struct SplittingMethod1D : QuEvolver1DImpl
 {
 
-	FourierTransformOptions fFourierTransformOptions;
+    FourierTransformOptions fFourierTransformOptions;
 
-	// period only
-	mutable std::shared_ptr<FourierTransform1D> fft_N;
-	mutable std::shared_ptr<FourierTransform1D> inv_fft_N;
-	ComplexType *fFTPsi = nullptr;
-
-
-	// infinite wall
-	mutable std::shared_ptr<FourierTransform1D> inv_fft_2N;
-	ComplexType * const fIWPsi = nullptr;
-	ComplexType * const fIWKPsi = nullptr;
+    // period only
+    mutable std::shared_ptr<FourierTransform1D> fft_N;
+    mutable std::shared_ptr<FourierTransform1D> inv_fft_N;
+    ComplexType *fFTPsi = nullptr;
 
 
-	Delayed fDestructor = [this]() {
-		if (fDevice) {
-			if (fFTPsi) fDevice->Free(fFTPsi);
-			if (fIWPsi) fDevice->Free(fIWPsi);
-			if (fIWKPsi) fDevice->Free(fIWKPsi);
-		}
-	};
+    // infinite wall
+    mutable std::shared_ptr<FourierTransform1D> inv_fft_2N;
+    ComplexType * const fIWPsi = nullptr;
+    ComplexType * const fIWKPsi = nullptr;
 
-	void InitSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
-		Complex dt, bool force_normalization_each_step,
-		std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t n,
-		BoundaryCondition b, SolverMethod solver,
-		Real mass, Real hbar, OptionsImpl const &opts) override;
 
-	void UpdatePsi() override;
-	Real CalKinEn() const override;
+    Delayed fDestructor = [this]() {
+        if (fDevice) {
+            if (fFTPsi) fDevice->Free(fFTPsi);
+            if (fIWPsi) fDevice->Free(fIWPsi);
+            if (fIWKPsi) fDevice->Free(fIWKPsi);
+        }
+    };
 
-	void InitExpV();
-	// vpsi = exp(-i/hbar V Dt) psi
-	void ExpV(Complex *psi, Real t) const;
-	void ExpT(Complex *psi, Real t) const;
+    void InitSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
+        Complex dt, bool force_normalization_each_step,
+        std::function<Complex(Real)> const &vs, Real x0, Real x1, size_t n,
+        BoundaryCondition b, SolverMethod solver,
+        Real mass, Real hbar, OptionsImpl const &opts) override;
+
+    void UpdatePsi() override;
+    Real CalKinEn() const override;
+
+    void InitExpV();
+    // vpsi = exp(-i/hbar V Dt) psi
+    void ExpV(Complex *psi, Real t) const;
+    void ExpT(Complex *psi, Real t) const;
 
 
 };

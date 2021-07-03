@@ -6,8 +6,8 @@
 struct ComplexPotentialIVPSolver1DImpl : SolverImpl1D {
 
 
-	PsiVector fV;
-	void Compute() override;
+    PsiVector fV;
+    void Compute() override;
 
 
 };

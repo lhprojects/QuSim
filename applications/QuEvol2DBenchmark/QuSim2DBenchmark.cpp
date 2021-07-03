@@ -94,7 +94,7 @@ int main()
 			if (strstr(tests[i].name, "cuda") == 0) {
 				iters *= 100;
 			}
-            printf("%13.2f ", dim * dim * iters / time * 1E-6);
+			printf("%13.2f ", dim * dim * iters / time * 1E-6);
 		}
 		printf("\n");
 

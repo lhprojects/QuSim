@@ -5,9 +5,9 @@
 #include "Perburbation.h"
 
 void ScatteringProblemSolverInverseMatrix3D::InitScatteringSolver3D(std::function<Complex(Real, Real, Real)> const & v,
-	Real x0, Real x1, size_t nx, Real y0, Real y1, size_t ny, Real z0, Real z1, size_t nz,
-	Real en, Real directionx, Real directiony, Real directionz,
-	SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
+    Real x0, Real x1, size_t nx, Real y0, Real y1, size_t ny, Real z0, Real z1, size_t nz,
+    Real en, Real directionx, Real directiony, Real directionz,
+    SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
 {
 
     ScatteringSolver3DImpl::InitScatteringSolver3D(v, x0, x1, nx, y0, y1, ny, z0, z1, nz,
@@ -17,13 +17,13 @@ void ScatteringProblemSolverInverseMatrix3D::InitScatteringSolver3D(std::functio
     PerburbationUtility::GaussMAsbLayer3D(fNx, fNy, fNz, fDx, fDy, fDz,
         mutable_ptr_cast(fV), fHbar, fMass, fE, 3.);
 
-	InitCommon(fDevice.get(), fN, opts);
-	InitEMinusH();
+    InitCommon(fDevice.get(), fN, opts);
+    InitEMinusH();
 }
 
 void ScatteringProblemSolverInverseMatrix3D::Compute()
 {
-	InverseMatrixCompute(this);
+    InverseMatrixCompute(this);
 }
 
 void ScatteringProblemSolverInverseMatrix3D::InitEMinusH()

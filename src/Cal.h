@@ -51,35 +51,35 @@ struct CalExpr;
 
 struct Cal {
 
-	// Codes are stil not avaliable
-	Cal(char const *x);
+    // Codes are stil not avaliable
+    Cal(char const *x);
 
-	// Alloc and set variable
-	// This operation will make codes not avaliable
-	void SetVarVal(std::string const &name, CCom const &v);
-	// Get variable (address), you must alloc and set variable before you get variable
-	CCom &GetVarVal(std::string const &name);
-	// Generate (if codes not avaliable) and run codes
-	CCom Val();
+    // Alloc and set variable
+    // This operation will make codes not avaliable
+    void SetVarVal(std::string const &name, CCom const &v);
+    // Get variable (address), you must alloc and set variable before you get variable
+    CCom &GetVarVal(std::string const &name);
+    // Generate (if codes not avaliable) and run codes
+    CCom Val();
 
-	~Cal();
+    ~Cal();
 
 
-	// Generate codes
-	// Codes will be avaliable
-	void GenPseudoCode();
-	// Run codes, Codes must be avaliable
-	CCom RunPseudoCode();
+    // Generate codes
+    // Codes will be avaliable
+    void GenPseudoCode();
+    // Run codes, Codes must be avaliable
+    CCom RunPseudoCode();
 private:
-	friend struct CalExpr;
-	std::map<std::string, CCom> fVarVals;
-	std::shared_ptr<CalExpr> fExpr;
-	std::string fStr;
+    friend struct CalExpr;
+    std::map<std::string, CCom> fVarVals;
+    std::shared_ptr<CalExpr> fExpr;
+    std::string fStr;
 
-	std::vector<int> fPseudoCode;
-	std::vector<CCom> fStack;
-	std::vector<CCom> fConstants;
-	std::vector<CCom const*> fVariables;
+    std::vector<int> fPseudoCode;
+    std::vector<CCom> fStack;
+    std::vector<CCom> fConstants;
+    std::vector<CCom const*> fVariables;
 
 };
 

@@ -7,9 +7,9 @@ void testFFT();
 
 int main()
 {
-	testCal();
-	testFFT();
-	printf("%d tests failed\n", qu_num_failed_tests());
-	return 0;
+    testCal();
+    testFFT();
+    printf("%d tests failed\n", qu_num_failed_tests());
+    return 0;
 }
 

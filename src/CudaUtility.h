@@ -10,35 +10,35 @@ cudaError cudaProduct(cuComplex * __restrict__ out, const cuComplex * __restrict
 cudaError cudaScale(cuComplex * __restrict__ out, const cuComplex * __restrict__ in, float alpha, size_t n);
 
 inline cufftResult fftExec(cufftHandle plan,
-	cufftComplex* idata,
-	cufftComplex* odata,
-	int direction)
+    cufftComplex* idata,
+    cufftComplex* odata,
+    int direction)
 {
-	return cufftExecC2C(plan, idata, odata, direction);
+    return cufftExecC2C(plan, idata, odata, direction);
 }
 
 
 inline cufftResult fftExec(cufftHandle plan,
-	cufftDoubleComplex* idata,
-	cufftDoubleComplex* odata,
-	int direction)
+    cufftDoubleComplex* idata,
+    cufftDoubleComplex* odata,
+    int direction)
 {
-	return cufftExecZ2Z(plan, idata, odata, direction);
+    return cufftExecZ2Z(plan, idata, odata, direction);
 }
 
 inline cufftResult cufftExec(cufftHandle plan,
-	cufftComplex* idata,
-	cufftComplex* odata,
-	int direction)
+    cufftComplex* idata,
+    cufftComplex* odata,
+    int direction)
 {
-	return cufftExecC2C(plan, idata, odata, direction);
+    return cufftExecC2C(plan, idata, odata, direction);
 }
 
 
 inline cufftResult cufftExec(cufftHandle plan,
-	cufftDoubleComplex* idata,
-	cufftDoubleComplex* odata,
-	int direction)
+    cufftDoubleComplex* idata,
+    cufftDoubleComplex* odata,
+    int direction)
 {
-	return cufftExecZ2Z(plan, idata, odata, direction);
+    return cufftExecZ2Z(plan, idata, odata, direction);
 }
