@@ -394,6 +394,7 @@ void benchmark_for_each_big()
 
 #include "../src/kissfft.hh"
 #include "../src/FourierTransform.h"
+#include "../src/Device.h"
 
 #include <memory>
 
@@ -459,16 +460,21 @@ void benchmark_fouier()
 
 void benchmark_fouier_3d()
 {
+    begin_section("benchmark_fouier fft + invfft 500x500x500");
     size_t nx = 500;
     size_t ny = 500;
     size_t nz = 500;
-    begin_section("benchmark_fouier fft + invfft 10000x10000");
     Complex* in = new Complex[nx * ny * nz];
     Complex* out = new Complex[nx * ny * nz];
     std::unique_ptr<Complex> autofree1(in);
     std::unique_ptr<Complex> autofree2(out);
 
     std::fill(in, in + nx * ny, 1.);
+
+#ifdef QUSIM_USE_CUDA
+    Device::Create();
+    Complex* in_d = new Complexp[];
+#endif
 
     std::unique_ptr<FourierTransform3D> kiss(FourierTransform3D::Create(nx, ny, nz, false, FourierTransformLibrary::KISS));
     std::unique_ptr<FourierTransform3D> ikiss(FourierTransform3D::Create(nx, ny, nz, true, FourierTransformLibrary::KISS));
