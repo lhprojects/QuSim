@@ -14,6 +14,29 @@
 #define EXPORT_STRUCT __declspec(dllimport)
 #endif
 
+
+inline size_t CalGlobalIdx(size_t ix, size_t nx)
+{
+	assert(ix < nx);
+	return ix;
+}
+
+inline size_t CalGlobalIdx(size_t ix, size_t iy, size_t nx, size_t ny)
+{
+	assert(ix < nx);
+	assert(iy < ny);
+	return iy + ix * ny;
+}
+
+inline size_t CalGlobalIdx(size_t ix, size_t iy, size_t iz,
+	size_t nx, size_t ny, size_t nz)
+{
+	assert(ix < nx);
+	assert(iy < ny);
+	assert(iz < nz);
+	return (iy + ix * ny) * nz + iz;
+}
+
 template<class T>
 struct VectorView {
 
@@ -51,9 +74,9 @@ struct MatrixView {
 	// second is the col (represent x)
 
 	T const & operator()(size_t row, size_t col) const {
-		assert(row < fRows );
-		assert(col < fCols);
-		return fData[col + row *fCols];
+        assert(row < fRows);
+        assert(col < fCols);
+        return fData[CalGlobalIdx(row, col, fRows, fCols)];
 	}
 private:
 	T const * const fData;
@@ -79,13 +102,14 @@ struct Tensor3View {
 	T const *data() const { return fData; }
 	T const & operator[](size_t i) const { assert(i < size()); return fData[i]; }
 	T const & operator()(size_t i) const { assert(i < size()); return fData[i]; }
-	T const & operator()(size_t i3, size_t i2, size_t i1) const
-	{
-		assert(i3 < fSize3);
-		assert(i2 < fSize2);
+
+    T const& operator()(size_t i1, size_t i2, size_t i3) const
+    {
 		assert(i1 < fSize1);
-		return fData[i3 + fSize3 *(i2  + fSize2 * i1)];
-	}
+		assert(i2 < fSize2);
+		assert(i3 < fSize3);
+        return fData[CalGlobalIdx(i1, i2, i3, fSize1, fSize2, fSize3)];
+    }
 private:
 	T const * const fData;
 	size_t const fSize1;
@@ -201,27 +225,6 @@ void ForEach2DGrid(R x0, R dx, size_t nx,
 			op(idx, Ix, Iy, X, Y);
 		}
 	}
-}
-
-inline size_t CalGlobalIdx(size_t ix, size_t nx)
-{
-	assert(ix < nx);
-	return ix;
-}
-
-inline size_t CalGlobalIdx(size_t ix, size_t iy, size_t nx, size_t ny)
-{
-	assert(ix < nx);
-	assert(iy < ny);
-	return iy + ix * ny;
-}
-inline size_t CalGlobalIdx(size_t ix, size_t iy, size_t iz,
-	size_t nx, size_t ny, size_t nz)
-{
-	assert(ix < nx);
-	assert(iy < ny);
-	assert(iz < nz);
-	return (iy + ix * ny)*nz + iz;
 }
 
 template<class Op>

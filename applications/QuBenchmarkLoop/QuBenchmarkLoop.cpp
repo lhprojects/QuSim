@@ -242,6 +242,22 @@ void benchmark_loop()
 
 
 int nbt = 10000000;
+
+template<class R>
+struct QuComp {
+    QuComp() : fReal(), fImag() { }
+    QuComp(R real, R imag) : fReal(real), fImag(imag) { }
+    R fReal;
+    R fImag;
+};
+
+template<class R>
+inline QuComp<R> operator*(QuComp<R> l, QuComp<R> r)
+{
+    return QuComp<R>(l.fReal * r.fReal - l.fImag * r.fImag,
+        l.fReal * r.fImag + l.fImag * r.fReal);
+}
+
 void benchmark_transform_fill()
 {
     begin_section("benchmark_transform_fill");
@@ -277,6 +293,39 @@ void benchmark_transform_fill()
     end_section();
 }
 
+void benchmark_transform_std_complex_mul()
+{
+    begin_section("benchmark_transform_std_complex_mul");
+    std::complex<double>* in1 = new std::complex<double>[nbt];
+    QuComp<double>* in2 = new QuComp<double>[nbt];
+
+    std::unique_ptr<std::complex<double> > auto_free1(in1);
+    std::unique_ptr<QuComp<double> > auto_free2(in2);
+
+    for (int i = 0; i < 3; ++i) {
+        timeit("      seq & std::complex", [in1]() {
+            std::transform(std::execution::seq, in1, in1 + nbt, in1, in1, op_Mul());
+            });
+        timeit("      par & std::complex", [in1]() {
+            std::transform(std::execution::par, in1, in1 + nbt, in1, in1, op_Mul());
+            });
+        timeit("par_unseq & std::complex", [in1]() {
+            std::transform(std::execution::par_unseq, in1, in1 + nbt, in1, in1, op_Mul());
+            });
+    }
+    for (int i = 0; i < 3; ++i) {
+        timeit("      seq &       QuComp", [in2]() {
+            std::transform(std::execution::seq, in2, in2 + nbt, in2, in2, op_Mul());
+            });
+        timeit("      par &       QuComp", [in2]() {
+            std::transform(std::execution::par, in2, in2 + nbt, in2, in2, op_Mul());
+            });
+        timeit("par_unseq &       QuComp", [in2]() {
+            std::transform(std::execution::par_unseq, in2, in2 + nbt, in2, in2, op_Mul());
+            });
+    }
+    end_section();
+}
 
 void benchmark_transform_Exp()
 {
@@ -526,12 +575,13 @@ void benchmark_fouier_3d()
 int main()
 {
 
-    benchmark_for_each_big();
+    benchmark_transform_std_complex_mul();
     benchmark_transform_Dot();
     benchmark_transform_Exp();
     benchmark_transform_fill();
     benchmark_loop<double>();
     benchmark_loop<std::complex<double> >();
+    benchmark_for_each_big();
 
     benchmark_fouier_2d();
     benchmark_fouier_3d();
