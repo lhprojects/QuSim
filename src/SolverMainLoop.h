@@ -162,13 +162,13 @@ void SolverImpl1D:: LOOP_FUNC_NAME ()
         Real const c76 = 70 * (7 - sqrt(21)) / 180;
         //Real const one3 = c71 + c72 + c73 + c74 + c75 + c76;
 
-        Real const f1 = 0;
-        Real const f2 = 1;
-        Real const f3 = 1. / 2;
-        Real const f4 = 2. / 3;
-        Real const f5 = (7 - sqrt(21)) / 14;
-        Real const f6 = (7 + sqrt(21)) / 14;
-        Real const f7 = 1;
+        //Real const f1 = 0;
+        //Real const f2 = 1;
+        //Real const f3 = 1. / 2;
+        //Real const f4 = 2. / 3;
+        //Real const f5 = (7 - sqrt(21)) / 14;
+        //Real const f6 = (7 + sqrt(21)) / 14;
+        //Real const f7 = 1;
 
         Real const b1 = 9. / 180;
         Real const b3 = 64. / 180;

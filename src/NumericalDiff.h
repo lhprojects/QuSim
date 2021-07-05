@@ -152,7 +152,7 @@ void FillElems2D(std::vector<Eigen::Triplet<Complex> >& elems,
     R const tx = -hbar * hbar / (2 * mass) / (dx * dx);
     R const ty = -hbar * hbar / (2 * mass) / (dy * dy);
     auto const ftx = f * tx;
-    auto const fty = f * tx;
+    auto const fty = f * ty;
 
     auto foldx = [=](size_t i) -> size_t {
         if ((ptrdiff_t)i < 0) i += nx;
@@ -247,7 +247,7 @@ void FillElems3D(std::vector<Eigen::Triplet<Complex> >& elems,
     R const ty = -hbar * hbar / (2 * mass) / (dy * dy);
     R const tz = -hbar * hbar / (2 * mass) / (dz * dz);
     auto const ftx = f * tx;
-    auto const fty = f * tx;
+    auto const fty = f * ty;
     auto const ftz = f * tz;
 
     auto foldx = [=](size_t i) -> size_t {

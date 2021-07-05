@@ -46,11 +46,11 @@ struct OptionsImpl {
         using PureType = std::remove_cv_t< std::remove_reference_t<V> >;
         this->Set_<PureType>(std::forward<String>(k), std::forward<V>(v));
     }
+    bool Contains(std::string const& k) const;
 
-    // key must exist and has type of bool, else an exception will be thrown
-    bool GetBool(std::string const &k) const;
     // if key doesn't exist, default_ will be returned;
     // else if the key exists, however without a type of bool, an exception will be thrown
+    // else the return the value is returned
     bool GetBool(std::string const& k, bool default_) const;
     Int GetInt(std::string const& k) const;
     Int GetInt(std::string const& k, Int default_) const;
@@ -59,23 +59,30 @@ struct OptionsImpl {
     Complex GetComplex(std::string const& k) const;
     Complex GetComplex(std::string const& k, Complex default_) const;
     std::string GetString(std::string const& k) const;
-    std::string GetString(std::string const& k, std::string const &v) const;
-    std::string GetString(std::string const& k, std::string &&v) const;
+    std::string GetString(std::string const& k, std::string const& default_) const;
+    std::string GetString(std::string const& k, std::string&& default_) const;
 
+    template<class V>
+    std::remove_cv_t< std::remove_reference_t<V> > GetDefaut(std::string const& k, V&& default_) const
+    {
+        using PureType = std::remove_cv_t< std::remove_reference_t<V> >;
+        return this->GetDefault_<PureType>(k, std::forward<V>(default_));
+    }
+    
+
+
+    // key must exist and has type of bool, else an exception will be thrown
+    bool GetBool(std::string const& k) const;
+
+    // return the result, if we have the key and type is right
+    // else exception is thrown
     template<class V>
     std::remove_cv_t< std::remove_reference_t<V> > Get(std::string const& k) const;
 
 
-    bool Contains(std::string const& k) const;
 
-    template<class V>
-    std::remove_cv_t< std::remove_reference_t<V> > GetDefaut(std::string const& k, V&& v) const
-    {
-        using PureType = std::remove_cv_t< std::remove_reference_t<V> >;
-        return this->GetDefault_<PureType>(k, std::forward<V>(v));
-    }
-
-    // return true, if we have the key and the type is right
+    // return true and result is set to v, if we have the key and the type is right
+    // else return false
     // note `int a; Get("", a)` may have linking error, if the `int` is not the same the `Int`
     template<class V>
     bool Get(std::string const& k, V& v) const;

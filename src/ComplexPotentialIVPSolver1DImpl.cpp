@@ -115,7 +115,7 @@ void ComplexPotentialIVPSolver1DImpl::Compute()
 
 
     if (fMethod == SolverMethod::ImplicitMidpointMethod) {
-        Real const OneFourthDxDx = 0.25 * fDx*fDx;
+        //Real const OneFourthDxDx = 0.25 * fDx*fDx;
         for (size_t i = 0; i < fNBins; ++i) {
             Matrix tr;
             Complex a = e - vk * fV[i];
@@ -236,13 +236,13 @@ void ComplexPotentialIVPSolver1DImpl::Compute()
         Complex const c76 = 70 * (7 - sqrt(21)) / 180;
         //Real const one3 = c71 + c72 + c73 + c74 + c75 + c76;
 
-        Complex const f1 = 0;
-        Complex const f2 = 1;
-        Complex const f3 = 1. / 2;
-        Complex const f4 = 2. / 3;
-        Complex const f5 = (7 - sqrt(21)) / 14;
-        Complex const f6 = (7 + sqrt(21)) / 14;
-        Complex const f7 = 1;
+        //Complex const f1 = 0;
+        //Complex const f2 = 1;
+        //Complex const f3 = 1. / 2;
+        //Complex const f4 = 2. / 3;
+        //Complex const f5 = (7 - sqrt(21)) / 14;
+        //Complex const f6 = (7 + sqrt(21)) / 14;
+        //Complex const f7 = 1;
 
         Complex const b1 = 9. / 180;
         Complex const b3 = 64. / 180;

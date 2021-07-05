@@ -1,4 +1,3 @@
-#pragma once
 
 #include "Utils.h"
 #include "OptionsImpl.h"

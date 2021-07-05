@@ -22,13 +22,14 @@ struct SplittingMethod1D : QuEvolver1DImpl
     ComplexType * const fIWKPsi = nullptr;
 
 
-    Delayed fDestructor = [this]() {
+    ~SplittingMethod1D()
+    {
         if (fDevice) {
-            if (fFTPsi) fDevice->Free(fFTPsi);
-            if (fIWPsi) fDevice->Free(fIWPsi);
-            if (fIWKPsi) fDevice->Free(fIWKPsi);
+            fDevice->SafeFree(fFTPsi);
+            fDevice->SafeFree(mutable_cast(fIWPsi));
+            fDevice->SafeFree(mutable_cast(fIWKPsi));
         }
-    };
+    }
 
     void InitSystem1D(std::function<Complex(Real)> const &psi, bool force_normalization,
         Complex dt, bool force_normalization_each_step,

@@ -83,8 +83,8 @@ struct CalExpr {
             delete x;
         }
     }
-    CalExprType fType;
     std::vector<CalExpr*> fSubExprs;
+    CalExprType fType;
 
     CCom fConstVal;
 
@@ -359,7 +359,6 @@ CalExpr *parseAndAndExpr(char const *&s)
     auto e1 = parseCmpExpr(s);
     for (;;) {
 
-        char c = *s;
         if (startWith(s, "&&")) {
             s += 2;
             skipEmpty(s);

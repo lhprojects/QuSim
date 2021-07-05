@@ -37,7 +37,7 @@ struct QuEvolverImpl
 
     size_t const fBatchSize = 1;
     bool const fFN = 0; // force normalization after initialization
-    OptionsImpl const fOpts;
+    OptionsImpl const fOpts{};
 
     void InitSystem(bool force_normalization,
         Complex dt, bool force_normalization_each_step,

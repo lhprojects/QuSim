@@ -163,7 +163,7 @@ void SolverImpl1D::Compute()
 
         Complex One = (-T12 * T21 + T11 * T22);
         One = 1;
-        Complex t = 2 * k1 * One / (k2*T11 - I * k1*k2*T12 + I * T21 + k1 * T22);
+        //Complex t = 2 * k1 * One / (k2*T11 - I * k1*k2*T12 + I * T21 + k1 * T22);
 
         fT = 4 * k1*k2 / abs2(k2*T11 - I * k1*k2*T12 + I * T21 + k1 * T22);
         fR = abs2(r);

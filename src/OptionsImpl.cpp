@@ -15,7 +15,7 @@ std::string to_string(Complex c)
 
 std::string to_string(std::string s)
 {
-    return std::move(s);
+    return s;
 }
 
 
@@ -163,7 +163,7 @@ bool OptionsImpl::Get(std::string const& k, V& v) const
     auto it = fOpts.find(k);
     if (it == fOpts.end()) {
         return false;
-    } else if (it->second.fType != GetOptionType(V())) {
+    } else if (it->second.fType != type) {
         return false;
     }
     v = std::get<std::remove_cv_t<V> >(it->second.fValue);
@@ -188,3 +188,9 @@ V OptionsImpl::GetDefault_(std::string const& k, V v) const
     }
     return std::get<Return>(it->second.fValue);
 }
+
+template bool OptionsImpl::GetDefault_<bool>(std::string const& k, bool v) const;
+template Int OptionsImpl::GetDefault_<Int>(std::string const& k, Int v) const;
+template Real OptionsImpl::GetDefault_<Real>(std::string const& k, Real v) const;
+template Complex OptionsImpl::GetDefault_<Complex>(std::string const& k, Complex v) const;
+template std::string OptionsImpl::GetDefault_<std::string>(std::string const& k, std::string v) const;

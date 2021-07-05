@@ -394,11 +394,10 @@ void benchmark_for_each_big()
 
 #include "../src/kissfft.hh"
 #include "../src/FourierTransform.h"
-#include "../src/Device.h"
 
 #include <memory>
 
-void benchmark_fouier()
+void benchmark_fouier_2d()
 {
     size_t nx = 10000;
     size_t ny = 10000;
@@ -526,9 +525,6 @@ void benchmark_fouier_3d()
 
 int main()
 {
-    benchmark_fouier_3d();
-    benchmark_fouier();
-    return 0;
 
     benchmark_for_each_big();
     benchmark_transform_Dot();
@@ -536,4 +532,8 @@ int main()
     benchmark_transform_fill();
     benchmark_loop<double>();
     benchmark_loop<std::complex<double> >();
+
+    benchmark_fouier_2d();
+    benchmark_fouier_3d();
+    return 0;
 }

@@ -488,7 +488,7 @@ struct DeviceTemplate : Device
     using RealType = typename Trait::RealType;
 
     template<class T>
-    using ScalarTrait = typename Trait::ScalarTrait<T>;
+    using ScalarTrait = typename Trait::template ScalarTrait<T>;
 
     DevicePtr<RealType> DevicePtrCast(DReal* p)
     {
@@ -729,7 +729,7 @@ struct DeviceTemplate : Device
     template<class R>
     struct op_Abs2K1D {
 
-        QUSIM_HOST_DEVICE op_Abs2K1D(size_t sz, R ax) : Nx(sz), ax(ax) {}
+        QUSIM_HOST_DEVICE op_Abs2K1D(size_t sz, R ax) : ax(ax), Nx(sz){}
 
         R const ax;
         size_t const Nx;
@@ -748,8 +748,8 @@ struct DeviceTemplate : Device
 
         QUSIM_HOST_DEVICE op_MulExpK1D(size_t sz, S ax) : Nx(sz), ax(ax) {}
 
-        S const ax;
         size_t const Nx;
+        S const ax;
 
         template<class U, class V>
         QUSIM_HOST_DEVICE auto operator()(U u, V idx) const
@@ -765,10 +765,10 @@ struct DeviceTemplate : Device
 
         QUSIM_HOST_DEVICE op_Abs2K2D(size_t nx, size_t ny, R ax, R ay) : Nx(nx), Ny(ny), ax(ax), ay(ay) {}
 
-        R const ax;
-        R const ay;
         size_t const Nx;
         size_t const Ny;
+        R const ax;
+        R const ay;
 
         template<class U, class V>
         QUSIM_HOST_DEVICE auto operator()(U u, V idx) const
@@ -791,11 +791,11 @@ struct DeviceTemplate : Device
         {
         }
 
-        S const alpha;
-        R const ax;
-        R const ay;
         size_t const Nx;
         size_t const Ny;
+        R const ax;
+        R const ay;
+        S const alpha;
 
         template<class U, class V>
         QUSIM_HOST_DEVICE auto operator()(U u, V idx) const
@@ -818,12 +818,12 @@ struct DeviceTemplate : Device
         {
         }
 
-        R const ax;
-        R const ay;
-        R const az;
         size_t const Nx;
         size_t const Ny;
         size_t const Nz;
+        R const ax;
+        R const ay;
+        R const az;
 
         template<class U, class V>
         QUSIM_HOST_DEVICE auto operator()(U u, V idx) const
@@ -847,13 +847,13 @@ struct DeviceTemplate : Device
         {
         }
 
-        S const alpha;
-        R const ax;
-        R const ay;
-        R const az;
         size_t const Nx;
         size_t const Ny;
         size_t const Nz;
+        R const ax;
+        R const ay;
+        R const az;
+        S const alpha;
 
         template<class U, class V>
         QUSIM_HOST_DEVICE auto operator()(U u, V idx) const
@@ -1158,12 +1158,12 @@ struct DeviceTemplate : Device
         return ans;
     }
 
-    void Set(DComplex* in, size_t idx, DComplex alpha)
+    void Set(DComplex* in, size_t idx, DComplex alpha) override
     {
         Trait::MoveToDevice(in + idx, &alpha, sizeof(DComplex));
     }
 
-    void Set(DReal* in, size_t idx, DReal alpha)
+    void Set(DReal* in, size_t idx, DReal alpha) override
     {
         Trait::MoveToDevice(in + idx, &alpha, sizeof(DReal));
     }
@@ -1211,7 +1211,7 @@ struct DeviceTemplate : Device
             op_Abs2Mul());
     }
 
-    DReal Norm2(DComplex const* in, size_t nx)
+    DReal Norm2(DComplex const* in, size_t nx) override
     {
         return Trait::TransformReduce(Exec(),
             DevicePtrCast(in),
@@ -1240,7 +1240,7 @@ struct DeviceTemplate : Device
             op_Abs2()));
     }
 
-    DReal SumReal(DComplex const* in, size_t n)
+    DReal SumReal(DComplex const* in, size_t n) override
     {
         return Trait::TransformReduce(Exec(),
             DevicePtrCast(in),
@@ -1251,7 +1251,7 @@ struct DeviceTemplate : Device
             );
     }
 
-    DReal SumImag(DComplex const* in, size_t n)
+    DReal SumImag(DComplex const* in, size_t n) override
     {
         return Trait::TransformReduce(Exec(),
             DevicePtrCast(in),
@@ -1273,7 +1273,7 @@ struct DeviceTemplate : Device
             op_MinusAbs2());
     }
 
-    DReal Norm2(DReal const* in, size_t nx)
+    DReal Norm2(DReal const* in, size_t nx) override
     {
         return Trait::TransformReduce(Exec(),
             DevicePtrCast(in), 
@@ -1387,7 +1387,7 @@ struct DeviceTemplate : Device
             op_Scale<ComplexType>(scale));
     }
 
-    void Sub(DComplex* to, DComplex const* in1, DComplex const* in2, size_t n)
+    void Sub(DComplex* to, DComplex const* in1, DComplex const* in2, size_t n) override
     {
         Trait::Transform(Exec(),
             DevicePtrCast(in1),
@@ -1615,7 +1615,7 @@ struct DeviceTemplate : Device
     }
 
     void G03D(DComplex* psik, DReal E, DReal epsilon, DReal a1, DReal a2, DReal a3,
-        size_t nx, size_t ny, size_t nz)
+        size_t nx, size_t ny, size_t nz) override
     {
         Trait::Transform(Exec(), 
             DevicePtrCast(psik),
@@ -1625,11 +1625,11 @@ struct DeviceTemplate : Device
             op_G03D<RealType>(nx, ny, nz, E, epsilon, a1, a2, a3));
     }
 
-    virtual DComplex Xsection3D(DComplex const* psi0, DComplex const* psi, DComplex const* v,
+    DComplex Xsection3D(DComplex const* psi0, DComplex const* psi, DComplex const* v,
         DReal kx, DReal ky, DReal kz,
         DReal x0, DReal y0, DReal z0,
         DReal dx, DReal dy, DReal dz,
-        size_t nx, size_t ny, size_t nz)
+        size_t nx, size_t ny, size_t nz) override
     {
         return Trait::TransformReduce(Exec(),
             DevicePtrCast(psi0),
@@ -1689,7 +1689,7 @@ struct DeviceTemplate : Device
             op_LinearUpdate<RealType>(gamma));
     }
 
-    void Vellekoop(DComplex* psi, DComplex const* newPsi, DComplex const* V, DReal slow, DReal epsilon, size_t n)
+    void Vellekoop(DComplex* psi, DComplex const* newPsi, DComplex const* V, DReal slow, DReal epsilon, size_t n) override
     {
         Trait::Transform(Exec(), 
             DevicePtrCast(psi), 
@@ -1699,7 +1699,7 @@ struct DeviceTemplate : Device
             DevicePtrCast(psi),
             op_Vellekoop<RealType>(slow, epsilon));
     }
-    void Hao1(DComplex* psi, DComplex const* newPsi, DComplex const* V, DReal slow, DReal epsilon, size_t n)
+    void Hao1(DComplex* psi, DComplex const* newPsi, DComplex const* V, DReal slow, DReal epsilon, size_t n) override
     {
         Trait::Transform(Exec(), 
             DevicePtrCast(psi),
@@ -1709,7 +1709,7 @@ struct DeviceTemplate : Device
             DevicePtrCast(psi),
             op_Hao1<RealType>(slow, epsilon));
     }
-    void Hao2(DComplex* psi, DComplex const* newPsi, DComplex const* V, DReal slow, DReal epsilon, size_t n)
+    void Hao2(DComplex* psi, DComplex const* newPsi, DComplex const* V, DReal slow, DReal epsilon, size_t n) override
     {
         Trait::Transform(Exec(),
             DevicePtrCast(psi),

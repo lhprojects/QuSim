@@ -55,7 +55,6 @@ void QuEvolver1DImpl::InitPsi()
 {
     mutable_cast(fPsi) = fDevice->Alloc<ComplexType>(fN);
 
-    ComplexType* psi;
     if (!fDevice->OnMainMem()) {
         mutable_cast(fPsiHost) = (ComplexType*)malloc(sizeof(ComplexType) * fN);
     } else {

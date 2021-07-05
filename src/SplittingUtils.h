@@ -40,7 +40,6 @@ void QuUpdatePsi(SplitingMethod* sm)
             }
 
         } else if (sm->fSolverMethod == SolverMethod::SplittingMethodO4) {
-            auto n2 = sm->fDevice->Norm2(psi, sm->fN);
             if (i == 0 || !fold_head_tail) {
                 sm->ExpV(psi, SplitingConstants<Real>::C1);
             }

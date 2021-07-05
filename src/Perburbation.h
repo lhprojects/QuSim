@@ -84,7 +84,6 @@ namespace PerburbationUtility {
     {
         PeReal k0 = sqrt(2 * mass * e) / hbar;
         for (size_t i = 0; i < nx; ++i) {
-            PeReal xx;
             PeReal x = fold_half(i, nx) * dx;
             auto idx = CalGlobalIdx(i, nx);
 

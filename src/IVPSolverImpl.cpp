@@ -1,6 +1,6 @@
 #include "IVPSolverImpl.h"
 
-IVPSolverImpl::IVPSolverImpl() : fMass(0), fHbar(0), fE(0), fMethod()
+IVPSolverImpl::IVPSolverImpl() : fE(0), fMass(0), fHbar(0), fMethod()
 {
 }
 

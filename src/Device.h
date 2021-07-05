@@ -48,6 +48,7 @@ struct Device
 
 
     static std::unique_ptr<Device> Create(DeviceType);
+    virtual ~Device() {}
 
     virtual bool OnMainMem() = 0;
     virtual void* AllocMem(size_t bytes) = 0;

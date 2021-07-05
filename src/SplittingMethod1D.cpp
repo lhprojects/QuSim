@@ -41,7 +41,6 @@ void SplittingMethod1D::ExpT(Complex* psi, Real tt) const
 {
     if (fBoundaryCondition == BoundaryCondition::Period) {
 
-        double n2 = fDevice->Norm2(psi, fN);
         fft_N->Transform(psi, fFTPsi);
 
         // Dk = 2 Pi / (a * N)
@@ -58,8 +57,6 @@ void SplittingMethod1D::ExpT(Complex* psi, Real tt) const
 
         inv_fft_N->Transform(fFTPsi, psi);
         fDevice->Scale(psi, 1. / fN, fN);
-        double n3 = fDevice->Norm2(psi, fN);
-        double n4 = fDevice->Norm2(psi, fN);
 
     } else if (fBoundaryCondition == BoundaryCondition::InfiniteWall) {
 
@@ -122,11 +119,6 @@ Real SplittingMethod1D::CalKinEn() const
         RealType const DT = QuSqr(Dk * fHbar) / (2 * fMass);
         RealType const kinen = fDevice->Abs2Idx2(fIWKPsi, fN) * DT;
         RealType const norm2 = fDevice->Norm2(fIWKPsi, fN);
-
-        RealType j2 = fDevice->Abs2Idx2(fIWKPsi, fN);
-        RealType j1 = fDevice->Abs2Idx(fIWKPsi, fN);
-        RealType kv2 = sqrt(j2 / norm2)*Dk;
-        RealType kv = Dk * j1 / norm2;
 
         return kinen / norm2;
 
