@@ -13,18 +13,19 @@ struct FourierTransform1D {
     // factory
     static FourierTransform1D *Create(size_t n, bool inverse, FourierTransformLibrary lib);
 
-    //FT
+    // Fourier Transform definition:
     // X_k = sum_n x_n Exp{-2 pi I k n/N}
-    // x_n = sum_n X_k Exp{+2 pi I k n/N} / N
-    virtual void Transform(Complex64 const *from, Complex64 *to) = 0;
-    virtual ~FourierTransform1D(){ }
+    // Inverse Fourier Transform definition:
+    // x_n = sum_n X_k Exp{+2 pi I k n/N}
+    virtual void Transform(Complex64 const* from, Complex64* to) = 0;
+    virtual ~FourierTransform1D() {}
 };
 
 struct FourierTransform2D {
     // factory
-    static FourierTransform2D *Create(size_t rows, size_t cols, bool inverse, FourierTransformLibrary lib);
-    virtual void Transform(Complex const *from, Complex*to) = 0;
-    virtual ~FourierTransform2D() { }
+    static FourierTransform2D* Create(size_t rows, size_t cols, bool inverse, FourierTransformLibrary lib);
+    virtual void Transform(Complex const* from, Complex* to) = 0;
+    virtual ~FourierTransform2D() {}
 };
 
 struct FourierTransform3D {
