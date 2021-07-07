@@ -714,6 +714,14 @@ struct DeviceTemplate : Device
         }
     };
 
+    struct op_MulMinusI {
+        template<class U, class V>
+        QUSIM_HOST_DEVICE auto operator()(U o1, V o2) const
+        {
+            return o1 * V(0, -Trait::GetImag(o2));
+        }
+    };
+
     template<class P>
     struct op_MulMul {
 
@@ -1405,6 +1413,16 @@ struct DeviceTemplate : Device
             DevicePtrCast(from2),
             DevicePtrCast(to),
             op_MulR());
+    }
+
+    void MulMinusI(DComplex* to, DComplex const* from1, DComplex const* from2, size_t nx) override
+    {
+        Trait::Transform(Exec(),
+            DevicePtrCast(from1),
+            DevicePtrCast(from1 + nx),
+            DevicePtrCast(from2),
+            DevicePtrCast(to),
+            op_MulMinusI());
     }
 
     void Mul(DComplex* to, DComplex const* from1, DComplex const* from2, size_t nx) override

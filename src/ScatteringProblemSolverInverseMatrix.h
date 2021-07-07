@@ -20,7 +20,7 @@ void InverseMatrixCompute(Solver* s)
 {
     if (s->fPreferPreciseSmallWaveFunction) {
 
-        s->fDevice->MulR(s->fTmpPsi, s->fPsi0X, s->fV, s->fN);
+        s->fDevice->MulMinusI(s->fTmpPsi, s->fPsi0X, s->fV, s->fN);
         s->fMatrixSolver.Solve(s->fEMinusH, s->fTmpPsi, s->fPsiX, s->fN);
         s->fDevice->Sub(s->fPsiX, s->fPsiX, s->fPsi0X, s->fN);
 

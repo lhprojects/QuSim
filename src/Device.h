@@ -120,6 +120,7 @@ struct Device
     virtual void Sub(DComplex* to, DComplex const* in1, DComplex const* in2, size_t n) = 0;
     virtual void Mul(DComplex* to, DComplex const* from1, DComplex const* from2, size_t nx) = 0;
     virtual void MulR(DComplex* to, DComplex const* from1, DComplex const* from2, size_t nx) = 0;
+    virtual void MulMinusI(DComplex* to, DComplex const* from1, DComplex const* from2, size_t nx) = 0;
     virtual void Mul(DComplex* to, DReal const* from1, DComplex const* from2, size_t nx) = 0;
     virtual void Mul(DComplex* to, DReal const* from1, DComplex alpha, DComplex const* from2, size_t nx) = 0;
     virtual void Mul(DComplex* to, DComplex const* from2, size_t nx) = 0;
