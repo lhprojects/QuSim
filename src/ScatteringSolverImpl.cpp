@@ -121,7 +121,13 @@ void ScatteringSolver2DImpl::InitPotential()
     for_each_global_idx(fX0, fDx, fNx,
         fY0, fDy, fNy,
         [&, v = mutable_ptr_cast(fVHost)](size_t idx, Real x, Real y) {
-        v[idx] = fVFunc(x, y);
+        auto pot = fVFunc(x, y);
+        if (std::isnan(pot.real()) || std::isnan(pot.imag())) {
+            throw std::runtime_error("nan in function, "
+            "x: " + std::to_string(x) + ", "
+            "y: " + std::to_string(y));
+        }
+        v[idx] = pot;
     });
 
     if (!fDevice->OnMainMem()) {

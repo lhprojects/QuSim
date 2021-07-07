@@ -7,7 +7,22 @@ template<class CreateFFT>
 void testFFT(CreateFFT createFFT, int n)
 {
     auto cpu = Device::Create(DeviceType::CPU_SEQ);
+
+    auto fft1 = createFFT(n, false, FourierTransformLibrary::KISS);
+    auto fft2 = createFFT(n, false, FourierTransformLibrary::FFTW);
+
+    auto invfft1 = createFFT(n, true, FourierTransformLibrary::KISS);
+    auto invfft2 = createFFT(n, true, FourierTransformLibrary::FFTW);
+
+#if defined(QUSIM_USE_CUDA)
     auto cuda = Device::Create(DeviceType::GPU_CUDA);
+    auto fft3 = createFFT(n, false, FourierTransformLibrary::CUDA);
+    auto invfft3 = createFFT(n, true, FourierTransformLibrary::CUDA);
+#else
+    auto fft3 = createFFT(n, false, FourierTransformLibrary::KISS);
+    auto invfft3 = createFFT(n, true, FourierTransformLibrary::KISS);
+    auto cuda = Device::Create(DeviceType::CPU_SEQ);
+#endif
 
     auto cpu_o = cpu->Alloc<Complex>(n);
     for (int i = 0; i < n; ++i) {
@@ -23,14 +38,6 @@ void testFFT(CreateFFT createFFT, int n)
     auto cpu_x2 = cpu->Alloc<Complex>(n);
     auto cpu_x3 = cpu->Alloc<Complex>(n);
     auto cuda_x3 = cuda->Alloc<Complex>(n);
-
-    auto fft1 = createFFT(n, false, FourierTransformLibrary::KISS);
-    auto fft2 = createFFT(n, false, FourierTransformLibrary::FFTW);
-    auto fft3 = createFFT(n, false, FourierTransformLibrary::CUDA);
-
-    auto invfft1 = createFFT(n, true, FourierTransformLibrary::KISS);
-    auto invfft2 = createFFT(n, true, FourierTransformLibrary::FFTW);
-    auto invfft3 = createFFT(n, true, FourierTransformLibrary::CUDA);
 
     fft1->Transform(cpu_o, cpu_k1);
     fft2->Transform(cpu_o, cpu_k2);

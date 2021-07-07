@@ -121,21 +121,12 @@ bool startWith(char const *s, char const *s1)
     }
     return *s1 == '\0';
 }
-CalExpr *parseQuestionExpr(char const *&s);
+
+CalExpr* parseQuestionExpr(char const*& s);
+CalExpr* praseUnitary(char const*& s);
+
 CalExpr *parseFunc(char const *&s)
 {
-
-    if (startWith(s, "-") || startWith(s, "+")) {
-        char c = *s;
-        ++s;
-        skipEmpty(s);
-        auto e =  parseFunc(s);
-        if (c == '-') {
-            return new CalExpr(CALE_NEG, {e});
-        } else if (c == '+') {
-            return e;
-        }
-    }
 
     if (isNum(*s)) {
         double a;
@@ -256,6 +247,7 @@ CalExpr *parseFunc(char const *&s)
     else throw std::runtime_error(std::string("unexpected: ") + s);
 }
 
+
 CalExpr *parsePowExpr(char const *&s)
 {
     auto e1 = parseFunc(s);
@@ -263,24 +255,39 @@ CalExpr *parsePowExpr(char const *&s)
     if (*s == '^') {
         ++s;
         skipEmpty(s);
-        auto e2 = parsePowExpr(s);
+        auto e2 = praseUnitary(s);
         e1 = new CalExpr(CALE_POW, { e1, e2 });
     }
 
     return e1;
 }
 
+CalExpr* praseUnitary(char const*& s)
+{
+    if (startWith(s, "-") || startWith(s, "+")) {
+        char c = *s;
+        ++s;
+        skipEmpty(s);
+        auto e = parsePowExpr(s);
+        if (c == '-') {
+            return new CalExpr(CALE_NEG, { e });
+        } else if (c == '+') {
+            return e;
+        }
+    }
+    return parsePowExpr(s);
+}
 
 CalExpr *parseMulExpr(char const *&s)
 {
-    auto e1 = parsePowExpr(s);
+    auto e1 = praseUnitary(s);
     for (;;) {
 
         char c = *s;
         if (*s == '*' || *s == '/') {
             ++s;
             skipEmpty(s);
-            auto e2 = parsePowExpr(s);
+            auto e2 = praseUnitary(s);
             if (c == '*') {
                 e1 = new CalExpr(CALE_MUL, { e1, e2 });
             } else if (c == '/') {

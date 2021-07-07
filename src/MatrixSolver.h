@@ -12,6 +12,7 @@ enum class Preconditioner {
     IncompleteLUT,
 };
 
+
 enum class MatrixSolverMethod {
     LU,
     BiCGSTAB,

@@ -109,5 +109,12 @@ void testCal()
         Cal cal(" 1 + 1 ");
         ASS(abs(cal.Val().real() - 2) < 0.001);
     }
-
+    {
+        Cal cal("-2^2");
+        ASS(abs(cal.Val().real() - -4) < 0.001);
+    }
+    {
+        Cal cal("-2^-2");
+        ASS(abs(cal.Val().real() - -0.25) < 0.001);
+    }
 }
