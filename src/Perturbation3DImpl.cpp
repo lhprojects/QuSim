@@ -11,11 +11,12 @@ void QuPerturbation3DImpl::InitPerturbation3D(std::function<Complex(Real, Real, 
     SolverMethod met,
     Real mass, Real hbar, OptionsImpl const & opts)
 {
+    auto const k0 = QuCalMomentum(en, mass);
     ScatteringSolver3DImpl::InitScatteringSolver3D(v,
         x0, x1, nx,
         y0, y1, ny,
         z0, z1, nz,
-        en,
+        en, k0,
         directionx, directiony, directionz,
         met, mass, hbar, opts);
 

@@ -353,3 +353,64 @@ void FillElems3D(std::vector<Eigen::Triplet<Complex> >& elems,
         }
         });
 };
+
+
+
+
+inline Real CalE(Real k0, Real dx, int space_order, Real hbar, Real mass)
+{
+    if (space_order == 2) {
+        return  2. * QuSqr(sin(k0 * dx / 2.))
+            * QuSqr(hbar / dx) / mass;
+    } else if (space_order == 4) {
+        return 1 / 3. * (7 - cos(k0 * dx)) * QuSqr(sin(k0 * dx / 2.))
+            * QuSqr(hbar / dx) / mass;
+    } else if (space_order == 6) {
+        return 1 / 45. * (111. - 23. * cos(k0 * dx) + 2. * cos(2 * k0 * dx)) * QuSqr(sin(k0 * dx / 2.))
+            * QuSqr(hbar / dx) / mass;
+    } else {
+        throw std::invalid_argument("too high order!");
+    }
+}
+
+inline Real ComputeK01D(Real e, Real k0, Real dx, int space_order, Real hbar, Real mass)
+{
+    // e = CalE(k0+dx) = CalE(k0) + k0*hbar^2/mass * dk0
+    // dk0 = (e-CalE(k0))/( k0*hbar^2/mass )
+    for (int i = 0; i < 9; ++i) {
+        auto const dk0 = (e - CalE(k0, dx, space_order, hbar, mass)) / (k0 * hbar * hbar / mass);
+        k0 += dk0;
+    }
+    return k0;
+}
+
+inline Real ComputeK02D(Real e, Real k0, Real cosx, Real cosy,
+    Real dx, Real dy,
+    int space_order, Real hbar, Real mass)
+{
+    // e = CalE(k0+dx) = CalE(k0) + k0*hbar^2/mass * dk0
+    // dk0 = (e-CalE(k0))/( k0*hbar^2/mass )
+    for (int i = 0; i < 9; ++i) {
+        auto const e0 = CalE(k0 * cosx, dx, space_order, hbar, mass);
+        auto const e1 = CalE(k0 * cosy, dy, space_order, hbar, mass);
+        auto const dk0 = (e - (e0 + e1)) / (k0 * hbar * hbar / mass);
+        k0 += dk0;
+    }
+    return k0;
+}
+
+inline Real ComputeK03D(Real e, Real k0, Real cosx, Real cosy, Real cosz,
+    Real dx, Real dy, Real dz,
+    int space_order, Real hbar, Real mass)
+{
+    // e = CalE(k0+dx) = CalE(k0) + k0*hbar^2/mass * dk0
+    // dk0 = (e-CalE(k0))/( k0*hbar^2/mass )
+    for (int i = 0; i < 9; ++i) {
+        auto const e0 = CalE(k0 * cosx, dx, space_order, hbar, mass);
+        auto const e1 = CalE(k0 * cosy, dy, space_order, hbar, mass);
+        auto const e3 = CalE(k0 * cosz, dz, space_order, hbar, mass);
+        auto const dk0 = (e - (e0 + e1 + e3)) / (k0 * hbar * hbar / mass);
+        k0 += dk0;
+    }
+    return k0;
+}

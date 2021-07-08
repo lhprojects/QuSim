@@ -83,6 +83,9 @@ namespace PerburbationUtility {
         PeReal alpha)
     {
         PeReal k0 = sqrt(2 * mass * e) / hbar;
+        if (k0 * dx * nx < 30) {
+            throw std::invalid_argument("too small world to fit absb layer");
+        }
         for (size_t i = 0; i < nx; ++i) {
             PeReal x = fold_half(i, nx) * dx;
             auto idx = CalGlobalIdx(i, nx);

@@ -9,7 +9,7 @@
 
 struct ScatteringSolverImpl
 {
-    void InitScatteringSolver(Real en, SolverMethod met, Real mass, Real hbar, size_t n,
+    void InitScatteringSolver(Real en, Real k0, SolverMethod met, Real mass, Real hbar, size_t n,
         OptionsImpl const& opts);
 
     virtual void Compute() = 0;
@@ -62,11 +62,12 @@ inline Real ScatteringSolverImpl::GetMomentum() const {
 struct ScatteringSolver1DImpl : ScatteringSolverImpl {
 
     virtual void InitScatteringSolver1D(
-        std::function<Complex(Real)> const & v,
+        std::function<Complex(Real)> const& v,
         Real x0,
         Real x1,
         size_t n,
         Real en,
+        Real k0,
         Real direction,
         SolverMethod met,
         Real mass,
@@ -101,6 +102,7 @@ struct ScatteringSolver2DImpl : ScatteringSolverImpl {
         Real y1,
         size_t ny,
         Real en,
+        Real k0,
         Real directionx,
         Real directiony,
         SolverMethod met,
@@ -146,6 +148,7 @@ struct ScatteringSolver3DImpl : ScatteringSolverImpl {
         Real z1,
         size_t nz,
         Real en,
+        Real k0,
         Real directionx,
         Real directiony,
         Real directionz,

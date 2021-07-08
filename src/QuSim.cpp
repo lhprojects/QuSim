@@ -479,7 +479,7 @@ void QuScatteringInverseMatrix1D::init(std::function<Complex(Real)> const & v, R
 {
 
     fImpl = new ScatteringProblemSolverInverseMatrix1D();
-    static_cast<ScatteringProblemSolverInverseMatrix1D*>(fImpl)->InitScatteringSolver1D(v, x0, x1,
+    static_cast<ScatteringProblemSolverInverseMatrix1D*>(fImpl)->Initialize(v, x0, x1,
         n, en, direction, met, mass, hbar, *opts.fOpts);
 
 }
@@ -611,7 +611,7 @@ void QuScatteringInverseMatrix2D::init(std::function<Complex(Real, Real)> const 
     Real hbar, Options const & opts)
 {
     fImpl = new ScatteringProblemSolverInverseMatrix2D();
-    static_cast<ScatteringProblemSolverInverseMatrix2D*>(fImpl)->InitScatteringSolver2D(v, x0, x1,
+    static_cast<ScatteringProblemSolverInverseMatrix2D*>(fImpl)->Initialize(v, x0, x1,
         nx, y0, y1, ny,
         en, directionx, directiony, met, mass, hbar, *opts.fOpts);
 }
@@ -663,7 +663,7 @@ void QuScatteringInverseMatrix3D::init(std::function<Complex(Real, Real, Real)> 
     SolverMethod met, Real mass, Real hbar, Options const & opts)
 {
     fImpl = new ScatteringProblemSolverInverseMatrix3D();
-    static_cast<ScatteringProblemSolverInverseMatrix3D*>(fImpl)->InitScatteringSolver3D(v,
+    static_cast<ScatteringProblemSolverInverseMatrix3D*>(fImpl)->Initialize(v,
         x0, x1, nx,
         y0, y1, ny,
         z0, z1, nz,

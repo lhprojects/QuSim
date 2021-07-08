@@ -1,27 +1,28 @@
 #include "ScatteringSolverImpl.h"
 #include "Utils.h"
 #include "DeviceType.h"
-void ScatteringSolverImpl::InitScatteringSolver(Real en, SolverMethod met, Real mass, Real hbar, size_t n,
+void ScatteringSolverImpl::InitScatteringSolver(Real en,
+    Real p0,
+    SolverMethod met, Real mass, Real hbar, size_t n,
     OptionsImpl const& opts)
 {
-
-    const_cast<Real&>(fE) = en;
-    const_cast<SolverMethod&>(fMet) = met;
-    const_cast<Real&>(fMass) = mass;
-    const_cast<Real&>(fHbar) = hbar;
-    const_cast<OptionsImpl&>(fOpts) = opts;
+    mutable_cast(fE) = en;
+    mutable_cast(fK0) = p0 / hbar;
+    mutable_cast(fMet) = met;
+    mutable_cast(fMass) = mass;
+    mutable_cast(fHbar) = hbar;
     mutable_cast(fN) = n;
-    const_cast<Real&>(fK0) = sqrt(2 * fMass * fE) / fHbar;
+    mutable_cast(fOpts) = opts;
 
     mutable_cast(fDeviceType) = GetDeviceType(opts);
     mutable_cast(fDevice) = Device::Create(fDeviceType);
 }
 
 void ScatteringSolver1DImpl::InitScatteringSolver1D(std::function<Complex(Real)> const & v,
-    Real x0, Real x1, size_t n, Real en, Real direction,
+    Real x0, Real x1, size_t n, Real en, Real p0, Real direction,
     SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
 {
-    InitScatteringSolver(en, met, mass, hbar, n, opts);
+    InitScatteringSolver(en, p0, met, mass, hbar, n, opts);
 
     mutable_cast(fN) = n;
     const_cast<size_t&>(fNx) = n;
@@ -31,7 +32,6 @@ void ScatteringSolver1DImpl::InitScatteringSolver1D(std::function<Complex(Real)>
     if (direction < 0) direction = -1;
     else if (direction > 0) direction = 1;
     const_cast<Real&>(fDirection) = direction > 0 ? 1 : -1;
-    const_cast<Real&>(fK0) = sqrt(2 * fMass * fE) / fHbar;
 
     InitPotential();
     InitPsi();
@@ -79,11 +79,12 @@ void ScatteringSolver2DImpl::InitScatteringSolver2D(std::function<Complex(Real, 
     Real x0, Real x1, size_t nx,
     Real y0, Real y1, size_t ny,
     Real en,
+    Real k0,
     Real directionx,
     Real directiony,
     SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
 {
-    InitScatteringSolver(en, met, mass, hbar, nx * ny, opts);
+    InitScatteringSolver(en, k0, met, mass, hbar, nx * ny, opts);
 
     const_cast<size_t&>(fNx) = nx;
     const_cast<size_t&>(fNy) = ny;
@@ -216,10 +217,11 @@ Real ScatteringSolver2DImpl::ComputeTotalXSection(Int n)
 void ScatteringSolver3DImpl::InitScatteringSolver3D(std::function<Complex(Real, Real, Real)> const & v, Real x0, Real x1, size_t nx,
     Real y0, Real y1, size_t ny, Real z0, Real z1, size_t nz,
     Real en,
+    Real k0,
     Real directionx, Real directiony, Real directionz,
     SolverMethod met, Real mass, Real hbar, OptionsImpl const & opts)
 {
-    InitScatteringSolver(en, met, mass, hbar, nx*ny*nz, opts);
+    InitScatteringSolver(en, k0, met, mass, hbar, nx*ny*nz, opts);
 
     const_cast<size_t&>(fNx) = nx;
     const_cast<size_t&>(fNy) = ny;

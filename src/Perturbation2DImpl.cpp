@@ -7,10 +7,10 @@ void QuPerturbation2DImpl::InitPerturbation2D(std::function<Complex(Real, Real)>
     Real directionx, Real directiony, SolverMethod met,
     Real mass, Real hbar, OptionsImpl const & opts)
 {
+    auto const k0 = QuCalMomentum(en, mass);
     ScatteringSolver2DImpl::InitScatteringSolver2D(v, x0, x1, nx, y0, y1, ny,
-        en, directionx, directiony,
+        en, k0, directionx, directiony,
         met, mass, hbar, opts);
-
 
     fFourierTransformOptions.Init(opts, fDeviceType);
     fFFT.reset(FourierTransform2D::Create(fNx, fNy, false, fFourierTransformOptions.fLib));

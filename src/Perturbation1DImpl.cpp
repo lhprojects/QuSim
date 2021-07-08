@@ -9,7 +9,8 @@ void QuPerturbation1DImpl::InitPerturbation1D(std::function<Complex(Real)> const
     SolverMethod met, Real mass, Real hbar,
     OptionsImpl const & opts)
 {
-    InitScatteringSolver1D(v, x0, x1, n, en, direction, met, mass, hbar, opts);
+    auto const k0 = QuCalMomentum(en, mass);
+    InitScatteringSolver1D(v, x0, x1, n, en, k0, direction, met, mass, hbar, opts);
     fFourierTransformOptions.Init(opts, fDeviceType);
     fFFT.reset(FourierTransform1D::Create(fNx, false, fFourierTransformOptions.fLib));
     fInvFFT.reset(FourierTransform1D::Create(fNx, true, fFourierTransformOptions.fLib));

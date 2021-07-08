@@ -7,7 +7,7 @@
 
 struct ScatteringProblemSolverInverseMatrix3D : ScatteringSolver3DImpl, InverseMatrixMethodCommon {
 
-    void InitScatteringSolver3D(
+    void Initialize(
         std::function<Complex(Real, Real, Real)> const & v,
         Real x0,
         Real x1,
@@ -25,7 +25,7 @@ struct ScatteringProblemSolverInverseMatrix3D : ScatteringSolver3DImpl, InverseM
         SolverMethod met,
         Real mass,
         Real hbar,
-        OptionsImpl const &opts) override;
+        OptionsImpl const &opts);
 
 
     void Compute() override;

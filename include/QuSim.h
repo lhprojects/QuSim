@@ -15,6 +15,29 @@
 #endif
 
 
+using QuReal = double;
+using QuComplex = std::complex<QuReal>;
+
+using Real = double;
+using Complex = std::complex<Real>;
+using Real32 = float;
+using Complex32 = std::complex<Real32>;
+using Real64 = double;
+using Complex64 = std::complex<Real64>;
+
+using Int = int64_t;
+using UInt = uint64_t;
+
+inline constexpr QuComplex QuI = Complex(0, 1);
+inline constexpr QuReal QuPi = 3.141592653589793238462643383279502884197169399375;
+static constexpr Complex I = Complex(0, 1);
+static constexpr Real Pi = 3.141592653589793238462643383279502884197169399375;
+
+inline Real QuCalMomentum(Real en, Real mass)
+{
+	return sqrt(2 * en * mass);
+}
+
 inline size_t CalGlobalIdx(size_t ix, size_t nx)
 {
 	assert(ix < nx);
@@ -116,24 +139,6 @@ private:
 	size_t const fSize2;
 	size_t const fSize3;
 };
-
-using QuReal = double;
-using QuComplex = std::complex<QuReal>;
-
-using Real = double;
-using Complex = std::complex<Real>;
-using Real32 = float;
-using Complex32 = std::complex<Real32>;
-using Real64 = double;
-using Complex64 = std::complex<Real64>;
-
-using Int = int64_t;
-using UInt = uint64_t;
-
-inline constexpr QuComplex QuI = Complex(0, 1);
-inline constexpr QuReal QuPi = 3.141592653589793238462643383279502884197169399375;
-static constexpr Complex I = Complex(0, 1);
-static constexpr Real Pi = 3.141592653589793238462643383279502884197169399375;
 
 template<class R, class Op>
 void for_each_global_idx(R x0, R dx, size_t nx,

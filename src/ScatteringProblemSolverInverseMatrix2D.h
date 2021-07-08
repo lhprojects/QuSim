@@ -7,7 +7,7 @@
 struct ScatteringProblemSolverInverseMatrix2D : ScatteringSolver2DImpl, InverseMatrixMethodCommon {
 
 
-    void InitScatteringSolver2D(
+    void Initialize(
         std::function<Complex(Real, Real)> const & v,
         Real x0,
         Real x1,
@@ -21,7 +21,7 @@ struct ScatteringProblemSolverInverseMatrix2D : ScatteringSolver2DImpl, InverseM
         SolverMethod met,
         Real mass,
         Real hbar,
-        OptionsImpl const &opts) override;
+        OptionsImpl const &opts);
 
 
     void Compute() override;
