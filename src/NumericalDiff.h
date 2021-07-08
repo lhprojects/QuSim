@@ -41,7 +41,7 @@ struct NumericalDiffUtils {
 };
 
 template<class R>
-R CalKinEnergy(Complex const *psi, size_t nx, int order, R hbar, R mass, R dx, Device *dev)
+R CalKinEnergy(Complex const* psi, size_t nx, int order, R hbar, R mass, R dx, Device* dev)
 {
     // T = -hbar^2/2m nabla
     R const tx = hbar * hbar / (2 * mass) / (dx * dx);
@@ -54,23 +54,23 @@ R CalKinEnergy(Complex const *psi, size_t nx, int order, R hbar, R mass, R dx, D
     R kin = 0;
     for (size_t i = 0; i < nx; ++i) {
         if (order <= 2) {
-            auto psi_prime_x = NumericalDiffUtils<Real>::C1_2_L0Half() * psi[i] 
+            auto psi_prime_x = NumericalDiffUtils<Real>::C1_2_L0Half() * psi[i]
                 + NumericalDiffUtils<Real>::C1_2_R0Half() * psi[foldx(i + 1)];
             kin += Abs2(psi_prime_x) * tx;
         } else if (order <= 4) {
             auto psi_prime_x = NumericalDiffUtils<Real>::C1_4_L1Half() * psi[i]
                 + NumericalDiffUtils<Real>::C1_4_L0Half() * psi[foldx(i + 1)]
-            +NumericalDiffUtils<Real>::C1_4_R0Half() * psi[foldx(i + 2)]
-            +NumericalDiffUtils<Real>::C1_4_R1Half() * psi[foldx(i + 3)];
+                + NumericalDiffUtils<Real>::C1_4_R0Half() * psi[foldx(i + 2)]
+                + NumericalDiffUtils<Real>::C1_4_R1Half() * psi[foldx(i + 3)];
 
             kin += Abs2(psi_prime_x) * tx;
         } else if (order <= 6) {
             auto psi_prime_x = NumericalDiffUtils<Real>::C1_6_L2Half() * psi[i]
                 + NumericalDiffUtils<Real>::C1_6_L1Half() * psi[foldx(i + 1)]
-            +NumericalDiffUtils<Real>::C1_6_L0Half() * psi[foldx(i + 2)]
-            +NumericalDiffUtils<Real>::C1_6_R0Half() * psi[foldx(i + 3)]
-            +NumericalDiffUtils<Real>::C1_6_R1Half() * psi[foldx(i + 4)]
-            +NumericalDiffUtils<Real>::C1_6_R2Half() * psi[foldx(i + 5)];
+                + NumericalDiffUtils<Real>::C1_6_L0Half() * psi[foldx(i + 2)]
+                + NumericalDiffUtils<Real>::C1_6_R0Half() * psi[foldx(i + 3)]
+                + NumericalDiffUtils<Real>::C1_6_R1Half() * psi[foldx(i + 4)]
+                + NumericalDiffUtils<Real>::C1_6_R2Half() * psi[foldx(i + 5)];
 
             kin += Abs2(psi_prime_x) * tx;
         } else {
@@ -79,6 +79,84 @@ R CalKinEnergy(Complex const *psi, size_t nx, int order, R hbar, R mass, R dx, D
     }
 
     kin /= dev->Norm2(psi, nx);
+    return kin;
+}
+
+template<class R>
+R CalKinEnergy2D(Complex const* psi,
+    size_t nx, size_t ny,
+    int order, R hbar, R mass,
+    R dx, R dy,
+    Device* dev)
+{
+    // T = -hbar^2/2m nabla
+    R const tx = hbar * hbar / (2 * mass) / (dx * dx);
+    R const ty = hbar * hbar / (2 * mass) / (dy * dy);
+    auto foldx = [=](size_t i) -> size_t {
+        if ((ptrdiff_t)i < 0) i += nx;
+        else if (i >= nx) i -= nx;
+        return i;
+    };
+
+    auto foldy = [=](size_t i) -> size_t {
+        if ((ptrdiff_t)i < 0) i += ny;
+        else if (i >= ny) i -= ny;
+        return i;
+    };
+
+    auto global = [=](size_t x, size_t y)->size_t {
+        return CalGlobalIdx(foldx(x), foldy(y), nx, ny);
+    };
+
+    R kinx = 0;
+    R kiny = 0;
+    for (size_t i = 0; i < nx; ++i) {
+        for (size_t j = 0; j < ny; ++j) {
+            if (order <= 2) {
+                auto psi_prime_x = NumericalDiffUtils<Real>::C1_2_L0Half() * psi[global(i, j)]
+                    + NumericalDiffUtils<Real>::C1_2_R0Half() * psi[global(i + 1, j)];
+                auto psi_prime_y = NumericalDiffUtils<Real>::C1_2_L0Half() * psi[global(i, j)]
+                    + NumericalDiffUtils<Real>::C1_2_R0Half() * psi[global(i, j + 1)];
+                kinx += Abs2(psi_prime_x);
+                kiny += Abs2(psi_prime_y);
+            } else if (order <= 4) {
+                auto psi_prime_x = NumericalDiffUtils<Real>::C1_4_L1Half() * psi[global(i, j)]
+                    + NumericalDiffUtils<Real>::C1_4_L0Half() * psi[global(i + 1, j)]
+                    + NumericalDiffUtils<Real>::C1_4_R0Half() * psi[global(i + 2, j)]
+                    + NumericalDiffUtils<Real>::C1_4_R1Half() * psi[global(i + 3, j)];
+
+                auto psi_prime_y = NumericalDiffUtils<Real>::C1_4_L1Half() * psi[global(i, j)]
+                    + NumericalDiffUtils<Real>::C1_4_L0Half() * psi[global(i, j + 1)]
+                    + NumericalDiffUtils<Real>::C1_4_R0Half() * psi[global(i, j + 2)]
+                    + NumericalDiffUtils<Real>::C1_4_R1Half() * psi[global(i, j + 3)];
+
+                kinx += Abs2(psi_prime_x);
+                kiny += Abs2(psi_prime_y);
+            } else if (order <= 6) {
+                auto psi_prime_x = NumericalDiffUtils<Real>::C1_6_L2Half() * psi[global(i, j)]
+                    + NumericalDiffUtils<Real>::C1_6_L1Half() * psi[global(i + 1, j)]
+                    + NumericalDiffUtils<Real>::C1_6_L0Half() * psi[global(i + 2, j)]
+                    + NumericalDiffUtils<Real>::C1_6_R0Half() * psi[global(i + 3, j)]
+                    + NumericalDiffUtils<Real>::C1_6_R1Half() * psi[global(i + 4, j)]
+                    + NumericalDiffUtils<Real>::C1_6_R2Half() * psi[global(i + 5, j)];
+
+                auto psi_prime_y = NumericalDiffUtils<Real>::C1_6_L2Half() * psi[global(i, j)]
+                    + NumericalDiffUtils<Real>::C1_6_L1Half() * psi[global(i, j + 1)]
+                    + NumericalDiffUtils<Real>::C1_6_L0Half() * psi[global(i, j + 2)]
+                    + NumericalDiffUtils<Real>::C1_6_R0Half() * psi[global(i, j + 3)]
+                    + NumericalDiffUtils<Real>::C1_6_R1Half() * psi[global(i, j + 4)]
+                    + NumericalDiffUtils<Real>::C1_6_R2Half() * psi[global(i, j + 5)];
+
+                kinx += Abs2(psi_prime_x);
+                kiny += Abs2(psi_prime_y);
+            } else {
+                throw std::runtime_error("too higher order");
+            }
+        }
+    }
+
+    Real kin = kinx * tx + kiny * ty;
+    kin /= dev->Norm2(psi, nx * ny);
     return kin;
 }
 
@@ -167,7 +245,7 @@ void FillElems2D(std::vector<Eigen::Triplet<Complex> >& elems,
     };
 
     auto global = [=](size_t x, size_t y)->size_t {
-        return foldy(y) + foldx(x) * ny;
+        return CalGlobalIdx(foldx(x), foldy(y), nx, ny);
     };
 
 

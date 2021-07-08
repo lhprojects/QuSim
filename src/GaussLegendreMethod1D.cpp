@@ -30,7 +30,7 @@ void GaussLegendreMethod1D::InitSystem1D(std::function<Complex(Real)> const &psi
 
 void GaussLegendreMethod1D::UpdatePsi()
 {
-    fGaussLegendreMethod.UpdatePsi(fPsi);
+    fGaussLegendreMethod.UpdatePsi(fPsi, fSolverMethod);
     fStep += 1;
 }
 

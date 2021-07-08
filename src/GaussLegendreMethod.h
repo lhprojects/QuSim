@@ -9,9 +9,15 @@ struct QuGaussLegendreMethod
 private:
     Eigen::VectorXcd fTmpPsi;
     Eigen::SparseMatrix<Complex> fh; // h = H * dt /hbar
-    Eigen::SparseMatrix<Complex> fd;
-    Eigen::SparseMatrix<Complex> fn;
-    Eigen::SparseLU<Eigen::SparseMatrix<Complex> > fdLU;
+    Eigen::SparseMatrix<Complex> fd1;
+    Eigen::SparseMatrix<Complex> fd2;
+    Eigen::SparseMatrix<Complex> fd3;
+    Eigen::SparseMatrix<Complex> fn1;
+    Eigen::SparseMatrix<Complex> fn2;
+    Eigen::SparseMatrix<Complex> fn3;
+    Eigen::SparseLU<Eigen::SparseMatrix<Complex> > fdLU1;
+    Eigen::SparseLU<Eigen::SparseMatrix<Complex> > fdLU2;
+    Eigen::SparseLU<Eigen::SparseMatrix<Complex> > fdLU3;
     size_t const fN = 0;
 public:
 
@@ -22,7 +28,7 @@ public:
 
     void ComputeLU(SolverMethod solver_method);
 
-    void UpdatePsi(Complex* psi);
+    void UpdatePsi(Complex* psi, SolverMethod solver_method);
 
 };
 

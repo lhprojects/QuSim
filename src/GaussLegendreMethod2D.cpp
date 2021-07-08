@@ -34,12 +34,12 @@ void GaussLegendreMethod2D::InitSystem2D(std::function<Complex(Real, Real)> cons
 
 void GaussLegendreMethod2D::UpdatePsi()
 {	
-    fGaussLegendreMethod.UpdatePsi(fPsi);
+    fGaussLegendreMethod.UpdatePsi(fPsi, fSolverMethod);
     fStep += 1;
 }
 
 Real GaussLegendreMethod2D::CalKinEn() const
 {
-    return Real();
+    return CalKinEnergy2D(fPsi, fNx, fNy, fSpaceOrder, fHbar, fMass, fDx, fDy, fDevice.get());
 }
 
