@@ -219,8 +219,18 @@ void benchmark_loop()
             in[idx] *= exp(Tr::OneORI() * (alpha1 * Sqr(1. * i) + alpha2 * Sqr(1. * j)));
         }
         });
-    timeit(Tr::title(" transform_red  mul"), [in, alpha1 = alpha1, alpha2 = alpha2]() {
-        dont_optimize_out = std::transform_reduce(std::execution::par, in, in + nx * ny, int_iter<size_t>(0), double(0),
+
+    timeit(Tr::title("transform       mul"), [in]() {
+        std::transform(std::execution::seq,
+            int_iter<size_t>(0), int_iter<size_t>(nx * ny), in,
+            [in](size_t idx) {
+                size_t i = idx / ny;
+                size_t j = idx % ny;
+                return (1. * i + 1. * j);
+            });
+        });
+    timeit(Tr::title("transform_reduc mul"), [in, alpha1 = alpha1, alpha2 = alpha2]() {
+        dont_optimize_out = std::transform_reduce(std::execution::seq, in, in + nx * ny, int_iter<size_t>(0), double(0),
             op_Add(),
             [alpha1, alpha2](S s, size_t idx) {
                 size_t i = idx / ny;
@@ -228,8 +238,8 @@ void benchmark_loop()
                 return Abs2(s) * (alpha1 * Sqr(1. * i) + alpha2 * Sqr(1. * j));
             });
         });
-    timeit(Tr::title(" transform      exp"), [in, alpha1 = alpha1, alpha2 = alpha2]() {
-        std::transform(std::execution::par, in, in + nx * ny, int_iter<size_t>(0), in,
+    timeit(Tr::title("transform       exp"), [in, alpha1 = alpha1, alpha2 = alpha2]() {
+        std::transform(std::execution::seq, in, in + nx * ny, int_iter<size_t>(0), in,
             [alpha1, alpha2](S s, size_t idx) {
                 size_t i = idx / ny;
                 size_t j = idx % ny;
@@ -574,13 +584,15 @@ void benchmark_fouier_3d()
 
 int main()
 {
+    benchmark_loop<double>();
+    benchmark_loop<std::complex<double> >();
 
-    benchmark_transform_std_complex_mul();
     benchmark_transform_Dot();
     benchmark_transform_Exp();
     benchmark_transform_fill();
-    benchmark_loop<double>();
-    benchmark_loop<std::complex<double> >();
+
+
+    benchmark_transform_std_complex_mul();
     benchmark_for_each_big();
 
     benchmark_fouier_2d();
